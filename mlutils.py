@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from sklearn.model_selection import train_test_split
 
-def plot_history(history, figsize=(10, 6)):
+
+def plot_model_history(history, figsize=(10, 6)):
     plt.figure(figsize=figsize)
 
     # Plot the traiing loss and accuracy
@@ -38,7 +40,7 @@ def plot_history(history, figsize=(10, 6)):
     plt.show()
 
 
-def plot_xy_and_label(X, y):
+def plot_xy_data_with_label(X, y):
     """
     X       = is an array containing vectors of x/y coordinates.
     y       = are the associated labels (0=blue, 1=red)
@@ -54,7 +56,7 @@ def plot_xy_and_label(X, y):
     plt.show()
 
 
-def normalize_xy_negative(X):
+def normalize_xy_data(X):
     """
     :param X: the vector containing values from -X to +X which need to be normalized between 0 and 1
     :return: the normalized vector.
@@ -104,7 +106,7 @@ def plot_decision_boundary(model, X, y):
     plt.ylim(yy.min(), yy.max())
 
 
-def find_lr_range(learning_rate, epochs):
+def find_learning_rate_range(learning_rate, epochs):
     """
     Arguments:
       learning_rate =            starting learning rate
@@ -123,3 +125,15 @@ def find_lr_range(learning_rate, epochs):
         max_lr = learning_rate * 10 ** (epochs / division)
         division -= 1
     return (min_lr, max_lr, division)
+
+
+def split_train_test_data(*arrays,
+    test_size=None,
+    train_size=None,
+    random_state=None,
+    shuffle=True):
+    return train_test_split(arrays,
+                     test_size=test_size,
+                     train_size=train_size,
+                     random_state=random_state,
+                     shuffle=shuffle)

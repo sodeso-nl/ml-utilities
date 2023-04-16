@@ -128,8 +128,8 @@ def find_learning_rate_range(learning_rate, epochs):
 
 
 def split_train_test_data(*arrays,
-    test_size=None,
-    train_size=None,
+    test_size=.2,
+    train_size=.8,
     random_state=None,
     shuffle=True):
     return train_test_split(arrays,

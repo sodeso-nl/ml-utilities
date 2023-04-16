@@ -138,7 +138,7 @@ def split_train_test_data(*arrays,
     X_train, X_test, y_train, y_test =
         split_train_test_data(X, y)
     """
-    return train_test_split(arrays,
+    return train_test_split(*arrays,
                      test_size=test_size,
                      train_size=train_size,
                      random_state=random_state,

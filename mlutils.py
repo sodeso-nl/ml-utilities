@@ -5,6 +5,13 @@ from sklearn.model_selection import train_test_split
 
 
 def plot_model_history(history, figsize=(10, 6)):
+    """
+    Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
+
+    :param history: the history object returned from fitting a model.
+    :param figsize: figure size (default: (10, 6))
+    :return: two graphs, one for loss and one for accuracy
+    """
     plt.figure(figsize=figsize)
 
     # Plot the traiing loss and accuracy
@@ -42,8 +49,10 @@ def plot_model_history(history, figsize=(10, 6)):
 
 def plot_xy_data_with_label(X, y):
     """
-    X       = is an array containing vectors of x/y coordinates.
-    y       = are the associated labels (0=blue, 1=red)
+    Plots a graph of the values of X.
+
+    :param X: is an array containing vectors of x/y coordinates.
+    :param y: are the associated labels (0=blue, 1=red)
     """
     plt.plot(X[:, 0][y == 1], X[:, 1][y == 1], "bs")
     plt.plot(X[:, 0][y == 0], X[:, 1][y == 0], "r^")
@@ -58,6 +67,9 @@ def plot_xy_data_with_label(X, y):
 
 def normalize_xy_data(X):
     """
+    Normalizes an array containing vectors of x/y coordinates so that the array does not contain
+    negative values.
+
     :param X: the vector containing values from -X to +X which need to be normalized between 0 and 1
     :return: the normalized vector.
     """
@@ -69,13 +81,14 @@ def normalize_xy_data(X):
 
 def plot_decision_boundary(model, X, y):
     """
-    model =      The sequence model.
-    X     =      Array containing vectors with x/y coordinates
-    y     =      Are the associated labels (0=blue, 1=red)
-
     Plots the decision boundary created by a model predicting on X.
+
     Inspired by the following two websites:
     https://cs231n.github.io/neural-networks-case-study
+
+    :param model: the sequence model.
+    :param X: array containing vectors with x/y coordinates
+    :param y: are the associated labels (0=blue, 1=red)
     """
     # Define the axis boundaries of the plot and create a meshgrid.
     x_min, x_max = X[:, 0].min() - 0.1, X[:, 0].max() + 0.1
@@ -106,16 +119,19 @@ def plot_decision_boundary(model, X, y):
     plt.ylim(yy.min(), yy.max())
 
 
-def find_learning_rate_range(learning_rate, epochs):
+def find_learning_rate_division(learning_rate, epochs):
     """
-    Arguments:
-      learning_rate =            starting learning rate
-      epochs        =            number of epochs to train for
+    Finds the optimal division which can be used in a learning rate scheduler.
 
-    Returns:
-      Minimum learning rate
-      Maximum learning rate
-      Division to use in the LearningRateScheduler (lambda epoch: learning_rate * 10 ** (epoch / division))
+    epochs = 50
+    initial_lr = 0.001
+
+    division = find_learning_rate_division(initial_lr, epochs)
+    lr_scheduler = LearningRateScheduler(lambda epoch: initial_lr * 10 ** (epoch / division))
+
+    :param learning_rate: initial learning rate
+    :param epochs: number of epochs that the model will train for
+    :return: the minimum learning rate, maximum learning rate and the division which can be used in the scheduler.
     """
     min_lr = 0.
     max_lr = 0.

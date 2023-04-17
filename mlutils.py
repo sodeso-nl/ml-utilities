@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 from sklearn.model_selection import train_test_split
 
@@ -144,10 +145,10 @@ def find_learning_rate_division(learning_rate, epochs):
 
 
 def split_train_test_data(*arrays,
-    test_size=.2,
-    train_size=.8,
-    random_state=42,
-    shuffle=True):
+                          test_size=.2,
+                          train_size=.8,
+                          random_state=42,
+                          shuffle=True):
     """
     Usage:
 
@@ -155,7 +156,38 @@ def split_train_test_data(*arrays,
         split_train_test_data(X, y)
     """
     return train_test_split(*arrays,
-                     test_size=test_size,
-                     train_size=train_size,
-                     random_state=random_state,
-                     shuffle=shuffle)
+                            test_size=test_size,
+                            train_size=train_size,
+                            random_state=random_state,
+                            shuffle=shuffle)
+
+
+def show_images_from_nparray_or_tensor(X, y, class_labels=None, indexes=None, size=4, cmap='gray'):
+    """
+    Shows images stored in a tensor / numpy array. The array should be a vector of images.
+
+    :param X: is an array containing vectors of images.
+    :param y: are the associated labels
+    :param indexes: None to pick random, otherwise an array of indexes to display
+    :param size: is the number of images to display
+    :param cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
+    """
+
+    plt.figure(figsize=(size * 4, size * 2))
+    for i in range(size):
+        ax = plt.subplot(2, size, i + 1)
+        ax.axis('off')
+
+        if indexes is None:
+            rand_index = random.choice(range(len(X)))
+        else:
+            rand_index = indexes[i]
+
+        plt.imshow(X[rand_index], cmap=cmap)
+
+        if class_labels is None:
+            plt.title(y[rand_index])
+        else:
+            plt.title(class_labels[y[rand_index]])
+
+        plt.axis = (False)

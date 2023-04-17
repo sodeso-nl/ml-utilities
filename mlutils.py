@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+import itertools
 
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
 
 
 def plot_model_history(history, figsize=(10, 6)):
@@ -191,3 +193,63 @@ def show_images_from_nparray_or_tensor(X, y, class_labels=None, indexes=None, si
             plt.title(class_labels[y[rand_index]])
 
         plt.axis = (False)
+
+
+def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_size=15):
+    """
+      y_true    =      The actual result
+      y_pred    =      The predicted result
+      classes   =      The classes in case of a multi-class validation
+      figsize   =      Size of the graph
+      text_size =      Font-size
+      Plots the decision boundary created by a model predicting on X.
+      Inspired by the following two websites:
+      https://cs231n.github.io/neural-networks-case-study
+    """
+
+    # For the situation where y_pred is a multi-class non one-hot-encoded value:
+    # y_pred = [[0.9, 0.6], [0.2, 0.7]]
+    # and y_true contains the indices of which class it is.
+    # y_true = [9, 2, 1, 1, 6]
+    if y_pred.ndim == 2 and isinstance(y_pred[0][0], np.floating) and y_true.ndim == 1 and isinstance(y_true[0],
+                                                                                                      np.integer):
+        y_pred = tf.argmax(y_pred, axis=1)
+
+    # Create the confusion matrix
+    cm = confusion_matrix(y_true, y_pred)
+    cm_norm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]  # normalize our confusion matrix
+    n_classes = cm.shape[0]
+    # Let's prettify it
+    fig, ax = plt.subplots(figsize=figsize)
+    # Create a matrix plot
+    cax = ax.matshow(cm, cmap=plt.cm.Blues)
+    fig.colorbar(cax)
+    # Set labels to be classes
+    if classes:
+        labels = classes
+    else:
+        labels = np.arange(cm.shape[0])
+    # label the axes
+    ax.set(title="Confusion matrix",
+           xlabel="predicted label",
+           ylabel="True label",
+           xticks=np.arange(n_classes),
+           yticks=np.arange(n_classes),
+           xticklabels=labels,
+           yticklabels=labels)
+
+    # Set x-axis labels to bottom
+    ax.xaxis.set_label_position("bottom")
+    ax.xaxis.tick_bottom()
+    # Adjust label size
+    ax.yaxis.label.set_size(text_size);
+    ax.xaxis.label.set_size(text_size);
+    ax.title.set_size(text_size);
+    # Set treshold for different colors
+    threshold = (cm.max() + cm.min()) / 2.
+    # Plot the text on each cell
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, f"{cm[i, j]}, ({cm_norm[i, j] * 100:.1f}%)",
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > threshold else "black",
+                 size=text_size)

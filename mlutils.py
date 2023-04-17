@@ -213,7 +213,7 @@ def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_s
     # y_true = [9, 2, 1, 1, 6]
     if y_pred.ndim == 2 and isinstance(y_pred[0][0], np.floating) and y_true.ndim == 1 and isinstance(y_true[0],
                                                                                                       np.integer):
-        y_pred = tf.argmax(y_pred, axis=1)
+        y_pred = np.argmax(y_pred, axis=1)
 
     # Create the confusion matrix
     cm = confusion_matrix(y_true, y_pred)

@@ -207,13 +207,17 @@ def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_s
       https://cs231n.github.io/neural-networks-case-study
     """
 
-    # For the situation where y_pred is a multi-class non one-hot-encoded value:
+    # When the model is a multi-class classification:
     # y_pred = [[0.9, 0.6], [0.2, 0.7]]
-    # and y_true contains the indices of which class it is.
     # y_true = [9, 2, 1, 1, 6]
-    if y_pred.ndim == 2 and isinstance(y_pred[0][0], np.floating) and y_true.ndim == 1 and isinstance(y_true[0],
-                                                                                                      np.integer):
+    if len(y_pred[0]) > 1 and isinstance(y_pred[0][0], np.floating) and isinstance(y_true[0], np.integer):
         y_pred = np.argmax(y_pred, axis=1)
+
+    # When the model is a binary classification model:
+    # y_pred = [[0.9, 0.6], [0.2, 0.7]]
+    # y_true = [9, 2, 1, 1, 6]
+    elif len(y_pred[0]) == 1 and isinstance(y_pred[0][0], np.floating) and isinstance(y_true[0], np.integer):
+        y_pred = np.round(y_pred)
 
     # Create the confusion matrix
     cm = confusion_matrix(y_true, y_pred)

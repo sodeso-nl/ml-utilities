@@ -214,12 +214,16 @@ def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_s
       https://cs231n.github.io/neural-networks-case-study
     """
 
-    # When the model is a multi-class classification:
-    if len(y_pred[0]) > 1 and isinstance(y_pred[0][0], np.floating) and isinstance(y_true[0], np.integer):
+    # If the labels are on-hot encoded then change them to be integer encoded labels.
+    if y_true.ndim == 2:
+        y_true = np.argmax(y_true, axis=1) # convert back to integer encoded labels
+
+    # When the prediction is a multi-class classification:
+    if len(y_pred[0]) > 1 and isinstance(y_pred[0][0], np.floating):
         y_pred = np.argmax(y_pred, axis=1)
 
-    # When the model is a binary classification model:
-    elif len(y_pred[0]) == 1 and isinstance(y_pred[0][0], np.floating) and isinstance(y_true[0], np.integer):
+    # When the prediction is a binary classification model:
+    elif len(y_pred[0]) == 1 and isinstance(y_pred[0][0], np.floating):
         y_pred = np.round(y_pred)
 
     # Create the confusion matrix

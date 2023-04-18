@@ -164,20 +164,20 @@ def split_train_test_data(*arrays,
                             shuffle=shuffle)
 
 
-def show_images_from_nparray_or_tensor(X, y, class_labels=None, indexes=None, size=4, cmap='gray'):
+def show_images_from_nparray_or_tensor(X, y, class_labels=None, indexes=None, shape=(4, 6), cmap='gray'):
     """
     Shows images stored in a tensor / numpy array. The array should be a vector of images.
 
     :param X: is an array containing vectors of images.
     :param y: are the associated labels
-    :param indexes: None to pick random, otherwise an array of indexes to display
-    :param size: is the number of images to display
+    :param indexes: None (default) to pick random, otherwise an array of indexes to display
+    :param shape: is the number of images to display
     :param cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
     """
 
-    plt.figure(figsize=(size * 4, size * 2))
-    for i in range(size):
-        ax = plt.subplot(2, size, i + 1)
+    plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
+    for i in range(shape[0] * shape[1]):
+        ax = plt.subplot(shape[0], shape[1], i + 1)
         ax.axis('off')
 
         if indexes is None:

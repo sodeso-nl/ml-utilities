@@ -189,15 +189,15 @@ def show_images_from_nparray_or_tensor(X, y, class_labels=None, indexes=None, si
 
         if y.ndim == 2:
             # On-hot encoded labels
-            y_index = np.argmax(y[rand_index], axis=0) # convert back to integer encoded labels
+            class_index = np.argmax(y[rand_index], axis=0) # convert back to integer encoded labels
         else:
             # Integer encoded labels
-            y_index = y[rand_index]
+            class_index = y[rand_index]
 
         if class_labels is None:
-            plt.title(y[y_index])
+            plt.title(class_index)
         else:
-            plt.title(class_labels[y[y_index]])
+            plt.title(class_labels[class_index])
 
         plt.axis = (False)
 

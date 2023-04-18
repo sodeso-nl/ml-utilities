@@ -170,12 +170,14 @@ def show_images_from_nparray_or_tensor(X, y, class_labels=None, indexes=None, sh
 
     :param X: is an array containing vectors of images.
     :param y: are the associated labels
-    :param indexes: None (default) to pick random, otherwise an array of indexes to display
+    :param class_labels: the labels of the classes
+    :param indexes: None to pick random, otherwise an array of indexes to display
     :param shape: is the number of images to display
     :param cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
     """
 
-    plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
+    fig = plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
+    fig.patch.set_facecolor('gray')
     for i in range(shape[0] * shape[1]):
         ax = plt.subplot(shape[0], shape[1], i + 1)
         ax.axis('off')
@@ -189,17 +191,15 @@ def show_images_from_nparray_or_tensor(X, y, class_labels=None, indexes=None, sh
 
         if y.ndim == 2:
             # On-hot encoded labels
-            class_index = np.argmax(y[rand_index], axis=0) # convert back to integer encoded labels
+            class_index = np.argmax(y[rand_index], axis=0)  # convert back to integer encoded labels
         else:
             # Integer encoded labels
             class_index = y[rand_index]
 
         if class_labels is None:
-            plt.title(class_index)
+            plt.title(class_index, color='white')
         else:
-            plt.title(class_labels[class_index])
-
-        plt.axis = (False)
+            plt.title("{name}: {idx}".format(name=class_labels[class_index], idx=class_index), color='white')
 
 
 def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_size=15):
@@ -216,7 +216,7 @@ def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_s
 
     # If the labels are on-hot encoded then change them to be integer encoded labels.
     if y_true.ndim == 2:
-        y_true = np.argmax(y_true, axis=1) # convert back to integer encoded labels
+        y_true = np.argmax(y_true, axis=1)  # convert back to integer encoded labels
 
     # When the prediction is a multi-class classification:
     if len(y_pred[0]) > 1 and isinstance(y_pred[0][0], np.floating):

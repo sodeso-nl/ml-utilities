@@ -187,10 +187,17 @@ def show_images_from_nparray_or_tensor(X, y, class_labels=None, indexes=None, si
 
         plt.imshow(X[rand_index], cmap=cmap)
 
-        if class_labels is None:
-            plt.title(y[rand_index])
+        if y.ndim == 2:
+            # On-hot encoded labels
+            y_index = np.argmax(y[rand_index], axis=0) # convert back to integer encoded labels
         else:
-            plt.title(class_labels[y[rand_index]])
+            # Integer encoded labels
+            y_index = y[rand_index]
+
+        if class_labels is None:
+            plt.title(y[y_index])
+        else:
+            plt.title(class_labels[y[y_index]])
 
         plt.axis = (False)
 
@@ -208,14 +215,10 @@ def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_s
     """
 
     # When the model is a multi-class classification:
-    # y_pred = [[0.9, 0.6], [0.2, 0.7]]
-    # y_true = [9, 2, 1, 1, 6]
     if len(y_pred[0]) > 1 and isinstance(y_pred[0][0], np.floating) and isinstance(y_true[0], np.integer):
         y_pred = np.argmax(y_pred, axis=1)
 
     # When the model is a binary classification model:
-    # y_pred = [[0.9, 0.6], [0.2, 0.7]]
-    # y_true = [9, 2, 1, 1, 6]
     elif len(y_pred[0]) == 1 and isinstance(y_pred[0][0], np.floating) and isinstance(y_true[0], np.integer):
         y_pred = np.round(y_pred)
 

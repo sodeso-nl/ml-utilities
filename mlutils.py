@@ -33,24 +33,42 @@ def plot_model_history(history, figsize=(10, 6)):
     plt.xlabel('Epoch', size=14)
     plt.legend()
 
-    # Start a new figure
-    plt.figure(figsize=figsize, facecolor='#FFFFFF')
+    if 'accuracy' in history.history:
+        # Start a new figure
+        plt.figure(figsize=figsize, facecolor='#FFFFFF')
 
-    # Plot the validation loss and accuracy
-    plt.plot(history.history['accuracy'], label='Training accuracy', color='#0000FF', linewidth=1.5)
-    if 'val_accuracy' in history.history:
-        plt.plot(history.history['val_accuracy'], label='Validation accuracy', color='#00FF00', linewidth=1.5)
+        # Plot the validation loss and accuracy
+        plt.plot(history.history['accuracy'], label='Training accuracy', color='#0000FF', linewidth=1.5)
+        if 'val_accuracy' in history.history:
+            plt.plot(history.history['val_accuracy'], label='Validation accuracy', color='#00FF00', linewidth=1.5)
 
-    # Plot the learning rate
-    if 'lr' in history.history:
-        plt.plot(history.history['lr'], label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
-    plt.title('Accuracy', size=20)
-    plt.xticks(history.epoch)
-    plt.xlabel('Epoch', size=14)
-    plt.legend()
+        # Plot the learning rate
+        if 'lr' in history.history:
+            plt.plot(history.history['lr'], label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
+
+        plt.title('Accuracy', size=20)
+        plt.xticks(history.epoch)
+        plt.xlabel('Epoch', size=14)
+        plt.legend()
+
+    if 'mae' in history.history:
+        # Start a new figure
+        plt.figure(figsize=figsize, facecolor='#FFFFFF')
+        plt.plot(history.history['mae'], label='Training mae', color='#0000FF', linewidth=1.5)
+
+        if 'val_mae' in history.history:
+            plt.plot(history.history['val_mae'], label='Validation mae', color='#00FF00', linewidth=1.5)
+
+        # Plot the learning rate
+        if 'lr' in history.history:
+            plt.plot(history.history['lr'], label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
+
+        plt.title('Mean Absolute Accuracy', size=20)
+        plt.xticks(history.epoch)
+        plt.xlabel('Epoch', size=14)
+        plt.legend()
 
     plt.show()
-
 
 def plot_xy_data_with_label(X, y):
     """

@@ -6,6 +6,8 @@ import itertools
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
+from tensorflow.keras.callbacks import LearningRateScheduler
+
 
 def plot_model_history(history, figsize=(10, 6)):
     """
@@ -159,9 +161,9 @@ def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(15, 15), text_s
     ax.xaxis.set_label_position("bottom")
     ax.xaxis.tick_bottom()
     # Adjust label size
-    ax.yaxis.label.set_size(text_size);
-    ax.xaxis.label.set_size(text_size);
-    ax.title.set_size(text_size);
+    ax.yaxis.label.set_size(text_size)
+    ax.xaxis.label.set_size(text_size)
+    ax.title.set_size(text_size)
     # Set treshold for different colors
     threshold = (cm.max() + cm.min()) / 2.
     # Plot the text on each cell
@@ -170,6 +172,31 @@ def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(15, 15), text_s
                  horizontalalignment="center",
                  color="white" if cm[i, j] > threshold else "black",
                  size=text_size)
+
+
+def plot_histogram_from_dataframe(x, columns):
+    """
+    Plots a histogram for each of the specified columns in the DataFrame X.
+
+    :param X: a dataframe
+    :param columns: columns which exist within the DataFrame.
+    """
+    for c in columns:
+        x.hist(c)
+
+
+def cb_learning_rate_scheduler(learning_rate_start=0.001, epochs=50):
+    """
+    Creates a LearningRateScheduler which will be pre-configured with a division. The division
+    is calculated using find_learning_rate_division.
+
+    :param learning_rate_start: initial starting learning rate
+    :param epochs: number of epochs the model will train for
+    :return: the pre-configured LearningRateScheduler
+    """
+    min, max, division = find_learning_rate_division(learning_rate=learning_rate_start, epochs=epochs)
+    print(f"Min learning rate: {min}\nMax learning rate: {max}\nDivision: {division}")
+    return LearningRateScheduler(lambda epoch: learning_rate_start * 10 ** (epoch/division))
 
 
 def normalize_xy_data(X):

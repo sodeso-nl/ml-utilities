@@ -68,20 +68,6 @@ def plot_xy_data_with_label(X, y):
     plt.show()
 
 
-def normalize_xy_data(X):
-    """
-    Normalizes an array containing vectors of x/y coordinates so that the array does not contain
-    negative values.
-
-    :param X: the vector containing values from -X to +X which need to be normalized between 0 and 1
-    :return: the normalized vector.
-    """
-    X = X + (np.abs(np.min(X[:, 0])))
-    X = X / np.max(X[:, 0])
-    X = X + (np.abs(np.min(X[:, 1])))
-    return X / np.max(X[:, 1])
-
-
 def plot_decision_boundary(model, X, y):
     """
     Plots the decision boundary created by a model predicting on X.
@@ -122,87 +108,7 @@ def plot_decision_boundary(model, X, y):
     plt.ylim(yy.min(), yy.max())
 
 
-def find_learning_rate_division(learning_rate, epochs):
-    """
-    Finds the optimal division which can be used in a learning rate scheduler.
-
-    epochs = 50
-    initial_lr = 0.001
-
-    division = find_learning_rate_division(initial_lr, epochs)
-    lr_scheduler = LearningRateScheduler(lambda epoch: initial_lr * 10 ** (epoch / division))
-
-    :param learning_rate: initial learning rate
-    :param epochs: number of epochs that the model will train for
-    :return: the minimum learning rate, maximum learning rate and the division which can be used in the scheduler.
-    """
-    min_lr = 0.
-    max_lr = 0.
-    division = 1000
-    while max_lr < 0.1:
-        min_lr = learning_rate * 10 ** (1 / division)
-        max_lr = learning_rate * 10 ** (epochs / division)
-        division -= 1
-    return (min_lr, max_lr, division)
-
-
-def split_train_test_data(*arrays,
-                          test_size=.2,
-                          train_size=.8,
-                          random_state=42,
-                          shuffle=True):
-    """
-    Usage:
-
-    X_train, X_test, y_train, y_test =
-        split_train_test_data(X, y)
-    """
-    return train_test_split(*arrays,
-                            test_size=test_size,
-                            train_size=train_size,
-                            random_state=random_state,
-                            shuffle=shuffle)
-
-
-def show_images_from_nparray_or_tensor(X, y, class_labels=None, indexes=None, shape=(4, 6), cmap='gray'):
-    """
-    Shows images stored in a tensor / numpy array. The array should be a vector of images.
-
-    :param X: is an array containing vectors of images.
-    :param y: are the associated labels
-    :param class_labels: the labels of the classes
-    :param indexes: None to pick random, otherwise an array of indexes to display
-    :param shape: is the number of images to display
-    :param cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
-    """
-
-    fig = plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
-    fig.patch.set_facecolor('gray')
-    for i in range(shape[0] * shape[1]):
-        ax = plt.subplot(shape[0], shape[1], i + 1)
-        ax.axis('off')
-
-        if indexes is None:
-            rand_index = random.choice(range(len(X)))
-        else:
-            rand_index = indexes[i]
-
-        plt.imshow(X[rand_index], cmap=cmap)
-
-        if y.ndim == 2:
-            # On-hot encoded labels
-            class_index = np.argmax(y[rand_index], axis=0)  # convert back to integer encoded labels
-        else:
-            # Integer encoded labels
-            class_index = y[rand_index]
-
-        if class_labels is None:
-            plt.title(class_index, color='white')
-        else:
-            plt.title("{name}: {idx}".format(name=class_labels[class_index], idx=class_index), color='white')
-
-
-def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_size=15):
+def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(15, 15), text_size=10):
     """
       y_true    =      The actual result
       y_pred    =      The predicted result
@@ -264,3 +170,102 @@ def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_s
                  horizontalalignment="center",
                  color="white" if cm[i, j] > threshold else "black",
                  size=text_size)
+
+
+def normalize_xy_data(X):
+    """
+    Normalizes an array containing vectors of x/y coordinates so that the array does not contain
+    negative values.
+
+    :param X: the vector containing values from -X to +X which need to be normalized between 0 and 1
+    :return: the normalized vector.
+    """
+    X = X + (np.abs(np.min(X[:, 0])))
+    X = X / np.max(X[:, 0])
+    X = X + (np.abs(np.min(X[:, 1])))
+    return X / np.max(X[:, 1])
+
+
+
+def find_learning_rate_division(learning_rate, epochs):
+    """
+    Finds the optimal division which can be used in a learning rate scheduler.
+
+    epochs = 50
+    initial_lr = 0.001
+
+    division = find_learning_rate_division(initial_lr, epochs)
+    lr_scheduler = LearningRateScheduler(lambda epoch: initial_lr * 10 ** (epoch / division))
+
+    :param learning_rate: initial learning rate
+    :param epochs: number of epochs that the model will train for
+    :return: the minimum learning rate, maximum learning rate and the division which can be used in the scheduler.
+    """
+    min_lr = 0.
+    max_lr = 0.
+    division = 1000
+    while max_lr < 0.1:
+        min_lr = learning_rate * 10 ** (1 / division)
+        max_lr = learning_rate * 10 ** (epochs / division)
+        division -= 1
+    return (min_lr, max_lr, division)
+
+
+def split_train_test_data(*arrays, test_size=.2, train_size=.8, random_state=42, shuffle=True):
+    """
+    Usage:
+
+    X_train, X_test, y_train, y_test =
+        split_train_test_data(X, y)
+    """
+    return train_test_split(*arrays,
+                            test_size=test_size,
+                            train_size=train_size,
+                            random_state=random_state,
+                            shuffle=shuffle)
+
+
+def show_images_from_nparray_or_tensor(X, y, class_labels=None, indices=None, shape=(4, 6), cmap='gray'):
+    """
+    Shows images stored in a tensor / numpy array. The array should be a vector of images.
+
+    :param X: is an array containing vectors of images.
+    :param y: are the associated labels
+    :param class_labels: the labels of the classes
+    :param indices: None to pick random, otherwise an array of indexes to display
+    :param shape: is the number of images to display
+    :param cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
+    """
+
+    if indices:
+        assert shape[0] * shape[1] <= len(indices), f"Size of shape ({shape[0]}, {shape[1]}), with a total of {shape[0] * shape[1]} images, is larger then number of indices supplied ({len(indices)})."
+        for i in indices:
+            if i > len(X):
+                assert False, f"Values of indices point to an index ({i}) which is out of bounds of X (length: {len(X)})"
+
+    fig = plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
+    fig.patch.set_facecolor('gray')
+    for i in range(shape[0] * shape[1]):
+        ax = plt.subplot(shape[0], shape[1], i + 1)
+        ax.axis('off')
+
+        if indices is None:
+            rand_index = random.choice(range(len(X)))
+        else:
+            rand_index = indices[i]
+
+        plt.imshow(X[rand_index], cmap=cmap)
+
+        if y.ndim == 2:
+            # On-hot encoded labels
+            class_index = np.argmax(y[rand_index], axis=0)  # convert back to integer encoded labels
+        else:
+            # Integer encoded labels
+            class_index = y[rand_index]
+
+        if class_labels is None:
+            plt.title(class_index, color='white')
+        else:
+            plt.title("{name}: {idx}".format(name=class_labels[class_index], idx=class_index), color='white')
+
+

@@ -6,7 +6,7 @@ import itertools
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
-from tensorflow.keras.callbacks import LearningRateScheduler
+from keras.callbacks import LearningRateScheduler
 
 
 def plot_model_history(history, figsize=(10, 6)):
@@ -190,17 +190,6 @@ def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(15, 15), text_s
                  horizontalalignment="center",
                  color="white" if cm[i, j] > threshold else "black",
                  size=text_size)
-
-
-def plot_histogram_from_dataframe(x, columns):
-    """
-    Plots a histogram for each of the specified columns in the DataFrame X.
-
-    :param X: a dataframe
-    :param columns: columns which exist within the DataFrame.
-    """
-    for c in columns:
-        x.hist(c)
 
 
 def cb_learning_rate_scheduler(learning_rate_start=0.001, epochs=50):

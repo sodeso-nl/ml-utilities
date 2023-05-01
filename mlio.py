@@ -1,5 +1,6 @@
 import os
 import tarfile
+import zipfile
 import urllib
 
 
@@ -14,12 +15,37 @@ def download_file(source, destination):
     urllib.request.urlretrieve(source, destination)
 
 
-def extract_tgz(file):
+def extract_tgz(file, folder=None):
     """
-    Extracts a .tgz file in the same path as where the .tgz file exists.
+    Extracts a .tgz file in the specified destination.
+    :param file: the .tgz file
+    :param folder: the destination location, if not specified then same path as source file.
+    """
+    if folder is None:
+        folder = os.path.dirname(file)
+    tgz_file = tarfile.open(file)
+    tgz_file.extractall(path=folder)
+    tgz_file.close()
+
+
+def extract_zip(file, folder=None):
+    """
+    Extracts a .zip file in the specified destination.
+
     :param file: the path and filename
+    :param folder: the destination location, if not specified then same path as source file.
     """
-    path = os.path.dirname(file)
-    housing_tgz = tarfile.open(file)
-    housing_tgz.extractall(path=path)
-    housing_tgz.close()
+    if folder is None:
+        folder = os.path.dirname(file)
+    zip_file = zipfile.ZipFile(file)
+    zip_file.extractall(path=folder)
+    zip_file.close()
+
+
+def list_dir_summary(folder):
+    """
+    Lists a summary of the specified folder
+    :param folder: the folder to list the contents of
+    """
+    for dirpath, dirnames, filenames in os.walk(folder):
+        print(f"There are {len(dirnames)} directories, and {len(filenames)} in {dirpath}")

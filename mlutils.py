@@ -2,11 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import itertools
+import datetime
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
-from keras.callbacks import LearningRateScheduler
+from keras.callbacks import LearningRateScheduler, TensorBoard
 
 
 def plot_model_history(history, figsize=(10, 6)):
@@ -204,6 +205,12 @@ def cb_learning_rate_scheduler(learning_rate_start=0.001, epochs=50):
     min, max, division = find_learning_rate_division(learning_rate=learning_rate_start, epochs=epochs)
     print(f"Min learning rate: {min}\nMax learning rate: {max}\nDivision: {division}")
     return LearningRateScheduler(lambda epoch: learning_rate_start * 10 ** (epoch/division))
+
+
+def cb_tensorboard(log_base, experiment_name):
+    log_dir = log_base + '/' + experiment_name + '/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    print(f"Saving TensorBoard log files to: {log_dir}")
+    return TensorBoard(log_dir=log_dir)
 
 
 def normalize_xy_data(X):

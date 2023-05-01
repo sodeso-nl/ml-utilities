@@ -207,8 +207,8 @@ def cb_learning_rate_scheduler(learning_rate_start=0.001, epochs=50):
     return LearningRateScheduler(lambda epoch: learning_rate_start * 10 ** (epoch/division))
 
 
-def cb_tensorboard(log_base, experiment_name):
-    log_dir = log_base + '/' + experiment_name + '/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+def cb_tensorboard(dir_name, experiment_name):
+    log_dir = dir_name + '/' + experiment_name + '/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     print(f"Saving TensorBoard log files to: {log_dir}")
     return TensorBoard(log_dir=log_dir)
 

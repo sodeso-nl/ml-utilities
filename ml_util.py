@@ -2,12 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import itertools
-import datetime
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
-
-from keras.callbacks import LearningRateScheduler, TensorBoard
 
 
 def plot_model_history(history, figsize=(10, 6)):
@@ -193,26 +190,6 @@ def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(15, 15), text_s
                  size=text_size)
 
 
-def cb_learning_rate_scheduler(learning_rate_start=0.001, epochs=50):
-    """
-    Creates a LearningRateScheduler which will be pre-configured with a division. The division
-    is calculated using find_learning_rate_division.
-
-    :param learning_rate_start: initial starting learning rate
-    :param epochs: number of epochs the model will train for
-    :return: the pre-configured LearningRateScheduler
-    """
-    min, max, division = find_learning_rate_division(learning_rate=learning_rate_start, epochs=epochs)
-    print(f"Min learning rate: {min}\nMax learning rate: {max}\nDivision: {division}")
-    return LearningRateScheduler(lambda epoch: learning_rate_start * 10 ** (epoch/division))
-
-
-def cb_tensorboard(experiment_name, dir_name='./logs'):
-    log_dir = dir_name + '/' + experiment_name + '/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-    print(f"Saving TensorBoard log files to: {log_dir}")
-    return TensorBoard(log_dir=log_dir)
-
-
 def normalize_xy_data(X):
     """
     Normalizes an array containing vectors of x/y coordinates so that the array does not contain
@@ -226,30 +203,6 @@ def normalize_xy_data(X):
     X = X + (np.abs(np.min(X[:, 1])))
     return X / np.max(X[:, 1])
 
-
-
-def find_learning_rate_division(learning_rate, epochs):
-    """
-    Finds the optimal division which can be used in a learning rate scheduler.
-
-    epochs = 50
-    initial_lr = 0.001
-
-    division = find_learning_rate_division(initial_lr, epochs)
-    lr_scheduler = LearningRateScheduler(lambda epoch: initial_lr * 10 ** (epoch / division))
-
-    :param learning_rate: initial learning rate
-    :param epochs: number of epochs that the model will train for
-    :return: the minimum learning rate, maximum learning rate and the division which can be used in the scheduler.
-    """
-    min_lr = 0.
-    max_lr = 0.
-    division = 1000
-    while max_lr < 0.1:
-        min_lr = learning_rate * 10 ** (1 / division)
-        max_lr = learning_rate * 10 ** (epochs / division)
-        division -= 1
-    return (min_lr, max_lr, division)
 
 
 def split_train_test_data(*arrays, test_size=.2, train_size=.8, random_state=42, shuffle=True):

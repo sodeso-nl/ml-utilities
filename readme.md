@@ -12,11 +12,11 @@ Create a new environment in conda:
 
 Activate the newly created environment
 
->> conda activate keras-mnist
+>> conda activate ml-utilities
 
 To delete the created environment
 
->> conda remove -n keras-mnist --all
+>> conda remove -n ml-utilities --all
 
 To de-activate the environment
 

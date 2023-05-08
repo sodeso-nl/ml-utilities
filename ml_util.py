@@ -110,7 +110,7 @@ def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
 
 
 def plot_history(history, figsize=(10, 6)):
-    plot_consecutive_histories([history], "history", figsize=figsize)
+    plot_consecutive_histories([history], ["Start history"], figsize=figsize)
 
 
 def plot_xy_data_with_label(X, y):

@@ -1,8 +1,22 @@
 from tensorflow.python.platform import tf_logging as logging
 from keras.utils import io_utils
-from keras.callbacks import Callback, TensorBoard, LearningRateScheduler
+from keras.callbacks import Callback, TensorBoard, LearningRateScheduler, ModelCheckpoint
 
 import datetime
+
+
+def create_model_checkpoint_callback(experiment_name='experiment.ckpt',
+                                     dir_name='./checkpoints',
+                                     metric='val_loss',
+                                     save_weights_only=False,
+                                     save_best_only=False, save_freq='epoch'):
+    log_dir = dir_name + '/' + experiment_name
+    return ModelCheckpoint(filepath=log_dir,
+                           monitor=metric,
+                           save_weights_only=save_weights_only,
+                           save_best_only=save_best_only,
+                           save_freq=save_freq,
+                           verbose=1)
 
 
 def create_learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50):

@@ -68,6 +68,7 @@ def plot_model_history(history, figsize=(10, 6)):
 
     plt.show()
 
+
 def plot_xy_data_with_label(X, y):
     """
     Plots a graph of the values of X.

@@ -15,6 +15,12 @@ def plot_model_history(history, figsize=(10, 6)):
     :param figsize: figure size (default: (10, 6))
     :return: two graphs, one for loss and one for accuracy
     """
+    ## Determine the first and last epoch, then create the labels for the X-axis.
+    first_epoch = history.epoch[0]
+    last_epoch = history.epoch[-1]
+    labels = range(first_epoch + 1, last_epoch + 2)
+    ticks = range(len(labels))
+
     plt.figure(figsize=figsize)
 
     # Plot the traiing loss and accuracy
@@ -27,7 +33,7 @@ def plot_model_history(history, figsize=(10, 6)):
         plt.plot(history.history['lr'], label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
 
     plt.title('Loss', size=20)
-    plt.xticks(history.epoch)
+    plt.xticks(ticks, labels)
     plt.xlabel('Epoch', size=14)
     plt.legend()
 
@@ -45,7 +51,7 @@ def plot_model_history(history, figsize=(10, 6)):
             plt.plot(history.history['lr'], label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
 
         plt.title('Accuracy', size=20)
-        plt.xticks(history.epoch)
+        plt.xticks(ticks, labels)
         plt.xlabel('Epoch', size=14)
         plt.legend()
 
@@ -62,7 +68,7 @@ def plot_model_history(history, figsize=(10, 6)):
             plt.plot(history.history['lr'], label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
 
         plt.title('Mean Absolute Accuracy', size=20)
-        plt.xticks(history.epoch)
+        plt.xticks(ticks, labels)
         plt.xlabel('Epoch', size=14)
         plt.legend()
 

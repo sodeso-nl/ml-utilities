@@ -10,7 +10,7 @@ def create_model_checkpoint_callback(experiment_name,
                                      metric='val_loss',
                                      save_weights_only=False,
                                      save_best_only=False, save_freq='epoch'):
-    log_dir = dir_name + '/' + experiment_name + f'/model-{{epoch:02d}}-{{{metric}:.2f}}.hdf5'
+    log_dir = dir_name + '/' + experiment_name + f'/model-epoch-{{epoch:02d}}-{metric}-{{{metric}:.2f}}.hdf5'
     return ModelCheckpoint(filepath=log_dir,
                            monitor=metric,
                            save_weights_only=save_weights_only,

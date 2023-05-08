@@ -5,12 +5,12 @@ from keras.callbacks import Callback, TensorBoard, LearningRateScheduler, ModelC
 import datetime
 
 
-def create_model_checkpoint_callback(experiment_name='experiment.ckpt',
+def create_model_checkpoint_callback(experiment_name,
                                      dir_name='./checkpoints',
                                      metric='val_loss',
                                      save_weights_only=False,
                                      save_best_only=False, save_freq='epoch'):
-    log_dir = dir_name + '/' + experiment_name
+    log_dir = dir_name + '/' + experiment_name + '/'
     return ModelCheckpoint(filepath=log_dir,
                            monitor=metric,
                            save_weights_only=save_weights_only,

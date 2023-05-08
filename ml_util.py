@@ -110,71 +110,7 @@ def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
 
 
 def plot_history(history, figsize=(10, 6)):
-    """
-    Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
-
-    :param history: the history object returned from fitting a model.
-    :param figsize: figure size (default: (10, 6))
-    :return: two graphs, one for loss and one for accuracy
-    """
-    ## Determine the first and last epoch, then create the labels for the X-axis.
-    first_epoch = history.epoch[0]
-    last_epoch = history.epoch[-1]
-    labels = range(first_epoch + 1, last_epoch + 2)
-    ticks = range(len(labels))
-
-    plt.figure(figsize=figsize)
-
-    # Plot the traiing loss and accuracy
-    plt.plot(history.history['loss'], label='Training loss', color='#0000FF', linewidth=1.5)
-    if 'val_loss' in history.history:
-        plt.plot(history.history['val_loss'], label='Validation loss', color='#00FF00', linewidth=1.5)
-
-    # Plot the learning rate
-    if 'lr' in history.history:
-        plt.plot(history.history['lr'], label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
-
-    plt.title('Loss', size=20)
-    plt.xticks(ticks, labels)
-    plt.xlabel('Epoch', size=14)
-    plt.legend()
-
-    if 'accuracy' in history.history:
-        # Start a new figure
-        plt.figure(figsize=figsize, facecolor='#FFFFFF')
-
-        # Plot the validation loss and accuracy
-        plt.plot(history.history['accuracy'], label='Training accuracy', color='#0000FF', linewidth=1.5)
-        if 'val_accuracy' in history.history:
-            plt.plot(history.history['val_accuracy'], label='Validation accuracy', color='#00FF00', linewidth=1.5)
-
-        # Plot the learning rate
-        if 'lr' in history.history:
-            plt.plot(history.history['lr'], label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
-
-        plt.title('Accuracy', size=20)
-        plt.xticks(ticks, labels)
-        plt.xlabel('Epoch', size=14)
-        plt.legend()
-
-    if 'mae' in history.history:
-        # Start a new figure
-        plt.figure(figsize=figsize, facecolor='#FFFFFF')
-        plt.plot(history.history['mae'], label='Training mae', color='#0000FF', linewidth=1.5)
-
-        if 'val_mae' in history.history:
-            plt.plot(history.history['val_mae'], label='Validation mae', color='#00FF00', linewidth=1.5)
-
-        # Plot the learning rate
-        if 'lr' in history.history:
-            plt.plot(history.history['lr'], label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
-
-        plt.title('Mean Absolute Accuracy', size=20)
-        plt.xticks(ticks, labels)
-        plt.xlabel('Epoch', size=14)
-        plt.legend()
-
-    plt.show()
+    plot_consecutive_histories([history], "history", figsize=figsize)
 
 
 def plot_xy_data_with_label(X, y):

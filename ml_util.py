@@ -7,12 +7,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
 
-def _plot_history_ends(histories):
+def _plot_history_ends(histories, labels):
     for idx, history in enumerate(histories):
-        plt.plot([min(history.epoch), min(history.epoch)], plt.ylim(), label=f'H{idx}')
+        plt.plot([min(history.epoch), min(history.epoch)], plt.ylim(), label=f'{labels[idx]}')
 
 
-def plot_consecutive_histories(histories, figsize=(10, 6)):
+def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
     """
     Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
 
@@ -49,8 +49,8 @@ def plot_consecutive_histories(histories, figsize=(10, 6)):
         if 'lr' in history.history:
             all_lr_history = [*all_lr_history, *history.history['lr']]
 
-    labels = range(first_epoch + 1, last_epoch + 2)
-    ticks = range(len(labels))
+    epoch_labels = range(first_epoch + 1, last_epoch + 2)
+    ticks = range(len(epoch_labels))
 
     plt.figure(figsize=figsize, facecolor='#FFFFFF')
     # Plot the traiing loss and accuracy
@@ -62,10 +62,10 @@ def plot_consecutive_histories(histories, figsize=(10, 6)):
     if all_lr_history:
         plt.plot(all_lr_history, label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
 
-    _plot_history_ends(histories)
+    _plot_history_ends(histories, labels)
 
     plt.title('Loss', size=20)
-    plt.xticks(ticks, labels)
+    plt.xticks(ticks, epoch_labels)
     plt.xlabel('Epoch', size=14)
     plt.legend()
 
@@ -82,10 +82,10 @@ def plot_consecutive_histories(histories, figsize=(10, 6)):
         if all_lr_history:
             plt.plot(all_lr_history, label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
 
-        _plot_history_ends(histories)
+        _plot_history_ends(histories, labels)
 
         plt.title('Accuracy', size=20)
-        plt.xticks(ticks, labels)
+        plt.xticks(ticks, epoch_labels)
         plt.xlabel('Epoch', size=14)
         plt.legend()
 
@@ -101,10 +101,10 @@ def plot_consecutive_histories(histories, figsize=(10, 6)):
         if all_lr_history:
             plt.plot(all_lr_history, label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
 
-        _plot_history_ends(histories)
+        _plot_history_ends(histories, labels)
 
         plt.title('Mean Absolute Accuracy', size=20)
-        plt.xticks(ticks, labels)
+        plt.xticks(ticks, epoch_labels)
         plt.xlabel('Epoch', size=14)
         plt.legend()
 

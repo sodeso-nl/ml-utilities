@@ -7,7 +7,109 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
 
-def plot_model_history(history, figsize=(10, 6)):
+def _plot_history_ends(histories):
+    for idx, history in enumerate(histories):
+        plt.plot([min(history.epoch), min(history.epoch)], plt.ylim(), label=f'H{idx}')
+
+
+def plot_consecutive_histories(histories, figsize=(10, 6)):
+    """
+    Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
+
+    :param histories: the history objects returned from fitting models.
+    :param figsize: figure size (default: (10, 6))
+    :return: two graphs, one for loss and one for accuracy
+    """
+    ## Determine the first and last epoch, then create the labels for the X-axis.
+    all_loss_history = []
+    all_val_loss_history = []
+    all_accuracy_history = []
+    all_val_accuracy_history = []
+    all_mae_history = []
+    all_val_mae_history = []
+    all_lr_history = []
+
+    first_epoch = 10000
+    last_epoch = -1
+    for history in histories:
+        first_epoch = min(first_epoch, min(history.epoch))
+        last_epoch = max(last_epoch, max(history.epoch))
+
+        all_loss_history = [*all_loss_history, *history.history['loss']]
+        all_val_loss_history = [*all_val_loss_history, *history.history['val_loss']]
+
+        if 'accuracy' in history.history:
+            all_accuracy_history = [*all_accuracy_history, *history.history['accuracy']]
+            all_val_accuracy_history = [*all_val_accuracy_history, *history.history['val_accuracy']]
+
+        if 'mae' in history.history:
+            all_mae_history = [*all_mae_history, *history.history['mae']]
+            all_val_mae_history = [*all_val_mae_history, *history.history['val_mae']]
+
+        if 'lr' in history.history:
+            all_lr_history = [*all_lr_history, *history.history['lr']]
+
+    labels = range(first_epoch + 1, last_epoch + 2)
+    ticks = range(len(labels))
+
+    plt.figure(figsize=figsize, facecolor='#FFFFFF')
+    # Plot the traiing loss and accuracy
+    plt.plot(all_loss_history, label='Training loss', color='#0000FF', linewidth=1.5)
+    if all_val_loss_history:
+        plt.plot(all_val_loss_history, label='Validation loss', color='#00FF00', linewidth=1.5)
+
+    # Plot the learning rate
+    if all_lr_history:
+        plt.plot(all_lr_history, label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
+
+    _plot_history_ends(histories)
+
+    plt.title('Loss', size=20)
+    plt.xticks(ticks, labels)
+    plt.xlabel('Epoch', size=14)
+    plt.legend()
+
+    if all_accuracy_history:
+        # Start a new figure
+        plt.figure(figsize=figsize, facecolor='#FFFFFF')
+
+        # Plot the validation loss and accuracy
+        plt.plot(all_accuracy_history, label='Training accuracy', color='#0000FF', linewidth=1.5)
+        if all_val_accuracy_history:
+            plt.plot(all_val_accuracy_history, label='Validation accuracy', color='#00FF00', linewidth=1.5)
+
+        # Plot the learning rate
+        if all_lr_history:
+            plt.plot(all_lr_history, label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
+
+        _plot_history_ends(histories)
+
+        plt.title('Accuracy', size=20)
+        plt.xticks(ticks, labels)
+        plt.xlabel('Epoch', size=14)
+        plt.legend()
+
+    if all_mae_history:
+        # Start a new figure
+        plt.figure(figsize=figsize, facecolor='#FFFFFF')
+        plt.plot(all_mae_history, label='Training mae', color='#0000FF', linewidth=1.5)
+
+        if all_val_mae_history:
+            plt.plot(all_val_mae_history, label='Validation mae', color='#00FF00', linewidth=1.5)
+
+        # Plot the learning rate
+        if all_lr_history:
+            plt.plot(all_lr_history, label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
+
+        _plot_history_ends(histories)
+
+        plt.title('Mean Absolute Accuracy', size=20)
+        plt.xticks(ticks, labels)
+        plt.xlabel('Epoch', size=14)
+        plt.legend()
+
+
+def plot_history(history, figsize=(10, 6)):
     """
     Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
 

@@ -1,59 +1,30 @@
-def collect_trainable_layers(model):
-    """
-    Returns the names of all layers that are trainable.
-    :param model: the model
-    :return: a list of names of layers that have layer.trainable = True
-    """
-    trainable_layers = []
+def collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
+    layers = []
 
     for layer in model.layers:
-        if hasattr(layer, 'layers'):
-            trainable_layers = [*trainable_layers, *collect_trainable_layers(layer)]
+        if hasattr(layer, 'layers') and recursive:
+            layers = [*layers, *collect_layers(layer, recursive=recursive, include_trainable=include_trainable, include_non_trainable=include_non_trainable)]
         else:
-            if layer.trainable:
-                trainable_layers.append(layer.name)
+            if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable == False):
+                layers.append(layer)
 
-    return trainable_layers
-
-
-def enable_trainable_layers(model, layer_names):
-    """
-    Set layer.trainable = True on all layers with a name in the layer_names list within the specified model.
-    :param model: the model on which the layers should be enabled for training
-    :param layer_names: the names of the layers that should be enabled.
-    """
-    for layer in model.layers:
-        if hasattr(layer, 'layers'):
-            enable_trainable_layers(layer, layer_names)
-        else:
-            if layer.name in layer_names:
-                layer.trainable = True
+    return layers
 
 
-def disable_trainable_layers(model, layer_names):
-    """
-    Set layer.trainable = False on all layers with a name in the layer_names list within the specified model.
-    :param model: the model on which the layers should be disabled for training
-    :param layer_names: the names of the layers that should be disabled.
-    """
-    for layer in model.layers:
-        if hasattr(layer, 'layers'):
-            disable_trainable_layers(layer, layer_names)
-        else:
-            if layer.name in layer_names:
-                layer.trainable = False
+def collect_layer_names(model, recursive=True, include_trainable=True, include_non_trainable=True):
+    layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
+    return list(map(lambda layer: layer.name, layers))
 
 
-def disable_trainable_layers_all(model):
-    """
-    Disables trainable on the model and on all the layers.
-    :param model: the model to disable training on.
-    """
-    for layer in model.layers:
-        if hasattr(layer, 'layers'):
-            disable_trainable_layers_all(layer)
-        else:
-            layer.trainable = False
+def set_trainable_on_layers(model, layer_names, trainable=True):
+    for layer in collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
+        if layer.name in layer_names:
+            layer.trainable = trainable
+
+
+def disable_trainable_on_all_layers(model):
+    for layer in collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
+        layer.trainable = False
 
 
 def load_weights(model, filepath):
@@ -67,7 +38,7 @@ def load_weights(model, filepath):
     """
 
     # Collect all layers that are trainable
-    trainable_layers = collect_trainable_layers(model)
+    trainable_layer_names = collect_layer_names(model, recursive=True, include_trainable=True, include_non_trainable=False)
 
     # Disable training completely
     model.trainable = False
@@ -79,5 +50,19 @@ def load_weights(model, filepath):
     model.trainable = True
 
     # Now disable all layers to be trainable so that we can then enable only the layers that were trainable before.
-    disable_trainable_layers_all(model)
-    enable_trainable_layers(model, trainable_layers)
+    disable_trainable_on_all_layers(model)
+
+    set_trainable_on_layers(model, layer_names=trainable_layer_names, trainable=True)
+
+
+def list_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
+    layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
+    layer_name_col_width = len(max(list(map(lambda layer: layer.name, layers)), key=len))
+    layer_type_col_width = len(max(list(map(lambda layer: type(layer).__name__, layers)), key=len))
+    layer_shape_col_width = len(max(list(map(lambda layer: str(layer.output_shape), layers)), key=len))
+
+    print(f"{'Row':<5} | {'Name (Type)':<{layer_name_col_width + layer_type_col_width + 3}} | Trainable | Output Shape")
+    for layer_number, layer in enumerate(layers):
+        if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable == False):
+            print(f"{layer_number:<5} | {layer.name:<{layer_name_col_width}} ({type(layer).__name__:<{layer_type_col_width}}) | {str(layer.trainable):<9} | "
+                  f"{str(layer.output_shape):<{layer_shape_col_width}}")

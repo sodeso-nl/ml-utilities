@@ -5,7 +5,7 @@ def collect_layers(model, recursive=True, include_trainable=True, include_non_tr
         if hasattr(layer, 'layers') and recursive:
             layers = [*layers, *collect_layers(layer, recursive=recursive, include_trainable=include_trainable, include_non_trainable=include_non_trainable)]
         else:
-            if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable == False):
+            if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable is False):
                 layers.append(layer)
 
     return layers
@@ -63,6 +63,6 @@ def list_layers(model, recursive=True, include_trainable=True, include_non_train
 
     print(f"{'Row':<5} | {'Name (Type)':<{layer_name_col_width + layer_type_col_width + 3}} | Trainable | Output Shape")
     for layer_number, layer in enumerate(layers):
-        if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable == False):
+        if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable is False):
             print(f"{layer_number:<5} | {layer.name:<{layer_name_col_width}} ({type(layer).__name__:<{layer_type_col_width}}) | {str(layer.trainable):<9} | "
                   f"{str(layer.output_shape):<{layer_shape_col_width}}")

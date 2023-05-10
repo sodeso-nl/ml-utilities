@@ -15,7 +15,7 @@ def download_file(source, destination):
     urllib.request.urlretrieve(source, destination)
 
 
-def extract_tgz(file, folder=None):
+def extract_tgz(file, folder='.'):
     """
     Extracts a .tgz file in the specified destination.
     :param file: the .tgz file
@@ -28,7 +28,7 @@ def extract_tgz(file, folder=None):
     tgz_file.close()
 
 
-def extract_zip(file, folder=None):
+def extract_zip(file, folder='.'):
     """
     Extracts a .zip file in the specified destination.
 

@@ -12,15 +12,20 @@ def _plot_history_ends(histories, labels):
         plt.plot([min(history.epoch), min(history.epoch)], plt.ylim(), label=f'{labels[idx]}')
 
 
+def _plot_history_graph_line(data, label, color, linestyle='solid'):
+    if data:
+        plt.plot(data, label=label, color=color, linestyle=linestyle, linewidth=1.5)
+
+
 def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
     """
     Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
 
     :param histories: the history objects returned from fitting models.
+    :param labels: the labels for each history object for seperating the epochs
     :param figsize: figure size (default: (10, 6))
     :return: two graphs, one for loss and one for accuracy
     """
-    ## Determine the first and last epoch, then create the labels for the X-axis.
     all_loss_history = []
     all_val_loss_history = []
     all_accuracy_history = []
@@ -51,19 +56,11 @@ def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
 
     epoch_labels = range(first_epoch + 1, last_epoch + 2)
     ticks = range(len(epoch_labels))
-
     plt.figure(figsize=figsize, facecolor='#FFFFFF')
-    # Plot the traiing loss and accuracy
-    plt.plot(all_loss_history, label='Training loss', color='#0000FF', linewidth=1.5)
-    if all_val_loss_history:
-        plt.plot(all_val_loss_history, label='Validation loss', color='#00FF00', linewidth=1.5)
-
-    # Plot the learning rate
-    if all_lr_history:
-        plt.plot(all_lr_history, label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
-
+    _plot_history_graph_line(all_loss_history, label='Training loss', color='#0000FF')
+    _plot_history_graph_line(all_val_loss_history, label='Validation loss', color='#00FF00')
+    _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
     _plot_history_ends(histories, labels)
-
     plt.title('Loss', size=20)
     plt.xticks(ticks, epoch_labels)
     plt.xlabel('Epoch', size=14)
@@ -72,18 +69,10 @@ def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
     if all_accuracy_history:
         # Start a new figure
         plt.figure(figsize=figsize, facecolor='#FFFFFF')
-
-        # Plot the validation loss and accuracy
-        plt.plot(all_accuracy_history, label='Training accuracy', color='#0000FF', linewidth=1.5)
-        if all_val_accuracy_history:
-            plt.plot(all_val_accuracy_history, label='Validation accuracy', color='#00FF00', linewidth=1.5)
-
-        # Plot the learning rate
-        if all_lr_history:
-            plt.plot(all_lr_history, label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
-
+        _plot_history_graph_line(all_accuracy_history, label='Training accuracy', color='#0000FF')
+        _plot_history_graph_line(all_val_accuracy_history, label='Validation accuracy', color='#00FF00')
+        _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
         _plot_history_ends(histories, labels)
-
         plt.title('Accuracy', size=20)
         plt.xticks(ticks, epoch_labels)
         plt.xlabel('Epoch', size=14)
@@ -92,17 +81,10 @@ def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
     if all_mae_history:
         # Start a new figure
         plt.figure(figsize=figsize, facecolor='#FFFFFF')
-        plt.plot(all_mae_history, label='Training mae', color='#0000FF', linewidth=1.5)
-
-        if all_val_mae_history:
-            plt.plot(all_val_mae_history, label='Validation mae', color='#00FF00', linewidth=1.5)
-
-        # Plot the learning rate
-        if all_lr_history:
-            plt.plot(all_lr_history, label='Learning rate', color='#000000', linewidth=1.5, linestyle='--')
-
+        _plot_history_graph_line(all_mae_history, label='Training mae', color='#0000FF')
+        _plot_history_graph_line(all_val_mae_history, label='Validation mae', color='#00FF00')
+        _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
         _plot_history_ends(histories, labels)
-
         plt.title('Mean Absolute Accuracy', size=20)
         plt.xticks(ticks, epoch_labels)
         plt.xlabel('Epoch', size=14)
@@ -221,10 +203,12 @@ def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(15, 15), text_s
     # Set x-axis labels to bottom
     ax.xaxis.set_label_position("bottom")
     ax.xaxis.tick_bottom()
+
     # Adjust label size
     ax.yaxis.label.set_size(text_size)
     ax.xaxis.label.set_size(text_size)
     ax.title.set_size(text_size)
+
     # Set treshold for different colors
     threshold = (cm.max() + cm.min()) / 2.
     # Plot the text on each cell
@@ -247,7 +231,6 @@ def normalize_xy_data(X):
     X = X / np.max(X[:, 0])
     X = X + (np.abs(np.min(X[:, 1])))
     return X / np.max(X[:, 1])
-
 
 
 def split_train_test_data(*arrays, test_size=.2, train_size=.8, random_state=42, shuffle=True):

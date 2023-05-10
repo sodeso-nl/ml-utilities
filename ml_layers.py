@@ -41,17 +41,10 @@ def load_weights(model, filepath):
     trainable_layer_names = collect_layer_names(model, recursive=True, include_trainable=True, include_non_trainable=False)
 
     # Disable training completely
-    # model.trainable = False
     disable_trainable_on_all_layers(model)
 
     # Load the weights
     model.load_weights(filepath)
-
-    # Set model to trainable (which in turn will also set all layers to trainable.
-    # model.trainable = True
-
-    # Now disable all layers to be trainable so that we can then enable only the layers that were trainable before.
-    disable_trainable_on_all_layers(model)
 
     set_trainable_on_layers(model, layer_names=trainable_layer_names, trainable=True)
 

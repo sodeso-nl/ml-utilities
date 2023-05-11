@@ -16,15 +16,10 @@ def collect_layer_names(model, recursive=True, include_trainable=True, include_n
     return list(map(lambda layer: layer.name, layers))
 
 
-def set_trainable_on_layers(model, layer_names, trainable=True):
+def set_trainable_on_layers(model, layer_names=None, trainable=True):
     for layer in collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
-        if layer.name in layer_names:
+        if layer_names is None or layer.name in layer_names:
             layer.trainable = trainable
-
-
-def disable_trainable_on_all_layers(model):
-    for layer in collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
-        layer.trainable = False
 
 
 def load_weights(model, filepath):
@@ -41,7 +36,7 @@ def load_weights(model, filepath):
     trainable_layer_names = collect_layer_names(model, recursive=True, include_trainable=True, include_non_trainable=False)
 
     # Disable training completely
-    disable_trainable_on_all_layers(model)
+    set_trainable_on_layers(model, trainable=False)
 
     # Load the weights
     model.load_weights(filepath)

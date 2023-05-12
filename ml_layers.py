@@ -22,6 +22,16 @@ def set_trainable_on_layers(model, layer_names=None, trainable=True):
             layer.trainable = trainable
 
 
+def set_trainable_on_first_n_layers(model, n, trainable=True):
+    for layer in model.layers[:-n]:
+        layer.trainable = trainable
+
+
+def set_trainable_on_last_n_layers(model, n, trainable=True):
+    for layer in model.layers[-n:]:
+        layer.trainable = trainable
+
+
 def load_weights(model, filepath):
     """
     Disables trainable on the model and on all the layers.

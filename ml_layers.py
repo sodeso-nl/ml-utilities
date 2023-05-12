@@ -22,12 +22,12 @@ def set_trainable_on_layers(model, layer_names=None, trainable=True):
             layer.trainable = trainable
 
 
-def set_trainable_on_all_except_last_n(model, n, trainable=True):
+def set_trainable_on_first_n_layers(model, n, trainable=True):
     for layer in model.layers[:-n]:
         layer.trainable = trainable
 
 
-def set_trainable_on_all_except_first_n(model, n, trainable=True):
+def set_trainable_on_last_n_layers(model, n, trainable=True):
     for layer in model.layers[-n:]:
         layer.trainable = trainable
 

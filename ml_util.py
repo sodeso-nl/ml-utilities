@@ -180,6 +180,43 @@ def __convert_to_numpy_array_if_neccesary(value):
     return value
 
 
+def __to_ordinal(y):
+    return np.argmax(y, axis=1)
+
+
+def __to_binary(y):
+    return np.round(y)
+
+
+def __is_multiclass_classification(y):
+    """
+    Return True if the y value is a multiclass classification, for example:
+    [
+        [0.33, 0.78, 0.23],
+        [0.64, 0.32, 0.11]
+    ]
+
+    :param y: the label to check if it is a multiclass classification
+    :return: True if it is multiclass classification, False if not.
+    """
+    return y.ndim == 2 and len(y[0]) > 1
+
+
+def __is_binary_classification(y):
+    """
+    Return True if the y value is a binary classification, for example:
+    [
+        [0.56],
+        [0.32],
+        [0.98]
+    ]
+
+    :param y: the label to check if it is a binary classification
+    :return: True if it is binary classification, False if not.
+    """
+    return y.ndim == 2 and len(y[0]) == 1
+
+
 def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(15, 15), text_size=10, norm=False, savefig=False):
     """
       Plots a confusion matrix of the given data.
@@ -206,16 +243,15 @@ def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(15, 15), text_s
     y_pred = __convert_to_numpy_array_if_neccesary(y_pred)
 
     # If the y_true labels are one-hot encoded then convert them to integer encoded labels.
-    if y_true.ndim == 2:
-        y_true = np.argmax(y_true, axis=1)
+    if __is_multiclass_classification(y_true):
+        y_true = __to_ordinal(y_true)
 
-    # When the prediction is a multi-class classification:
-    if y_pred.ndim != 1 and len(y_pred[0]) > 1 and isinstance(y_pred[0][0], np.floating):
-        y_pred = np.argmax(y_pred, axis=1)
-
-    # When the prediction is a binary classification model:
-    elif y_pred.ndim != 1 and len(y_pred[0]) == 1 and isinstance(y_pred[0][0], np.floating):
-        y_pred = np.round(y_pred)
+    # Check if we need to convert multi-class classification one-hot encoding to index or
+    # if we are dealing with binary classification, then we need to round the numer to either 0 or 1
+    if __is_multiclass_classification(y_pred):
+        y_pred = __to_ordinal(y_pred)
+    elif __is_binary_classification(y_pred):
+        y_pred = __to_binary(y_pred)
 
     # Create the confusion matrix
     cm = confusion_matrix(y_true, y_pred)

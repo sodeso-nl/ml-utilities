@@ -4,7 +4,9 @@ import random
 import itertools
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, classification_report
+
+from tensorflow.data import Dataset
 
 
 def _plot_history_ends(histories, labels):
@@ -153,28 +155,66 @@ def plot_decision_boundary(model, X, y):
     plt.ylim(yy.min(), yy.max())
 
 
-def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(15, 15), text_size=10):
+def get_labels_from_dataset(dataset, index_only=True):
     """
-      y_true    =      The actual result
-      y_pred    =      The predicted result
-      classes   =      The classes in case of a multi-class validation
-      figsize   =      Size of the graph
-      text_size =      Font-size
+    Returns the labels from a (batched)Dataset
+
+    :param dataset: the dataset from which we want the labels.
+    :param index_only: to create an indexed list or keep the one-hot encoded.
+    :return: the labels
+    """
+    y_labels = []
+    for images, labels in dataset.unbatch():
+        if index_only:  # unbatch the test data and get images and labels
+            y_labels.append(labels.numpy().argmax())  # append the index which has the largest value (one-hot)
+        else:
+            y_labels.append(labels.numpy())
+
+    return y_labels
+
+
+def __convert_to_numpy_array_if_neccesary(value):
+    if not isinstance(value, np.ndarray):
+        return np.array(value)
+
+    return value
+
+
+def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(15, 15), text_size=10, norm=False, savefig=False):
+    """
+      Plots a confusion matrix of the given data.
+
+      :param y_true: Array of truth labels (must be same shape as y_pred).
+      :param y_pred: Array of predicted labels (must be same shape as y_true).
+      :param classes: Array of class labels (e.g. string form). If `None`, integer labels are used.
+      :param figsize: Size of output figure (default=(15, 15)).
+      :param text_size: Size of output figure text (default=10).
+      :param norm: normalize values or not (default=False).
+      :param savefig: save confusion matrix to file (default=False).
+
       Plots the decision boundary created by a model predicting on X.
       Inspired by the following two websites:
       https://cs231n.github.io/neural-networks-case-study
     """
 
-    # If the labels are on-hot encoded then change them to be integer encoded labels.
+    if isinstance(y_true, Dataset):
+        raise TypeError('y_true is a dataset, please get the labels from the dataset using '
+                        '\'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')
+
+    # If y_true or y_pred is not a Numpy array then try to convert it.
+    y_true = __convert_to_numpy_array_if_neccesary(y_true)
+    y_pred = __convert_to_numpy_array_if_neccesary(y_pred)
+
+    # If the y_true labels are one-hot encoded then convert them to integer encoded labels.
     if y_true.ndim == 2:
-        y_true = np.argmax(y_true, axis=1)  # convert back to integer encoded labels
+        y_true = np.argmax(y_true, axis=1)
 
     # When the prediction is a multi-class classification:
-    if len(y_pred[0]) > 1 and isinstance(y_pred[0][0], np.floating):
+    if y_pred.ndim != 1 and len(y_pred[0]) > 1 and isinstance(y_pred[0][0], np.floating):
         y_pred = np.argmax(y_pred, axis=1)
 
     # When the prediction is a binary classification model:
-    elif len(y_pred[0]) == 1 and isinstance(y_pred[0][0], np.floating):
+    elif y_pred.ndim != 1 and len(y_pred[0]) == 1 and isinstance(y_pred[0][0], np.floating):
         y_pred = np.round(y_pred)
 
     # Create the confusion matrix
@@ -205,18 +245,79 @@ def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(15, 15), text_s
     ax.xaxis.tick_bottom()
 
     # Adjust label size
-    ax.yaxis.label.set_size(text_size)
-    ax.xaxis.label.set_size(text_size)
     ax.title.set_size(text_size)
+
+    plt.xticks(rotation=70, fontsize=text_size)
+    plt.yticks(fontsize=text_size)
 
     # Set treshold for different colors
     threshold = (cm.max() + cm.min()) / 2.
     # Plot the text on each cell
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, f"{cm[i, j]}, ({cm_norm[i, j] * 100:.1f}%)",
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > threshold else "black",
-                 size=text_size)
+        if norm:
+            plt.text(j, i, f"{cm[i, j]} ({cm_norm[i, j] * 100:.1f}%)",
+                     horizontalalignment="center",
+                     color="white" if cm[i, j] > threshold else "black",
+                     size=text_size)
+        else:
+            plt.text(j, i, f"{cm[i, j]}",
+                     horizontalalignment="center",
+                     color="white" if cm[i, j] > threshold else "black",
+                     size=text_size)
+
+    if savefig:
+        fig.savefig("confusion_matrix.png")
+
+
+def plot_classification_report_f1_score(y_true, y_pred, class_names):
+    if isinstance(y_true, Dataset):
+        raise TypeError(
+            'y_true is a dataset, please get the labels from the dataset using \'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')
+
+    # If y_true or y_pred is not a Numpy array then try to convert it.
+    y_true = __convert_to_numpy_array_if_neccesary(y_true)
+    y_pred = __convert_to_numpy_array_if_neccesary(y_pred)
+
+    # If the labels are on-hot encoded then change them to be integer encoded labels.
+    if y_true.ndim == 2:
+        y_true = np.argmax(y_true, axis=1)  # convert back to integer encoded labels
+
+    # When the prediction is a multi-class classification:
+    if y_pred.ndim != 1 and len(y_pred[0]) > 1 and isinstance(y_pred[0][0], np.floating):
+        y_pred = np.argmax(y_pred, axis=1)
+
+    # When the prediction is a binary classification model:
+    elif y_pred.ndim != 1 and len(y_pred[0]) == 1 and isinstance(y_pred[0][0], np.floating):
+        y_pred = np.round(y_pred)
+
+    report_dict = classification_report(y_true=y_true, y_pred=y_pred, target_names=class_names, output_dict=True)
+
+    f1_scores = {}
+    for k, v in report_dict.items():
+        if k == 'accuracy':  # Cut-off when the accuracy key is visible.
+            break
+        else:
+            f1_scores[k] = v['f1-score']
+
+    f1_scores_sorted = dict(sorted(f1_scores.items(), key=lambda item: item[1], reverse=True))
+
+    plt.rcdefaults()
+    fig, ax = plt.subplots(figsize=(10, 30))
+
+    y_pos = range(len(f1_scores_sorted))
+    scores = ax.barh(y_pos, f1_scores_sorted.values(), align='center')
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(f1_scores_sorted.keys())
+
+    ax.invert_yaxis()  # labels read top-to-bottom
+    ax.set_xlabel('F1-score')
+    ax.set_title('F1-Scores')
+    ax.bar_label(scores, fmt='%.2f')
+
+    # Remove anoying white space at top / bottom.
+    plt.margins(y=0)
+
+    plt.show()
 
 
 def normalize_xy_data(X):
@@ -260,7 +361,8 @@ def show_images_from_nparray_or_tensor(X, y, class_labels=None, indices=None, sh
     """
 
     if indices:
-        assert shape[0] * shape[1] <= len(indices), f"Size of shape ({shape[0]}, {shape[1]}), with a total of {shape[0] * shape[1]} images, is larger then number of indices supplied ({len(indices)})."
+        assert shape[0] * shape[1] <= len(
+            indices), f"Size of shape ({shape[0]}, {shape[1]}), with a total of {shape[0] * shape[1]} images, is larger then number of indices supplied ({len(indices)})."
         for i in indices:
             if i > len(X):
                 assert False, f"Values of indices point to an index ({i}) which is out of bounds of X (length: {len(X)})"
@@ -289,5 +391,3 @@ def show_images_from_nparray_or_tensor(X, y, class_labels=None, indices=None, sh
             plt.title(class_index, color='white')
         else:
             plt.title("{name}: {idx}".format(name=class_labels[class_index], idx=class_index), color='white')
-
-

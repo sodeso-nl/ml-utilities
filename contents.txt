@@ -1,0 +1,6 @@
+https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_callback.py
+https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_internal.py
+https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_io.py
+https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_layer.py
+https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_plot.py
+https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_util.py

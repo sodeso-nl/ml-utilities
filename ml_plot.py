@@ -116,7 +116,7 @@ def plot_xy_data_with_label(x, y):
     plt.show()
 
 
-def plot_decision_boundary(model, X, y):
+def plot_decision_boundary(model, x, y):
     """
     Plots the decision boundary created by a model predicting on X.
 
@@ -128,8 +128,8 @@ def plot_decision_boundary(model, X, y):
     :param y: are the associated labels (0=blue, 1=red)
     """
     # Define the axis boundaries of the plot and create a meshgrid.
-    x_min, x_max = X[:, 0].min() - 0.1, X[:, 0].max() + 0.1
-    y_min, y_max = X[:, 1].min() - 0.1, X[:, 1].max() + 0.1
+    x_min, x_max = x[:, 0].min() - 0.1, x[:, 0].max() + 0.1
+    y_min, y_max = x[:, 1].min() - 0.1, x[:, 1].max() + 0.1
 
     xx, yy = np.meshgrid(np.linspace(x_min, x_max, 100),
                          np.linspace(y_min, y_max, 100))
@@ -151,7 +151,7 @@ def plot_decision_boundary(model, X, y):
 
     # Plot the decision boundary
     plt.contourf(xx, yy, y_pred, cmap=plt.cm.RdYlBu, alpha=0.7)
-    plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.cm.RdYlBu)
+    plt.scatter(x[:, 0], x[:, 1], c=y, s=40, cmap=plt.cm.RdYlBu)
     plt.xlim(xx.min(), xx.max())
     plt.ylim(yy.min(), yy.max())
 
@@ -305,7 +305,7 @@ def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10
     plt.show()
 
 
-def show_images_from_nparray_or_tensor(X, y, class_labels=None, indices=None, shape=(4, 6), cmap='gray'):
+def show_images_from_nparray_or_tensor(x, y, class_labels=None, indices=None, shape=(4, 6), cmap='gray'):
     """
     Shows images stored in a tensor / numpy array. The array should be a vector of images.
 
@@ -322,8 +322,8 @@ def show_images_from_nparray_or_tensor(X, y, class_labels=None, indices=None, sh
             indices), f"Size of shape ({shape[0]}, {shape[1]}), with a total of " \
                       f"{shape[0] * shape[1]} images, is larger then number of indices supplied ({len(indices)})."
         for i in indices:
-            if i > len(X):
-                assert False, f"Values of indices point to an index ({i}) which is out of bounds of X (length: {len(X)})"
+            if i > len(x):
+                assert False, f"Values of indices point to an index ({i}) which is out of bounds of X (length: {len(x)})"
 
     fig = plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
     fig.patch.set_facecolor('gray')
@@ -332,11 +332,11 @@ def show_images_from_nparray_or_tensor(X, y, class_labels=None, indices=None, sh
         ax.axis('off')
 
         if indices is None:
-            rand_index = random.choice(range(len(X)))
+            rand_index = random.choice(range(len(x)))
         else:
             rand_index = indices[i]
 
-        plt.imshow(X[rand_index], cmap=cmap)
+        plt.imshow(x[rand_index], cmap=cmap)
 
         if mli.is_multiclass_classification(y):
             class_index = mli.to_ordinal(y)

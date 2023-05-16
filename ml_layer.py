@@ -56,9 +56,9 @@ def load_weights(model, filepath):
 
 def list_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
     layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
-    layer_name_col_width = len(max(list(map(lambda layer: layer.name, layers)), key=len))
-    layer_type_col_width = len(max(list(map(lambda layer: type(layer).__name__, layers)), key=len))
-    layer_shape_col_width = len(max(list(map(lambda layer: str(layer.output_shape), layers)), key=len))
+    layer_name_col_width = len(max(list(map(lambda l: l.name, layers)), key=len))
+    layer_type_col_width = len(max(list(map(lambda l: type(l).__name__, layers)), key=len))
+    layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), layers)), key=len))
 
     print(f"{'Row':<5} | {'Name (Type)':<{layer_name_col_width + layer_type_col_width + 3}} | Trainable | Output Shape")
     for layer_number, layer in enumerate(layers):

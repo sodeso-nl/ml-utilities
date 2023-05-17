@@ -11,7 +11,7 @@ def download_file(source, destination):
     :param destination: the destination path and filename
     """
     path = os.path.dirname(destination)
-    if not path:
+    if path:
         os.makedirs(path, exist_ok=True)
     else:
         os.path.join('./', destination)

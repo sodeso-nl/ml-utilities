@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 from sklearn.model_selection import train_test_split
 
@@ -12,7 +13,7 @@ def get_labels_from_dataset(dataset, index_only=True):
     :return: the labels
     """
     y_labels = []
-    for images, labels in dataset.unbatch(): # Un-batch the test data and get images and labels
+    for images, labels in dataset.unbatch():  # Un-batch the test data and get images and labels
         if index_only:
             y_labels.append(labels.numpy().argmax())  # Append the index which has the largest value (one-hot)
         else:
@@ -47,3 +48,32 @@ def split_train_test_data(*arrays, test_size=.2, train_size=.8, random_state=42,
                             train_size=train_size,
                             random_state=random_state,
                             shuffle=shuffle)
+
+
+# Create a function to load and prepare images
+def load_and_prep_image(filename, img_shape=224, scale=True):
+    """
+    Reads in an image from filename, turns it into a tensor and reshapes into
+    specified shape (img_shape, img_shape, channels)
+
+    Args:
+      filename (str): path to target image
+      image_shape (int): height/width dimension of target image size
+      scale (bool): scale pixel values from 0-255 to 0-1 or not
+
+    Returns:
+      Image tensor of shape (img_shape, img_shape, 3)
+    """
+    # Read in the image
+    img = tf.io.read_file(filename=filename)
+
+    # Decode image into tensor
+    img = tf.io.decode_image(contents=img, channels=3)
+
+    # Resize the image (height / width)
+    img = tf.image.resize(images=img, size=[img_shape, img_shape])
+
+    if scale:
+        return img / 255.
+    else:
+        return img

@@ -10,6 +10,17 @@ from sklearn.metrics import confusion_matrix, classification_report
 from tensorflow.data import Dataset
 
 
+def plot_histogram_from_dataframe(x, columns):
+    """
+    Plots a histogram for each of the specified columns in the DataFrame X.
+
+    :param X: a dataframe
+    :param columns: columns which exist within the DataFrame.
+    """
+    for c in columns:
+        x.hist(c)
+
+
 def _plot_history_ends(histories, labels):
     for idx, history in enumerate(histories):
         plt.plot([min(history.epoch), min(history.epoch)], plt.ylim(), label=f'{labels[idx]}')

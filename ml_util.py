@@ -50,7 +50,6 @@ def split_train_test_data(*arrays, test_size=.2, train_size=.8, random_state=42,
                             shuffle=shuffle)
 
 
-# Create a function to load and prepare images
 def load_and_prep_image(filename, img_shape=224, scale=True):
     """
     Reads in an image from filename, turns it into a tensor and reshapes into

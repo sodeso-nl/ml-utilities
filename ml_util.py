@@ -69,8 +69,14 @@ def load_and_prep_image(filename, img_shape=224, scale=True):
     # Decode image into tensor
     img = tf.io.decode_image(contents=img, channels=3)
 
-    # Resize the image (height / width)
+    # # Resize the image (height / width)
+    img = tf.image.convert_image_dtype(img, tf.float32)
     img = tf.image.resize(images=img, size=[img_shape, img_shape])
+
+    if not scale:
+        return tf.cast(img * 255, tf.int32)
+    else:
+        return img
 
     if scale:
         return img / 255.

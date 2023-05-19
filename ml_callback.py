@@ -1,8 +1,26 @@
 from tensorflow.python.platform import tf_logging as logging
 from keras.utils import io_utils
-from keras.callbacks import Callback, TensorBoard, LearningRateScheduler, ModelCheckpoint
+from keras.callbacks import Callback, TensorBoard, LearningRateScheduler, ModelCheckpoint, EarlyStopping
 
 import datetime
+
+
+def create_early_stopping_callback(monitor='val_loss',
+                                   min_delta=0,
+                                   patience=5,
+                                   verbose=0,
+                                   mode='min',
+                                   baseline=None,
+                                   restore_best_weights=True,
+                                   start_from_epoch=0):
+    return EarlyStopping(monitor=monitor,
+                         min_delta=min_delta,
+                         patienc=patience,
+                         verbose=verbose,
+                         mode=mode,
+                         baseline=baseline,
+                         restore_best_weights=restore_best_weights,
+                         start_from_epoch=start_from_epoch)
 
 
 def create_model_checkpoint_callback(experiment_name,
@@ -30,7 +48,7 @@ def create_learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50
     """
     min, max, division = _find_learning_rate_division(learning_rate=learning_rate_start, epochs=epochs)
     print(f"Min learning rate: {min}\nMax learning rate: {max}\nDivision: {division}")
-    return LearningRateScheduler(lambda epoch: learning_rate_start * 10 ** (epoch/division))
+    return LearningRateScheduler(lambda epoch: learning_rate_start * 10 ** (epoch / division))
 
 
 def create_tensorboard_callback(experiment_name, dir_name='./logs'):
@@ -40,11 +58,11 @@ def create_tensorboard_callback(experiment_name, dir_name='./logs'):
 
 
 def create_stop_training_on_target_callback(metric="val_loss",
-                 target=0.95,
-                 patience=0,
-                 verbose=0,
-                 start_from_epoch=0,
-                 restore_best_weights=False):
+                                            target=0.95,
+                                            patience=0,
+                                            verbose=0,
+                                            start_from_epoch=0,
+                                            restore_best_weights=False):
     return StopTrainingOnTarget(metric=metric,
                                 target=target,
                                 patience=patience,
@@ -138,7 +156,7 @@ class StopTrainingOnTarget(Callback):
             io_utils.print_msg(
                 f"Epoch {self.stopped_epoch + 1}: training stopped "
                 f"on metric a`{self.metric}` with a target value of {self.target}), "
-                f"epoch {self.best_epoch} achieved {round(self.best_value*100, 2)}% accuracy"
+                f"epoch {self.best_epoch} achieved {round(self.best_value * 100, 2)}% accuracy"
             )
 
     def _get_metric_value(self, logs):

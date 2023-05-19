@@ -2,6 +2,24 @@ import numpy as np
 import tensorflow as tf
 
 from sklearn.model_selection import train_test_split
+from keras import mixed_precision
+
+
+def set_single_precision_policy():
+    policy = mixed_precision.Policy("float32")
+    mixed_precision.set_global_policy(policy)
+
+
+def set_mixed_precision_policy_for_gpu():
+    policy = mixed_precision.Policy("mixed_float16")
+    mixed_precision.set_global_policy(policy)
+    print(f"For details: https://www.tensorflow.org/guide/mixed_precision")
+
+
+def set_mixed_precision_policy_for_tpu():
+    policy = mixed_precision.Policy("mixed_bfloat16")
+    mixed_precision.set_global_policy(policy)
+    print(f"For details: https://www.tensorflow.org/guide/mixed_precision")
 
 
 def get_labels_from_dataset(dataset, index_only=True):
@@ -50,35 +68,3 @@ def split_train_test_data(*arrays, test_size=.2, train_size=.8, random_state=42,
                             shuffle=shuffle)
 
 
-def load_and_prep_image(filename, img_shape=224, scale=True):
-    """
-    Reads in an image from filename, turns it into a tensor and reshapes into
-    specified shape (img_shape, img_shape, channels)
-
-    Args:
-      filename (str): path to target image
-      image_shape (int): height/width dimension of target image size
-      scale (bool): scale pixel values from 0-255 to 0-1 or not
-
-    Returns:
-      Image tensor of shape (img_shape, img_shape, 3)
-    """
-    # Read in the image
-    img = tf.io.read_file(filename=filename)
-
-    # Decode image into tensor
-    img = tf.io.decode_image(contents=img, channels=3)
-
-    # # Resize the image (height / width)
-    img = tf.image.convert_image_dtype(img, tf.float32)
-    img = tf.image.resize(images=img, size=[img_shape, img_shape])
-
-    if not scale:
-        return tf.cast(img * 255, tf.int32)
-    else:
-        return img
-
-    if scale:
-        return img / 255.
-    else:
-        return img

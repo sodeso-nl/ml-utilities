@@ -262,7 +262,7 @@ def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10
     :param y_true: Array of truth labels (must be same shape as y_pred).
     :param y_pred: Array of predicted labels (must be same shape as y_true).
     :param class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
-    :param figsize: Size of output figure (default=(15, 15)).
+    :param figsize: Size of output figure (default=(10, 8)).
     """
     if isinstance(y_true, Dataset):
         raise TypeError(
@@ -359,3 +359,19 @@ def show_images_from_nparray_or_tensor(x, y, class_labels=None, indices=None, sh
             plt.title(class_index, color='white')
         else:
             plt.title("{name}: {idx}".format(name=class_labels[class_index], idx=class_index), color='white')
+
+
+def plot_single_image_from_nparray_or_tensor(image, title="", figsize=(10, 8), cmap='gray'):
+    """
+    Shows images stored in a tensor / numpy array. The array should be a vector of images.
+
+    :param image: the image to plot
+    :param title: the title to display above the image
+    :param figsize: Size of output figure (default=(10, 8)).
+    :param cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
+    """
+    fig = plt.figure(figsize=figsize)
+    fig.patch.set_facecolor('gray')
+    plt.imshow(image, cmap=cmap)
+    plt.axis('off')
+    plt.title(f"{title}", color='white')

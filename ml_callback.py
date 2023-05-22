@@ -27,14 +27,16 @@ def create_model_checkpoint_callback(experiment_name,
                                      dir_name='./checkpoints',
                                      metric='val_loss',
                                      save_weights_only=False,
-                                     save_best_only=False, save_freq='epoch'):
+                                     save_best_only=False,
+                                     save_freq='epoch',
+                                     verbose=1):
     log_dir = dir_name + '/' + experiment_name + f'/model-epoch-{{epoch:02d}}-{metric}-{{{metric}:.2f}}.hdf5'
     return ModelCheckpoint(filepath=log_dir,
                            monitor=metric,
                            save_weights_only=save_weights_only,
                            save_best_only=save_best_only,
                            save_freq=save_freq,
-                           verbose=1)
+                           verbose=verbose)
 
 
 def create_learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50):

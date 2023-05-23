@@ -1,4 +1,32 @@
 def collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
+    """
+    Collects layers from the given model, if the model is functional then there might be sub-branches
+    inside the model, for example:
+
+    data_augmentation = Sequential([
+        RandomFlip("horizontal"),
+        RandomHeight(.2),
+        RandomWidth(.2),
+        RandomRotation(.2),
+        RandomZoom(.2),
+    ], name="data_augemtation")
+
+    inputs = Input(shape=INPUT_SHAPE, name="input_layer")
+    x = data_augmentation(inputs)
+    x = base_model(x, training=False)
+    x = GlobalAveragePooling2D(name='global_average_pooling_2d')(x)
+    outputs = Dense(10, activation="softmax", name="output_layer")(x)
+    model_2 = Model(inputs, outputs)
+
+    Where in this case the data_augmentation is a sub-branch inside the functional model, use recursive to also
+    traverse these layers.
+
+    :param model: the model
+    :param recursive: follow recursive
+    :param include_trainable: include layers that are set as trainable (default: True)
+    :param include_non_trainable: include layers that are set as non-trainable (default: True)
+    :return: the layers
+    """
     layers = []
 
     for layer in model.layers:

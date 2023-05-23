@@ -4,3 +4,5 @@ https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_io.py
 https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_layer.py
 https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_plot.py
 https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_util.py
+https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_data.py
+https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_view.py

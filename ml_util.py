@@ -17,38 +17,22 @@ def set_mixed_precision_policy_for_gpu():
     """
     Enable mixed precision by using the mixed_float16 policy, use this policy
     for GPU acceleration.
+
+    For details: https://www.tensorflow.org/guide/mixed_precision
     """
     policy = mixed_precision.Policy("mixed_float16")
     mixed_precision.set_global_policy(policy)
-    print(f"For details: https://www.tensorflow.org/guide/mixed_precision")
 
 
 def set_mixed_precision_policy_for_tpu():
     """
     Enable mixed precision by using the mixed_bfloat16 policy, use this policy
     for TPU acceleration.
+
+    For details: https://www.tensorflow.org/guide/mixed_precision
     """
     policy = mixed_precision.Policy("mixed_bfloat16")
     mixed_precision.set_global_policy(policy)
-    print(f"For details: https://www.tensorflow.org/guide/mixed_precision")
-
-
-def get_labels_from_dataset(dataset, index_only=True):
-    """
-    Returns the labels from a (batched)Dataset
-
-    :param dataset: the dataset from which we want the labels.
-    :param index_only: to create an indexed list or keep the one-hot encoded.
-    :return: the labels
-    """
-    y_labels = []
-    for images, labels in dataset.unbatch():  # Un-batch the test data and get images and labels
-        if index_only:
-            y_labels.append(labels.numpy().argmax())  # Append the index which has the largest value (one-hot)
-        else:
-            y_labels.append(labels.numpy())
-
-    return y_labels
 
 
 def normalize_xy_data(x):

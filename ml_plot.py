@@ -10,6 +10,11 @@ from sklearn.metrics import confusion_matrix, classification_report
 from tensorflow.data import Dataset
 
 
+########################################################################################################################
+# Plotting pandas Dataframe
+########################################################################################################################
+
+
 def plot_histogram_from_dataframe(x, columns):
     """
     Plots a histogram for each of the specified columns in the DataFrame X.
@@ -21,14 +26,9 @@ def plot_histogram_from_dataframe(x, columns):
         x.hist(c)
 
 
-def _plot_history_ends(histories, labels):
-    for idx, history in enumerate(histories):
-        plt.plot([min(history.epoch), min(history.epoch)], plt.ylim(), label=f'{labels[idx]}')
-
-
-def _plot_history_graph_line(data, label, color, linestyle='solid'):
-    if data:
-        plt.plot(data, label=label, color=color, linestyle=linestyle, linewidth=1.5)
+########################################################################################################################
+# Plotting history methods
+########################################################################################################################
 
 
 def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
@@ -109,9 +109,15 @@ def plot_history(history, figsize=(10, 6)):
     plot_consecutive_histories([history], ["Start history"], figsize=figsize)
 
 
+########################################################################################################################
+# Plotting methods for linear / logistic regression
+########################################################################################################################
+
+
 def plot_xy_data_with_label(x, y):
     """
-    Plots a graph of the values of x.
+    Plots a graph of the values of x whereas x contains vectors of x/y coordinates and y
+    is the label (0 or 1).
 
     :param X: is an array containing vectors of x/y coordinates.
     :param y: are the associated labels (0=blue, 1=red)
@@ -316,62 +322,30 @@ def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10
     plt.show()
 
 
-def show_images_from_nparray_or_tensor(x, y, class_labels=None, indices=None, shape=(4, 6), cmap='gray'):
+########################################################################################################################
+# Internal methods for plotting history
+########################################################################################################################
+
+
+def _plot_history_ends(histories, labels):
     """
-    Shows images stored in a tensor / numpy array. The array should be a vector of images.
+    Internal method which will plot a vertical line showing where a histories last epoch is visible.
 
-    :param X: is an array containing vectors of images.
-    :param y: are the associated labels
-    :param class_labels: the labels of the classes
-    :param indices: None to pick random, otherwise an array of indexes to display
-    :param shape: is the number of images to display
-    :param cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
+    :param histories: the history objects returned from fitting models.
+    :param labels: the labels for each history object for seperating the epochs
     """
-
-    if indices:
-        assert shape[0] * shape[1] <= len(
-            indices), f"Size of shape ({shape[0]}, {shape[1]}), with a total of " \
-                      f"{shape[0] * shape[1]} images, is larger then number of indices supplied ({len(indices)})."
-        for i in indices:
-            if i > len(x):
-                assert False, f"Values of indices point to an index ({i}) which is out of bounds of X (length: {len(x)})"
-
-    fig = plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
-    fig.patch.set_facecolor('gray')
-    for i in range(shape[0] * shape[1]):
-        ax = plt.subplot(shape[0], shape[1], i + 1)
-        ax.axis('off')
-
-        if indices is None:
-            rand_index = random.choice(range(len(x)))
-        else:
-            rand_index = indices[i]
-
-        plt.imshow(x[rand_index], cmap=cmap)
-
-        if mli.is_multiclass_classification(y):
-            class_index = mli.to_ordinal(y)
-        else:
-            # Integer encoded labels
-            class_index = y[rand_index]
-
-        if class_labels is None:
-            plt.title(class_index, color='white')
-        else:
-            plt.title("{name}: {idx}".format(name=class_labels[class_index], idx=class_index), color='white')
+    for idx, history in enumerate(histories):
+        plt.plot([min(history.epoch), min(history.epoch)], plt.ylim(), label=f'{labels[idx]}')
 
 
-def plot_single_image_from_nparray_or_tensor(image, title="", figsize=(10, 8), cmap='gray'):
+def _plot_history_graph_line(data, label, color, linestyle='solid'):
     """
-    Shows images stored in a tensor / numpy array. The array should be a vector of images.
+    Internal method which will plot the information from the fit histroy.
 
-    :param image: the image to plot
-    :param title: the title to display above the image
-    :param figsize: Size of output figure (default=(10, 8)).
-    :param cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
+    :param data: the data to plot
+    :param label: the label associated with the data
+    :param color: color of the line
+    :param linestyle: line-style of the line (default: solid)
     """
-    fig = plt.figure(figsize=figsize)
-    fig.patch.set_facecolor('gray')
-    plt.imshow(image, cmap=cmap)
-    plt.axis('off')
-    plt.title(f"{title}", color='white')
+    if data:
+        plt.plot(data, label=label, color=color, linestyle=linestyle, linewidth=1.5)

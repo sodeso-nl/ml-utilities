@@ -35,6 +35,13 @@ def set_mixed_precision_policy_for_tpu():
     mixed_precision.set_global_policy(policy)
 
 
+def get_mixed_precision_policy():
+    """
+    Returns the current configured mixed-precision policy.
+    :return: the current configured mixed-precision policy.
+    """
+    return mixed_precision.global_policy()
+
 def normalize_xy_data(x):
     """
     Normalizes an array containing vectors of x/y coordinates so that the array does not contain

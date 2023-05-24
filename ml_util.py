@@ -42,6 +42,7 @@ def get_mixed_precision_policy():
     """
     return mixed_precision.global_policy()
 
+
 def normalize_xy_data(x):
     """
     Normalizes an array containing vectors of x/y coordinates so that the array does not contain

@@ -151,7 +151,7 @@ def save_model_alt(model, directory, name, format='h5'):
         pickle.dump(config, fp)
 
     model_file = os.path.join(directory, name + '.' + format)
-    model.save(model_file, save_format="tf")
+    model.save(model_file, save_format=format)
 
 
 def load_model_alt(directory, name, format='h5'):

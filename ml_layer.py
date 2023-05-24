@@ -78,11 +78,12 @@ def list_layers(layers, include_trainable=True, include_non_trainable=True):
     layer_type_col_width = len(max(list(map(lambda l: type(l).__name__, layers)), key=len))
     layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), layers)), key=len))
     layer_dtype_col_width = len(max(list(map(lambda l: str(l.dtype), layers)), key=len))
+    layer_dtype_policy_col_width = len(max(list(map(lambda l: str(l.dtype_policy.name), layers)), key=len))
 
-    print(f"{'row':<5} | {'name (type)':<{layer_name_col_width + layer_type_col_width + 3}} | {'dtype':<{layer_dtype_col_width}} | trainable | output shape")
+    print(f"{'row':<5} | {'name (type)':<{layer_name_col_width + layer_type_col_width + 3}} | {'dtype':<{layer_dtype_col_width}} | {'policy':<{layer_dtype_policy_col_width}} | trainable | output shape")
     for layer_number, layer in enumerate(layers):
         if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable is False):
-            print(f"{layer_number:<5} | {layer.name:<{layer_name_col_width}} ({type(layer).__name__:<{layer_type_col_width}}) | {str(layer.dtype):<{layer_dtype_col_width}} | {str(layer.trainable):<9} | "
+            print(f"{layer_number:<5} | {layer.name:<{layer_name_col_width}} ({type(layer).__name__:<{layer_type_col_width}}) | {str(layer.dtype):<{layer_dtype_col_width}} | {str(layer.dtype_policy.name):<{layer_dtype_policy_col_width}} | {str(layer.trainable):<9} | "
                   f"{str(layer.output_shape):<{layer_shape_col_width}}")
 
 

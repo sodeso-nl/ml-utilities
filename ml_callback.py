@@ -1,8 +1,27 @@
 from tensorflow.python.platform import tf_logging as logging
 from keras.utils import io_utils
-from keras.callbacks import Callback, TensorBoard, LearningRateScheduler, ModelCheckpoint, EarlyStopping
+from keras.callbacks import Callback, TensorBoard, LearningRateScheduler, ModelCheckpoint, EarlyStopping, \
+    ReduceLROnPlateau
 
 import datetime
+
+
+def create_reduce_lr_on_plateau_callback(monitor="val_loss",
+                                         factor=0.2,
+                                         patience=2,
+                                         verbose=1,
+                                         mode="auto",
+                                         min_delta=1e-4,
+                                         cooldown=0,
+                                         min_lr=1e-7):
+    return ReduceLROnPlateau(monitor=monitor,
+                             factor=factor,
+                             patience=patience,
+                             verbose=verbose,
+                             mode=mode,
+                             min_delta=min_delta,
+                             cooldown=cooldown,
+                             min_lr=min_lr)
 
 
 def create_early_stopping_callback(monitor='val_loss',

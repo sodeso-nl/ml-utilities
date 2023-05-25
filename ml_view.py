@@ -4,7 +4,7 @@ import random
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-import ml_internal as mli
+import ml_internal as mlint
 
 
 def show_random_image_from_disk(target_dir, target_class):
@@ -62,8 +62,8 @@ def show_images_from_nparray_or_tensor(x, y, class_labels=None, indices=None, sh
 
         plt.imshow(x[rand_index], cmap=cmap)
 
-        if mli.is_multiclass_classification(y):
-            class_index = mli.to_ordinal(y)
+        if mlint.is_multiclass_classification(y):
+            class_index = mlint.to_ordinal(y)
         else:
             # Integer encoded labels
             class_index = y[rand_index]

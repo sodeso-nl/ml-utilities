@@ -1,6 +1,8 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
+import ml_internal as mlint
+
 from keras.utils import image_dataset_from_directory
 
 ########################################################################################################################
@@ -91,7 +93,7 @@ def load_food101_from_tdfs(img_shape=(224, 224), rescale=1/255., shuffle_buffer_
     return (train_data, test_data), ds_info
 
 
-def get_labels_from_dataset_info(ds_info):
+def get_class_names_from_dataset_info(ds_info):
     """
     Returns the labels from the dataset info object which is created from loading a
     TensorFlow Dataset (tensorflow_datasets)
@@ -132,8 +134,13 @@ def get_labels_from_dataset(dataset, index_only=True):
     :param index_only: to create an indexed list or keep the one-hot encoded.
     :return: the labels / class names
     """
+    dataset_unbatched = dataset.unbatch()
+    _, y = next(iter(dataset_unbatched))
+    if not mlint.is_multiclass_classification(y) and index_only:
+        raise TypeError('dataset is not a multiclass classification, index_only must be False')
+
     y_labels = []
-    for images, labels in dataset.unbatch():  # Un-batch the test data and get images and labels
+    for images, labels in dataset_unbatched:  # Un-batch the test data and get images and labels
         if index_only:
             y_labels.append(labels.numpy().argmax())  # Append the index which has the largest value (one-hot)
         else:

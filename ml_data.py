@@ -126,25 +126,26 @@ def load_image_dataset_from_directory(directory,
                                         )
 
 
-def get_labels_from_dataset(dataset, index_only=True):
+def get_labels_from_dataset(dataset):
     """
     Returns the labels from a (batched)Dataset
 
     :param dataset: the dataset from which we want the labels.
-    :param index_only: to create an indexed list or keep the one-hot encoded.
     :return: the labels / class names
     """
-    dataset_unbatched = dataset.unbatch()
-    _, y = next(iter(dataset_unbatched))
-    if not mlint.is_multiclass_classification(y) and index_only:
-        raise TypeError('dataset is not a multiclass classification, index_only must be False')
+    if not isinstance(dataset, tf.data.Dataset):
+      raise TypeError('dataset is not a tf.data.Dataset')
+
+    input_dataset = dataset._input_dataset
+    while not hasattr(input_dataset, '_batch_size') and hasattr(input_dataset, '_input_dataset'):
+      input_dataset = input_dataset._input_dataset
+
+    if hasattr(input_dataset, '_batch_size'):
+      dataset = dataset.unbatch()
 
     y_labels = []
-    for images, labels in dataset_unbatched:  # Un-batch the test data and get images and labels
-        if index_only:
-            y_labels.append(labels.numpy().argmax())  # Append the index which has the largest value (one-hot)
-        else:
-            y_labels.append(labels.numpy())
+    for _, labels in dataset:
+        y_labels.append(labels.numpy())
 
     return y_labels
 

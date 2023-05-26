@@ -16,7 +16,7 @@ def convert_to_numpy_array_if_neccesary(value):
 
 def to_ordinal(y):
     """
-    Converts one-hot encoded labels to ordinal labels:
+    Converts sparse encoded labels to ordinal labels:
 
     One-Hot:
     [
@@ -27,7 +27,7 @@ def to_ordinal(y):
     Ordinal:
     [1, 0]
 
-    :param y: One-hot encoded labels
+    :param y: Sparse encoded labels
     :return: Ordinal encoded labels
     """
     return np.argmax(y, axis=1)

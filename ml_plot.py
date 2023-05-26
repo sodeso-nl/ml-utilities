@@ -259,7 +259,7 @@ def plot_confusion_matrix(y_true, y_pred, class_names=None, figsize=(15, 15), te
                      size=text_size)
 
     if savefig:
-        fig.savefig("confusion_matrix.png")
+        fig.savefig("./confusion_matrix.png")
 
 
 def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10, 8)):

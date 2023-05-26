@@ -5,8 +5,8 @@ from sklearn.metrics import accuracy_score
 
 def calculate_accuracy(y_true, y_pred):
     # If y_true or y_pred is not a Numpy array then try to convert it.
-    y_true = mlint.convert_to_numpy_array_if_neccesary(y_true)
     y_pred = mlint.convert_to_numpy_array_if_neccesary(y_pred)
+    y_true = mlint.convert_to_numpy_array_if_neccesary(y_true)
 
     # If the y_true labels are one-hot encoded then convert them to integer encoded labels.
     if mlint.is_multiclass_classification(y_true):

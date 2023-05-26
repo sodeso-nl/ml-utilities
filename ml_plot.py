@@ -1,4 +1,4 @@
-import ml_internal as mli
+import ml_internal as mlint
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -195,19 +195,19 @@ def plot_confusion_matrix(y_true, y_pred, class_names=None, figsize=(15, 15), te
                         '\'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')
 
     # If y_true or y_pred is not a Numpy array then try to convert it.
-    y_true = mli.convert_to_numpy_array_if_neccesary(y_true)
-    y_pred = mli.convert_to_numpy_array_if_neccesary(y_pred)
+    y_true = mlint.convert_to_numpy_array_if_neccesary(y_true)
+    y_pred = mlint.convert_to_numpy_array_if_neccesary(y_pred)
 
     # If the y_true labels are one-hot encoded then convert them to integer encoded labels.
-    if mli.is_multiclass_classification(y_true):
-        y_true = mli.to_ordinal(y_true)
+    if mlint.is_multiclass_classification(y_true):
+        y_true = mlint.to_ordinal(y_true)
 
     # Check if we need to convert multi-class classification one-hot encoding to index or
     # if we are dealing with binary classification, then we need to round the numer to either 0 or 1
-    if mli.is_multiclass_classification(y_pred):
-        y_pred = mli.to_ordinal(y_pred)
-    elif mli.is_binary_classification(y_pred):
-        y_pred = mli.to_binary(y_pred)
+    if mlint.is_multiclass_classification(y_pred):
+        y_pred = mlint.to_ordinal(y_pred)
+    elif mlint.is_binary_classification(y_pred):
+        y_pred = mlint.to_binary(y_pred)
 
     # Create the confusion matrix
     cm = confusion_matrix(y_true, y_pred)
@@ -276,19 +276,19 @@ def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10
             '\'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')
 
     # If y_true or y_pred is not a Numpy array then try to convert it.
-    y_true = mli.convert_to_numpy_array_if_neccesary(y_true)
-    y_pred = mli.convert_to_numpy_array_if_neccesary(y_pred)
+    y_true = mlint.convert_to_numpy_array_if_neccesary(y_true)
+    y_pred = mlint.convert_to_numpy_array_if_neccesary(y_pred)
 
     # If the y_true labels are one-hot encoded then convert them to integer encoded labels.
-    if mli.is_multiclass_classification(y_true):
-        y_true = mli.to_ordinal(y_true)
+    if mlint.is_multiclass_classification(y_true):
+        y_true = mlint.to_ordinal(y_true)
 
     # Check if we need to convert multi-class classification one-hot encoding to index or
     # if we are dealing with binary classification, then we need to round the numer to either 0 or 1
-    if mli.is_multiclass_classification(y_pred):
-        y_pred = mli.to_ordinal(y_pred)
-    elif mli.is_binary_classification(y_pred):
-        y_pred = mli.to_binary(y_pred)
+    if mlint.is_multiclass_classification(y_pred):
+        y_pred = mlint.to_ordinal(y_pred)
+    elif mlint.is_binary_classification(y_pred):
+        y_pred = mlint.to_binary(y_pred)
 
     # Generate classification report from SKLearn.
     report_dict = classification_report(y_true=y_true, y_pred=y_pred, target_names=class_names, output_dict=True)

@@ -62,8 +62,8 @@ def show_images_from_nparray_or_tensor(x, y, class_labels=None, indices=None, sh
 
         plt.imshow(x[rand_index], cmap=cmap)
 
-        if mlint.is_multiclass_classification(y):
-            class_index = mlint.to_ordinal(y)
+        if mlint.is_label_dense(y):
+            class_index = mlint.sparse_labels(y)
         else:
             # Integer encoded labels
             class_index = y[rand_index]

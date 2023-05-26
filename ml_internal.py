@@ -14,65 +14,94 @@ def convert_to_numpy_array_if_neccesary(value):
     return value
 
 
-def to_ordinal(y):
+def sparse_labels(y):
     """
-    Converts sparse encoded labels to ordinal labels:
+    DONE
+    Converts multiclass dense label predictions to sparse labels:
 
     One-Hot:
     [
         [0.33, 0.78, 0.23],
-        [0.64, 0.32, 0.11]
+        [0.64, 0.32, 0.11],
+        [0.22, 0.36, 0.76]
     ]
 
     Ordinal:
-    [1, 0]
+    [1, 0, 2]
 
-    :param y: Sparse encoded labels
-    :return: Ordinal encoded labels
+    :param y: Dense encoded labels
+    :return: Sparse encoded labels
     """
     return np.argmax(y, axis=1)
 
 
-def to_binary(y):
+def binarize_labels(y):
     """
-    Converts predicted encoded labels with a value between 0 & 1 to 0 or 1.:
+    DONE
+    Converts scaled classification prediction labels to binarized classification prediction labels:
 
-    Ordinal:
-    [0.33, 0.67, 0.45, 0.99]
-
-    Ordinal:
-    [0, 1, 0, 1]
-
-    :param y: Predicted encoded labels
-    :return: Ordinal encoded labels
-    """
-    return np.round(y)
-
-
-def is_multiclass_classification(y):
-    """
-    Return True if the y value is a multiclass classification, for example:
-    [
-        [0.33, 0.78, 0.23],
-        [0.64, 0.32, 0.11]
-    ]
-
-    :param y: the label to check if it is a multiclass classification
-    :return: True if it is multiclass classification, False if not.
-    """
-    return y.ndim == 2 and len(y[0]) > 1
-
-
-def is_binary_classification(y):
-    """
-    Return True if the y value is a binary classification, for example:
+    Scaled:
     [
         [0.56],
         [0.32],
         [0.98]
     ]
 
-    :param y: the label to check if it is a binary classification
-    :return: True if it is binary classification, False if not.
+    Ordinal:
+    [
+        [1],
+        [0],
+        [1]
+    ]
+
+    :param y: Scaled classification prediction labels
+    :return: Binarized classification prediction labels
+    """
+    return np.round(y)
+
+
+def is_label_dense(y):
+    """
+    DONE
+    Return True if the y value is a multiclass classification where the values represent the probability of the result
+    to be that specific class, for example, when we have three possible outcomes:
+    [
+        [0.33, 0.78, 0.23],
+        [0.64, 0.32, 0.11]
+    ]
+
+    :param y: the label to check if it is a multiclass classification prediction
+    :return: True if it is a multiclass classification, False if not.
+    """
+    return y.ndim == 2 and len(y[0]) > 1
+
+
+def is_label_scaled(y):
+    """
+    Return True if the y value is a scaled classification prediction where the value represents a probability between 0 and 1,
+    for example, when we have three different predictions:
+    [
+        [0.56],
+        [0.32],
+        [0.98]
+    ]
+
+    :param y: the label to check if it is a scaled classification prediction
+    :return: True if it is a scaled classification, False if not.
     """
     return y.ndim == 2 and len(y[0]) == 1
+
+
+def convert_to_sparse_or_binary(y_true, y_pred):
+    y_pred = convert_to_numpy_array_if_neccesary(y_pred)
+    y_true = convert_to_numpy_array_if_neccesary(y_true)
+
+    if is_label_dense(y_true):
+        y_true = sparse_labels(y_true)
+
+    if is_label_dense(y_pred):
+        y_pred = sparse_labels(y_pred)
+    elif is_label_scaled(y_pred):
+        y_pred = binarize_labels(y_pred)
+
+    return y_true, y_pred

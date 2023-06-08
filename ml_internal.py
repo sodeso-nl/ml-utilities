@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 
 def convert_to_numpy_array_if_neccesary(value):
@@ -16,17 +17,16 @@ def convert_to_numpy_array_if_neccesary(value):
 
 def sparse_labels(y):
     """
-    DONE
     Converts multiclass dense label predictions to sparse labels:
 
-    One-Hot:
+    Dense:
     [
         [0.33, 0.78, 0.23],
         [0.64, 0.32, 0.11],
         [0.22, 0.36, 0.76]
     ]
 
-    Ordinal:
+    Sparse:
     [1, 0, 2]
 
     :param y: Dense encoded labels
@@ -92,16 +92,27 @@ def is_label_scaled(y):
     return y.ndim == 2 and len(y[0]) == 1
 
 
-def convert_to_sparse_or_binary(y_true, y_pred):
-    y_pred = convert_to_numpy_array_if_neccesary(y_pred)
-    y_true = convert_to_numpy_array_if_neccesary(y_true)
+def is_image_float32_and_not_normalized(x):
+    """
+    Convenience method to check if an image in Tensor format is of type float32 but not normalized (values between
+    0..255 instead of 0..1)
+    :param x: Tensor containing the image(s)
+    :return:
+    """
+    return x.dtype == tf.float32 and tf.math.reduce_max(x).numpy() > 1.0
 
-    if is_label_dense(y_true):
-        y_true = sparse_labels(y_true)
 
-    if is_label_dense(y_pred):
-        y_pred = sparse_labels(y_pred)
-    elif is_label_scaled(y_pred):
-        y_pred = binarize_labels(y_pred)
+def convert_to_sparse_or_binary(y):
+    """
+    Converts dense values to sparse or scaled values to binary.
+    :param y:
+    :return:
+    """
+    y = convert_to_numpy_array_if_neccesary(y)
 
-    return y_true, y_pred
+    if is_label_dense(y):
+        y = sparse_labels(y)
+    elif is_label_scaled(y):
+        y = binarize_labels(y)
+
+    return y

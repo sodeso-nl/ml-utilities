@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from keras import mixed_precision
 
 
-def set_single_precision_policy():
+def set_single_precision_policy() -> None:
     """
     Disable mixed precision by using the float32 policy.
     """
@@ -12,7 +12,7 @@ def set_single_precision_policy():
     mixed_precision.set_global_policy(policy)
 
 
-def set_mixed_precision_policy_for_gpu():
+def set_mixed_precision_policy_for_gpu() -> None:
     """
     Enable mixed precision by using the mixed_float16 policy, use this policy
     for GPU acceleration.
@@ -23,7 +23,7 @@ def set_mixed_precision_policy_for_gpu():
     mixed_precision.set_global_policy(policy)
 
 
-def set_mixed_precision_policy_for_tpu():
+def set_mixed_precision_policy_for_tpu() -> None:
     """
     Enable mixed precision by using the mixed_bfloat16 policy, use this policy
     for TPU acceleration.

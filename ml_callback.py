@@ -1,6 +1,13 @@
 from tensorflow.python.platform import tf_logging as logging
+
 from keras.utils import io_utils
-from keras.callbacks import Callback, TensorBoard, LearningRateScheduler, ModelCheckpoint, EarlyStopping, \
+
+from keras.callbacks import \
+    Callback, \
+    TensorBoard, \
+    LearningRateScheduler, \
+    ModelCheckpoint, \
+    EarlyStopping, \
     ReduceLROnPlateau
 
 import datetime
@@ -13,7 +20,7 @@ def create_reduce_lr_on_plateau_callback(monitor="val_loss",
                                          mode="auto",
                                          min_delta=1e-4,
                                          cooldown=0,
-                                         min_lr=1e-7):
+                                         min_lr=1e-7) -> ReduceLROnPlateau:
     return ReduceLROnPlateau(monitor=monitor,
                              factor=factor,
                              patience=patience,
@@ -31,7 +38,7 @@ def create_early_stopping_callback(monitor='val_loss',
                                    mode='min',
                                    baseline=None,
                                    restore_best_weights=True,
-                                   start_from_epoch=0):
+                                   start_from_epoch=0) -> EarlyStopping:
     return EarlyStopping(monitor=monitor,
                          min_delta=min_delta,
                          patience=patience,
@@ -48,7 +55,7 @@ def create_model_checkpoint_callback(experiment_name,
                                      save_weights_only=False,
                                      save_best_only=False,
                                      save_freq='epoch',
-                                     verbose=1):
+                                     verbose=1) -> ModelCheckpoint:
     log_dir = dir_name + '/' + experiment_name + f'/model-epoch-{{epoch:02d}}-{metric}-{{{metric}:.2f}}.hdf5'
     return ModelCheckpoint(filepath=log_dir,
                            monitor=metric,
@@ -58,7 +65,7 @@ def create_model_checkpoint_callback(experiment_name,
                            verbose=verbose)
 
 
-def create_learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50):
+def create_learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50) -> LearningRateScheduler:
     """
     Creates a LearningRateScheduler which will be pre-configured with a division. The division
     is calculated using find_learning_rate_division.

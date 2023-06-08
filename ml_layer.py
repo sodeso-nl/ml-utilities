@@ -1,7 +1,42 @@
 import os
 import pickle
 
+import numpy as np
+
 from keras import Model
+
+
+########################################################################################################################
+# Predicting / evaluating models
+########################################################################################################################
+
+def predict_dataset(model, dataset):
+    """
+    Performs predictions on the given model for all entries in the dataset, will
+    return y_pred and y_true as a tuple. Use full for when the dataset has shuffling enabled
+    :param model: model to perform the predictions on
+    :param dataset: dataset containing the data to use for the predictions
+    :return: y_true, y_pred
+    """
+    y_pred = None
+    y_true = None
+    for x, y in dataset:
+        batch_pred = model.predict(x)
+        if y_pred is None:
+            y_pred = batch_pred
+        else:
+            y_pred = np.concatenate((y_pred, batch_pred), axis=0)
+
+        if y_true is None:
+            y_true = y
+        else:
+            y_true = np.concatenate((y_true, y), axis=0)
+    return y_true, y_pred
+
+
+########################################################################################################################
+# Extract, list, change model layers
+########################################################################################################################
 
 
 def collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
@@ -50,30 +85,30 @@ def collect_layer_names(model, recursive=True, include_trainable=True, include_n
     return list(map(lambda layer: layer.name, layers))
 
 
-def set_trainable_on_layers(model, layer_names=None, trainable=True):
+def set_trainable_on_layers(model, layer_names=None, trainable=True) -> None:
     for layer in collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
         if layer_names is None or layer.name in layer_names:
             layer.trainable = trainable
 
 
-def set_trainable_on_first_n_layers(model, n, trainable=True):
+def set_trainable_on_first_n_layers(model, n, trainable=True) -> None:
     layers = collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True)
     for layer in layers[:n]:
         layer.trainable = trainable
 
 
-def set_trainable_on_last_n_layers(model, n, trainable=True):
+def set_trainable_on_last_n_layers(model, n, trainable=True) -> None:
     layers = collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True)
     for layer in layers[-n:]:
         layer.trainable = trainable
 
 
-def list_model(model, recursive=True, include_trainable=True, include_non_trainable=True):
+def list_model(model, recursive=True, include_trainable=True, include_non_trainable=True) -> None:
     layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
     list_layers(layers=layers, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
 
 
-def list_layers(layers, include_trainable=True, include_non_trainable=True):
+def list_layers(layers, include_trainable=True, include_non_trainable=True) -> None:
     layer_name_col_width = len(max(list(map(lambda l: l.name, layers)), key=len))
     layer_type_col_width = len(max(list(map(lambda l: type(l).__name__, layers)), key=len))
     layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), layers)), key=len))
@@ -92,13 +127,12 @@ def list_layers(layers, include_trainable=True, include_non_trainable=True):
 ########################################################################################################################
 
 
-def save_weights(model, filepath, save_format="h5"):
+def save_weights(model, filepath, save_format="h5") -> None:
     """
     Saves
     :param model:
     :param filepath:
     :param save_format:
-    :return:
     """
     path = os.path.dirname(filepath)
     if path:
@@ -106,7 +140,7 @@ def save_weights(model, filepath, save_format="h5"):
     model.save(filepath, save_format=save_format)
 
 
-def load_weights(model, filepath):
+def load_weights(model, filepath) -> None:
     """
     Disables trainable on the model and on all the layers, then loads the weights and
     restores the trainable configuration on the model and weights.
@@ -130,7 +164,7 @@ def load_weights(model, filepath):
     set_trainable_on_layers(model, layer_names=trainable_layer_names, trainable=True)
 
 
-def save_model_alt(model, directory, name, format='h5'):
+def save_model_alt(model, directory, name, format='h5') -> None:
     """
     Alternative solution to saving a model since the default implementation has issues with augemntation layers.
 

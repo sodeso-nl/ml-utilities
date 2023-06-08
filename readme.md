@@ -4,20 +4,20 @@ To initially setup your environment for Apple Silicon please execute the followi
 
 Install miniforge3:
 
->> brew install miniforge
+> brew install miniforge
 
 Create a new environment in conda:
 
->> conda env create -f environment.yml
+> conda env create -f environment.yml
 
 Activate the newly created environment
 
->> conda activate ml-utilities
+> conda activate ml
 
 To delete the created environment
 
->> conda remove -n ml-utilities --all
+> conda remove -n ml --all
 
 To de-activate the environment
 
->> conda deactivate
+> conda deactivate

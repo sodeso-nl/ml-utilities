@@ -4,7 +4,7 @@ import zipfile
 import urllib
 
 
-def download_file(source, destination):
+def download_file(source, destination) -> None:
     """
     Download a file from source location and store it at the specified destination location.
     :param source: the source URL
@@ -16,10 +16,11 @@ def download_file(source, destination):
     else:
         os.path.join('./', destination)
 
+    # noinspection PyUnresolvedReferences
     urllib.request.urlretrieve(source, destination)
 
 
-def extract_tgz(file, folder='.'):
+def extract_tgz(file, folder='.') -> None:
     """
     Extracts a .tgz file in the specified destination.
     :param file: the .tgz file
@@ -32,7 +33,7 @@ def extract_tgz(file, folder='.'):
     tgz_file.close()
 
 
-def extract_zip(file, folder='.'):
+def extract_zip(file, folder='.') -> None:
     """
     Extracts a .zip file in the specified destination.
 
@@ -46,7 +47,7 @@ def extract_zip(file, folder='.'):
     zip_file.close()
 
 
-def list_dir_summary(folder):
+def list_dir_summary(folder) -> None:
     """
     Lists a summary of the specified folder
     :param folder: the folder to list the contents of

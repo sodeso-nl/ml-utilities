@@ -1,8 +1,6 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
-import ml_internal as mlint
-
 from keras.utils import image_dataset_from_directory
 
 ########################################################################################################################
@@ -126,12 +124,21 @@ def load_image_dataset_from_directory(directory,
                                         )
 
 
+def get_class_names_from_dataset(dataset):
+    """
+    Returns the class names from the dataset
+    :param dataset: the dataset from which we want the class names.
+    :return: the class names
+    """
+    return dataset.class_names
+
+
 def get_labels_from_dataset(dataset):
     """
     Returns the labels from a (batched)Dataset
 
     :param dataset: the dataset from which we want the labels.
-    :return: the labels / class names
+    :return: the labels
     """
     if not isinstance(dataset, tf.data.Dataset):
       raise TypeError('dataset is not a tf.data.Dataset')
@@ -148,4 +155,3 @@ def get_labels_from_dataset(dataset):
         y_labels.append(labels.numpy())
 
     return y_labels
-

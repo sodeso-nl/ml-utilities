@@ -2,11 +2,13 @@ import ml_internal as mlint
 
 import matplotlib.pyplot as plt
 import numpy as np
-import random
 import itertools
 
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import \
+    confusion_matrix, \
+    classification_report
 
+# noinspection PyUnresolvedReferences
 from tensorflow.data import Dataset
 
 
@@ -15,11 +17,11 @@ from tensorflow.data import Dataset
 ########################################################################################################################
 
 
-def plot_histogram_from_dataframe(x, columns):
+def plot_histogram_from_dataframe(x, columns) -> None:
     """
     Plots a histogram for each of the specified columns in the DataFrame X.
 
-    :param X: a dataframe
+    :param x: a dataframe
     :param columns: columns which exist within the DataFrame.
     """
     for c in columns:
@@ -31,7 +33,7 @@ def plot_histogram_from_dataframe(x, columns):
 ########################################################################################################################
 
 
-def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
+def plot_consecutive_histories(histories, labels, figsize=(10, 6)) -> None:
     """
     Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
 
@@ -105,7 +107,7 @@ def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
         plt.legend()
 
 
-def plot_history(history, figsize=(10, 6)):
+def plot_history(history, figsize=(10, 6)) -> None:
     plot_consecutive_histories([history], ["Start history"], figsize=figsize)
 
 
@@ -114,12 +116,12 @@ def plot_history(history, figsize=(10, 6)):
 ########################################################################################################################
 
 
-def plot_xy_data_with_label(x, y):
+def plot_xy_data_with_label(x, y) -> None:
     """
     Plots a graph of the values of x whereas x contains vectors of x/y coordinates and y
     is the label (0 or 1).
 
-    :param X: is an array containing vectors of x/y coordinates.
+    :param x: is an array containing vectors of x/y coordinates.
     :param y: are the associated labels (0=blue, 1=red)
     """
     plt.plot(x[:, 0][y == 1], x[:, 1][y == 1], "bs")
@@ -133,7 +135,7 @@ def plot_xy_data_with_label(x, y):
     plt.show()
 
 
-def plot_decision_boundary(model, x, y):
+def plot_decision_boundary(model, x, y) -> None:
     """
     Plots the decision boundary created by a model predicting on X.
 
@@ -141,7 +143,7 @@ def plot_decision_boundary(model, x, y):
     https://cs231n.github.io/neural-networks-case-study
 
     :param model: the sequence model.
-    :param X: array containing vectors with x/y coordinates
+    :param x: array containing vectors with x/y coordinates
     :param y: are the associated labels (0=blue, 1=red)
     """
     # Define the axis boundaries of the plot and create a meshgrid.
@@ -167,13 +169,15 @@ def plot_decision_boundary(model, x, y):
         y_pred = np.round(y_pred).reshape(xx.shape)
 
     # Plot the decision boundary
+    # noinspection PyUnresolvedReferences
     plt.contourf(xx, yy, y_pred, cmap=plt.cm.RdYlBu, alpha=0.7)
+    # noinspection PyUnresolvedReferences
     plt.scatter(x[:, 0], x[:, 1], c=y, s=40, cmap=plt.cm.RdYlBu)
     plt.xlim(xx.min(), xx.max())
     plt.ylim(yy.min(), yy.max())
 
 
-def plot_confusion_matrix(y_true, y_pred, class_names=None, figsize=(15, 15), text_size=10, norm=False, savefig=False):
+def plot_confusion_matrix(y_true, y_pred, class_names=None, figsize=(15, 15), text_size=10, norm=False, savefig=False) -> None:
     """
       Plots a confusion matrix of the given data.
 
@@ -194,15 +198,17 @@ def plot_confusion_matrix(y_true, y_pred, class_names=None, figsize=(15, 15), te
         raise TypeError('y_true is a dataset, please get the labels from the dataset using '
                         '\'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')
 
-    y_true, y_pred = mlint.convert_to_sparse_or_binary(y_true=y_true, y_pred=y_pred)
+    y_true = mlint.convert_to_sparse_or_binary(y=y_true)
+    y_pred = mlint.convert_to_sparse_or_binary(y=y_pred)
 
     # Create the confusion matrix
     cm = confusion_matrix(y_true, y_pred)
     cm_norm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]  # normalize our confusion matrix
     n_classes = cm.shape[0]
-    # Let's prettify it
+
     fig, ax = plt.subplots(figsize=figsize)
-    # Create a matrix plot
+
+    # noinspection PyUnresolvedReferences
     cax = ax.matshow(cm, cmap=plt.cm.Blues)
     fig.colorbar(cax)
 
@@ -250,7 +256,7 @@ def plot_confusion_matrix(y_true, y_pred, class_names=None, figsize=(15, 15), te
         fig.savefig("./confusion_matrix.png")
 
 
-def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10, 8)):
+def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10, 8)) -> None:
     """
     Creates a horizontal bar graph with the F1-Scores of the y_true / y_pred.
     :param y_true: Array of truth labels (must be same shape as y_pred).
@@ -263,7 +269,8 @@ def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10
             'y_true is a dataset, please get the labels from the dataset using '
             '\'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')
 
-    y_true, y_pred = mlint.convert_to_sparse_or_binary(y_true=y_true, y_pred=y_pred)
+    y_true = mlint.convert_to_sparse_or_binary(y=y_true)
+    y_pred = mlint.convert_to_sparse_or_binary(y=y_pred)
 
     # Generate classification report from SKLearn.
     report_dict = classification_report(y_true=y_true, y_pred=y_pred, target_names=class_names, output_dict=True)
@@ -297,12 +304,42 @@ def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10
     plt.show()
 
 
+def plot_prediction_confidence(y_true, y_pred, class_names, figsize=(10, 8)):
+    plt.figure(figsize=figsize)
+
+    if mlint.is_label_dense(y_true):
+
+        # For each column (class) in y_true
+        for c in range(y_true.shape[1]):
+            # Concatenate the y_true column and y_pred column together.
+            y_comb = np.concatenate((y_true[:,[c]], y_pred[:,[c]]), axis=1)
+
+            # Filter out only the rows that are applicable to the column class (where y_true == 1)
+            y_comb_single = y_comb[np.in1d(y_comb[:, 0], [1])]
+
+            # Sort the values on the precision
+            y_comb_single_sorted = y_comb_single[y_comb_single[:, 1].argsort()]
+
+            # Plot a graph with the given values.
+            class_name = str(c) if class_names is None else class_names[c]
+            plt.plot(y_comb_single_sorted[:,1] * 100, label=class_name, linewidth=1.5)
+
+    # X contains two features, x1 and x2
+    plt.xlabel("Data", fontsize=20)
+    plt.ylim([0, 100])
+    plt.yticks(np.round(np.arange(0, 105, 5), 1))
+    plt.ylabel(r"Confidence (%)", fontsize=20)
+    plt.legend()
+    # Displaying the plot.
+    plt.show()
+
+
 ########################################################################################################################
 # Internal methods for plotting history
 ########################################################################################################################
 
 
-def _plot_history_ends(histories, labels):
+def _plot_history_ends(histories, labels) -> None:
     """
     Internal method which will plot a vertical line showing where a histories last epoch is visible.
 
@@ -313,7 +350,7 @@ def _plot_history_ends(histories, labels):
         plt.plot([min(history.epoch), min(history.epoch)], plt.ylim(), label=f'{labels[idx]}')
 
 
-def _plot_history_graph_line(data, label, color, linestyle='solid'):
+def _plot_history_graph_line(data, label, color, linestyle='solid') -> None:
     """
     Internal method which will plot the information from the fit histroy.
 

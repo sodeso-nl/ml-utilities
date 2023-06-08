@@ -1,8 +1,13 @@
-import ml_internal as mlint
-
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import recall_score, precision_score
 
 
-def calculate_accuracy(y_true, y_pred):
-    y_true, y_pred = mlint.convert_to_sparse_or_binary(y_true=y_true, y_pred=y_pred)
-    return accuracy_score(y_true, y_pred)
+def global_metric_precision_score(y_true, y_pred):
+    return precision_score(y_true=y_true, y_pred=y_pred, average="micro", zero_division=0)
+
+
+def global_metric_recall_score(y_true, y_pred):
+    return recall_score(y_true=y_true, y_pred=y_pred, average="micro", zero_division=0)
+
+
+gmps = global_metric_precision_score
+gmrs = global_metric_recall_score

@@ -1,6 +1,8 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
+import ml_internal as mlint
+
 from keras.utils import image_dataset_from_directory
 
 ########################################################################################################################
@@ -15,6 +17,30 @@ def add_batch_to_tensor(x):
     :return: The tensor with the batch size
     """
     return tf.expand_dims(x, axis=0)
+
+
+def image_as_tensor(image, img_shape=(224, 224), scale=True):
+    """
+        Reads in an image from filename, turns it into a tensor and reshapes into
+        specified shape (img_shape, img_shape, channels)
+
+        :param filename: path to target image
+        :param img_shape: tuple with height/width dimension of target image size
+        :param scale: scale pixel values from 0-255 to 0-1 or not
+        :return: Image tensor of shape (img_shape, img_shape, 3)
+        """
+
+    # Decode image into tensor
+    img = tf.io.decode_image(contents=image, channels=3)
+
+    # # Resize the image (height / width)
+    img = tf.image.convert_image_dtype(img, tf.float32)
+    img = tf.image.resize(images=img, size=[img_shape[0], img_shape[1]])
+
+    if not scale:
+        return tf.cast(img * 255, tf.int32)
+    else:
+        return img
 
 
 def load_image_as_tensor(filename, img_shape=(224, 224), scale=True):

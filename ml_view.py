@@ -133,5 +133,5 @@ def show_single_image_from_nparray_or_tensor(image, title="", figsize=(10, 8), c
     fig.patch.set_facecolor('gray')
     plt.imshow(image, cmap=cmap)
     plt.axis('off')
-    plt.title(f"{title}", color='white')
+    plt.title(f"{title} {image.shape}", color='white')
     plt.show()

@@ -2,13 +2,12 @@ import ml_internal as mlint
 
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 import itertools
 
-from sklearn.metrics import \
-    confusion_matrix, \
-    classification_report
+from sklearn.metrics import confusion_matrix, classification_report
+from scipy.interpolate import interp1d
 
-# noinspection PyUnresolvedReferences
 from tensorflow.data import Dataset
 
 
@@ -17,11 +16,11 @@ from tensorflow.data import Dataset
 ########################################################################################################################
 
 
-def plot_histogram_from_dataframe(x, columns) -> None:
+def plot_histogram_from_dataframe(x, columns):
     """
     Plots a histogram for each of the specified columns in the DataFrame X.
 
-    :param x: a dataframe
+    :param X: a dataframe
     :param columns: columns which exist within the DataFrame.
     """
     for c in columns:
@@ -33,7 +32,7 @@ def plot_histogram_from_dataframe(x, columns) -> None:
 ########################################################################################################################
 
 
-def plot_consecutive_histories(histories, labels, figsize=(10, 6)) -> None:
+def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
     """
     Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
 
@@ -107,7 +106,7 @@ def plot_consecutive_histories(histories, labels, figsize=(10, 6)) -> None:
         plt.legend()
 
 
-def plot_history(history, figsize=(10, 6)) -> None:
+def plot_history(history, figsize=(10, 6)):
     plot_consecutive_histories([history], ["Start history"], figsize=figsize)
 
 
@@ -304,28 +303,130 @@ def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10
     plt.show()
 
 
+def plot_prediction_confidence_hist(y_true, y_pred, class_names, figsize=(8, 4)):
+    bins = range(0, 110, 10)
+
+    if mlint.is_label_dense(y_true):
+        fig, axs = plt.subplots(nrows=max(int(len(class_names) / 4), 1), ncols=min(4, len(class_names)), figsize=figsize)
+
+        # Spacing between the graphs
+        fig.tight_layout(h_pad=5, w_pad=5)
+
+        # Set the ticks for all the subplots
+        plt.setp(axs, xticks=bins)
+
+        # For each column (class) in y_true
+        for n in range(y_true.shape[1]):
+
+            # Concatenate the y_true for the n'th class and y_pred for the n'th class together.
+            y = np.concatenate((y_true[:, [n]], y_pred[:, [n]]), axis=1)
+
+            # Filter out only the rows that are applicable to the n'th class (where y_true == 1)
+            y = y[np.in1d(y[:, 0], [1])]
+
+            # Delete first column (originally y_true)
+            y = np.delete(y, np.s_[0:1], axis=1)
+
+            # Round the values
+            y = (np.round(y, decimals=1) * 100).astype(dtype=int)
+
+            # Plot a histogram with the given values.
+            class_name = str(n) if class_names is None else class_names[n]
+            axs[n].hist(y, log=True, bins=11, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.5,
+                     label=class_name)
+            axs[n].set(title=class_name, xlabel='Confidence (%)', ylabel='Predictions')
+        plt.show()
+    else:
+        fig, axs = plt.subplots(nrows=1, ncols=2, figsize=figsize)
+
+        # Spacing between the graphs
+        fig.tight_layout(h_pad=5, w_pad=5)
+
+        # Set the ticks for all the subplots
+        plt.setp(axs, xticks=bins)
+
+        # In binary classification we have two possible best outcomes, 0 and 1, both ends mean that something has
+        # been positively identified, so we need to first extract the two classes based on y_true (0 is the first class
+        # and 1 is the second class), then we need to translate the value ranges, for results
+        # of class 1 (y_true[:] == 1) the closer the number to 1 the higher de confidence, and for results
+        # of class 0 (y_true[:] == 0) the close the number to 0 the higher de confidence.
+        # For this we use the interp1d function.
+        positivate_range_translation = interp1d([0.,1.],[0,100])
+        negative_range_translation = interp1d([0.,1.],[100,0])
+
+        y_true_int = mlint.binarize_labels(y_true, dtype=np.int32)
+        for n in range(2):
+            # Filter out only the rows thar are applicatie to the n'th class
+            y_pred_single_class = y_pred[np.in1d(y_true_int[:, 0], [n])]
+
+            # Convert ranges as described above
+            if n == 1:
+                y_pred_single_class_translated = positivate_range_translation(y_pred_single_class)
+            else:
+                y_pred_single_class_translated = negative_range_translation(y_pred_single_class)
+
+            # Sort the values
+            y = (np.round(y_pred_single_class_translated / 10) * 10).astype(dtype=int)
+
+            # Plot a graph with the given values.
+            class_name = str(n) if class_names is None else class_names[n]
+            axs[n].hist(y, log=True, bins=11, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.5,
+                        label=class_name)
+            axs[n].set(title=class_name, xlabel='Confidence (%)', ylabel='Predictions')
+
+
 def plot_prediction_confidence(y_true, y_pred, class_names, figsize=(10, 8)):
     plt.figure(figsize=figsize)
 
     if mlint.is_label_dense(y_true):
-
         # For each column (class) in y_true
-        for c in range(y_true.shape[1]):
-            # Concatenate the y_true column and y_pred column together.
-            y_comb = np.concatenate((y_true[:,[c]], y_pred[:,[c]]), axis=1)
+        for n in range(y_true.shape[1]):
+            # Concatenate the y_true for the n'th class and y_pred for the n'th class together.
+            y_combined = np.concatenate((y_true[:, [n]], y_pred[:, [n]]), axis=1)
 
-            # Filter out only the rows that are applicable to the column class (where y_true == 1)
-            y_comb_single = y_comb[np.in1d(y_comb[:, 0], [1])]
+            # Filter out only the rows that are applicable to the n'th class (where y_true == 1)
+            y_combined_class = y_combined[np.in1d(y_combined[:, 0], [1])]
 
-            # Sort the values on the precision
-            y_comb_single_sorted = y_comb_single[y_comb_single[:, 1].argsort()]
+            # Delete first column (originally y_true)
+            y_class = np.delete(y_combined_class, np.s_[0:1], axis=1)
+
+            # Sort the values
+            y_class_sorted = y_class[y_class[:, 0].argsort()] * 100
 
             # Plot a graph with the given values.
-            class_name = str(c) if class_names is None else class_names[c]
-            plt.plot(y_comb_single_sorted[:,1] * 100, label=class_name, linewidth=1.5)
+            class_name = str(n) if class_names is None else class_names[n]
+            plt.plot(y_class_sorted, label=class_name, linewidth=1.5)
+    else:
+        # In binary classification we have two possible best outcomes, 0 and 1, both ends mean that something has
+        # been positively identified, so we need to first extract the two classes based on y_true (0 is the first class
+        # and 1 is the second class), then we need to translate the value ranges, for results
+        # of class 1 (y_true[:] == 1) the closer the number to 1 the higher de confidence, and for results
+        # of class 0 (y_true[:] == 0) the close the number to 0 the higher de confidence.
+        # For this we use the interp1d function.
+        positivate_range_translation = interp1d([0.,1.],[0,100])
+        negative_range_translation = interp1d([0.,1.],[100,0])
+
+        y_true_int = mlint.binarize_labels(y_true, dtype=np.int32)
+        for n in range(2):
+            # Filter out only the rows thar are applicatie to the n'th class
+            y_pred_single_class = y_pred[np.in1d(y_true_int[:, 0], [n])]
+
+            # Convert ranges as described above
+            if n == 1:
+                y_pred_single_class_translated = positivate_range_translation(y_pred_single_class)
+            else:
+                y_pred_single_class_translated = negative_range_translation(y_pred_single_class)
+
+            # Sort the values
+            y_pred_single_class_translated_sorted = y_pred_single_class_translated[y_pred_single_class_translated[:, 0].argsort()]
+
+            # Plot a graph with the given values.
+            class_name = str(n) if class_names is None else class_names[n]
+            plt.plot(y_pred_single_class_translated_sorted, label=class_name, linewidth=1.5)
+
 
     # X contains two features, x1 and x2
-    plt.xlabel("Data", fontsize=20)
+    plt.xlabel("Predictions", fontsize=20)
     plt.ylim([0, 100])
     plt.yticks(np.round(np.arange(0, 105, 5), 1))
     plt.ylabel(r"Confidence (%)", fontsize=20)

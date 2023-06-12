@@ -35,9 +35,8 @@ def sparse_labels(y):
     return np.argmax(y, axis=1)
 
 
-def binarize_labels(y):
+def binarize_labels(y, dtype=None):
     """
-    DONE
     Converts scaled classification prediction labels to binarized classification prediction labels:
 
     Scaled:
@@ -55,9 +54,14 @@ def binarize_labels(y):
     ]
 
     :param y: Scaled classification prediction labels
+    :param dtype: optional parameter to change the dtype, leave None to keep the same
     :return: Binarized classification prediction labels
     """
-    return np.round(y)
+    y1 = np.round(a=y, decimals=0)
+    if dtype is not None:
+        return y1.astype(dtype)
+
+    return y1
 
 
 def is_label_dense(y):
@@ -102,17 +106,18 @@ def is_image_float32_and_not_normalized(x):
     return x.dtype == tf.float32 and tf.math.reduce_max(x).numpy() > 1.0
 
 
-def convert_to_sparse_or_binary(y):
+def convert_to_sparse_or_binary(y, dtype=None):
     """
     Converts dense values to sparse or scaled values to binary.
     :param y:
+    :param dtype: optional parameter to change the dtype, leave None to keep the same
     :return:
     """
     y = convert_to_numpy_array_if_neccesary(y)
 
-    if is_label_dense(y):
-        y = sparse_labels(y)
-    elif is_label_scaled(y):
-        y = binarize_labels(y)
+    if is_label_dense(y=y):
+        y = sparse_labels(y=y)
+    elif is_label_scaled(y=y):
+        y = binarize_labels(y=y, dtype=dtype)
 
     return y

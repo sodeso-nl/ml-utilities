@@ -1,15 +1,15 @@
 import os
 import random
 import logging
-
+import sys
 import tensorflow as tf
+import numpy as np
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 import ml_internal as mlint
 
-# noinspection PyUnresolvedReferences
 from tensorflow.data import Dataset
 
 
@@ -21,6 +21,7 @@ def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gr
     :param shape: is the number of images in a grid to display
     :param cmap: is the color map to use, use "gray" for gray scale images, use None for default.
     """
+    # Setup the target directory (we'll view images from here)
     try:
         target_folder = os.path.join(target_dir, target_class)
 
@@ -42,14 +43,7 @@ def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gr
         logging.error(e)
 
 
-def show_images_from_dataset(dataset, shape=(4, 8), cmap='gray') -> None:
-    """
-    Shows images stored in a dataset.
-
-    :param dataset: the dataset from which we want to show images
-    :param shape: the shape, where the shape width * height should reflect the batch size
-    :param cmap: is the color map to use, use "gray" for gray scale images, use None for default.
-    """
+def show_images_from_dataset(dataset, shape=(4, 8)):
     assert isinstance(dataset, Dataset), f"The dataset supplied is not a tensorflow.data.Dataset."
 
     # Retrieve first batch, depending on the initalization of the dataset the batch size is default 32
@@ -58,7 +52,7 @@ def show_images_from_dataset(dataset, shape=(4, 8), cmap='gray') -> None:
 
     # Use an iterator to get the first batch of images and labels
     batch_iter = iter(batches)
-    x, y_true = next(batch_iter)
+    x, y_true = batch_iter.next()
 
     assert shape[0] * shape[1] == len(x), f"Size of shape ({shape[0]}, {shape[1]}), with a total of " \
                   f"{shape[0] * shape[1]} images, is not equal to the batch size of the dataset ({len(x)})."
@@ -66,22 +60,22 @@ def show_images_from_dataset(dataset, shape=(4, 8), cmap='gray') -> None:
     if len(x) != shape[0] * shape[1]:
         raise TypeError('dataset is not a Dataset')
 
-    show_images_from_nparray_or_tensor(x=x, y=y_true, class_labels=dataset.class_names, shape=shape, cmap=cmap)
+    show_images_from_nparray_or_tensor(x=x, y=y_true, class_names=dataset.class_names, shape=shape)
     plt.show()
 
 
-def show_images_from_nparray_or_tensor(x, y, class_labels=None, indices=None, shape=(4, 6), cmap='gray'):
+def show_images_from_nparray_or_tensor(x, y, class_names=None, indices=None, shape=(4, 6), cmap='gray'):
     """
     Shows images stored in a tensor / numpy array. The array should be a vector of images.
 
     :param X: is an array containing vectors of images.
     :param y: are the associated labels
-    :param class_labels: the labels of the classes
+    :param class_names: the labels of the classes
     :param indices: None to pick random, otherwise an array of indexes to display
     :param shape: is the number of images to display
-    :param cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
+    :param cmap: is the color map to use, use "gray" for gray scale images, use None for default.
     """
-    y = mlint.convert_to_sparse_or_binary(y=y)
+    y = mlint.convert_to_sparse_or_binary(y=y, dtype=np.float32)
 
     if mlint.is_image_float32_and_not_normalized(x):
         x = tf.cast(x=x, dtype=tf.uint8)
@@ -113,10 +107,10 @@ def show_images_from_nparray_or_tensor(x, y, class_labels=None, indices=None, sh
             # Integer encoded labels
             class_index = y[rand_index]
 
-        if class_labels is None:
+        if class_names is None:
             plt.title(class_index, color='white')
         else:
-            plt.title(f"{class_labels[class_index]}, {class_index}, {x[rand_index].shape}", color='white')
+            plt.title(f", {class_index}, {x[rand_index].shape}", color='white')
     plt.show()
 
 

@@ -14,13 +14,13 @@ import datetime
 
 
 def create_reduce_lr_on_plateau_callback(monitor="val_loss",
-                                         factor=0.2,
-                                         patience=2,
+                                         factor=0.5,
+                                         patience=4,
                                          verbose=1,
                                          mode="auto",
                                          min_delta=1e-4,
                                          cooldown=0,
-                                         min_lr=1e-7) -> ReduceLROnPlateau:
+                                         min_lr=1e-6) -> ReduceLROnPlateau:
     return ReduceLROnPlateau(monitor=monitor,
                              factor=factor,
                              patience=patience,
@@ -33,9 +33,9 @@ def create_reduce_lr_on_plateau_callback(monitor="val_loss",
 
 def create_early_stopping_callback(monitor='val_loss',
                                    min_delta=0,
-                                   patience=5,
+                                   patience=6,
                                    verbose=0,
-                                   mode='min',
+                                   mode='auto',
                                    baseline=None,
                                    restore_best_weights=True,
                                    start_from_epoch=0) -> EarlyStopping:

@@ -164,7 +164,7 @@ def load_weights(model, filepath) -> None:
     set_trainable_on_layers(model, layer_names=trainable_layer_names, trainable=True)
 
 
-def save_model_alt(model, directory, name, format='h5') -> None:
+def save_model_alt(model, name, directory="./models", format='h5') -> None:
     """
     Alternative solution to saving a model since the default implementation has issues with augemntation layers.
 
@@ -188,7 +188,7 @@ def save_model_alt(model, directory, name, format='h5') -> None:
     model.save(model_file, save_format=format)
 
 
-def load_model_alt(directory, name, format='h5'):
+def load_model_alt(name, directory="./models", format='h5'):
     """
     Alternative solution to saving a model since the default implementation has issues with augemntation layers.
 

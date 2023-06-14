@@ -1,13 +1,36 @@
+import numpy as np
 import tensorflow as tf
 import tensorflow_datasets as tfds
+import pandas as pd
 
-import ml_internal as mlint
+from pandas.api.types import is_numeric_dtype
 
 from keras.utils import image_dataset_from_directory
 
 ########################################################################################################################
 # General
 ########################################################################################################################
+
+def describe_dataframe(dataframe, round=2):
+    data = []
+    for c in dataframe:
+        data.append([
+            dataframe[c].name,
+            dataframe[c].dtype,
+            dataframe[c].count(),
+            dataframe[c].isna().sum(),
+            dataframe[c].nunique(),
+            dataframe[c].mean() if is_numeric_dtype(dataframe[c]) else np.NAN,
+            dataframe[c].std() if is_numeric_dtype(dataframe[c]) else np.NAN,
+            dataframe[c].min() if is_numeric_dtype(dataframe[c]) else np.NAN,
+            dataframe[c].quantile(.25) if is_numeric_dtype(dataframe[c]) else np.NAN,
+            dataframe[c].quantile(.50) if is_numeric_dtype(dataframe[c]) else np.NAN,
+            dataframe[c].quantile(.75) if is_numeric_dtype(dataframe[c]) else np.NAN,
+            dataframe[c].max() if is_numeric_dtype(dataframe[c]) else np.NAN
+        ])
+
+    print(f"Total number of rows: {len(dataframe)}")
+    return pd.DataFrame(columns=["Column", "DType", "NotNull", "Null", "Unique", "Mean", "Std", "Min", "25%", "50%", "75%", "Max"], data=data).round(round)
 
 
 def add_batch_to_tensor(x):

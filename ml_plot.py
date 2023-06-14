@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import itertools
+import collections.abc
+import pandas as pd
+
+from pandas.api.types import is_numeric_dtype, is_object_dtype
 
 from sklearn.metrics import confusion_matrix, classification_report
 from scipy.interpolate import interp1d
@@ -16,15 +20,67 @@ from tensorflow.data import Dataset
 ########################################################################################################################
 
 
-def plot_histogram_from_dataframe(x, columns):
+def plot_histogram_from_dataframe(dataframe, column_names=None, min_nunique=3, max_nunique=50, figsize=None, cols=3, verbose=1):
     """
-    Plots a histogram for each of the specified columns in the DataFrame X.
+    Plots a histogram for each of the numeric columns in the DataFrame.
 
-    :param X: a dataframe
-    :param columns: columns which exist within the DataFrame.
+    :param dataframe: the dataframe dataframe
+    :param column_names: columns which exist within the DataFrame if none specified all columns will be processed
+    :param min_nunique: minimum number of unique values present, if lower then this then no graph will be displayed (since it is basically boolean)
+    :param max_nunique: maximum number of unique values present, only applicable to object column types since these cannot be binned
+    :param figsize: size of the plot, if None specified then one is calculated
+    :param cols: number of plots on the horizontal axis
     """
+    # assert column_names is not None, "column_names cannot be None"
+
+    # If the column_names argument is not a list then create a list
+    if not type(column_names) == list and column_names is not None:
+        column_names = [column_names]
+
+    # If we don't have a list of column names then create a histogram for every column.
+    if column_names is not None:
+        columns = list(dataframe[column_names].columns)
+    else:
+        columns = list(dataframe.columns)
+
+    # Calculate the number of rows / columns for the subplot.
+    rows = max(int(len(columns) / cols), 1)
+    cols = min(cols, len(columns))
+    rows += 1 if rows * cols < len(columns) else 0
+
+    # If figsize is not specified then calculate the fig-size
+    if figsize is None:
+        figsize = (17, rows * 4)
+
+    fig, axs = plt.subplots(nrows=rows, ncols=cols, figsize=figsize)
+
+    # If we have more then one column then flatten the axis so we can loop through them,
+    # if we have only one column then create list containing the axis so we can still loop through it.
+    if len(columns) > 1:
+        axs = axs.flatten()
+    else:
+        axs = [axs]
+
+    # Horizontal / vertical padding between the histograms.
+    fig.tight_layout(h_pad=10, w_pad=5)
+
+    n = 0
     for c in columns:
-        x.hist(c)
+        nunique = dataframe[c].nunique()
+
+        if (is_object_dtype(dataframe[c]) and min_nunique < nunique <= max_nunique) or \
+                (is_numeric_dtype(dataframe[c]) and min_nunique < nunique):
+            dataframe[c].hist(ax=axs[n], facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1, width = 1)
+            axs[n].set(title=dataframe[c].name)
+            # axs[n].tick_params(labelrotation=90)
+            # xlabels = axs[n].get_xticklabels()
+            # axs[n].set_xticklabels(xlabels, rotation=45, ha='right')
+            n += 1
+        elif verbose:
+            print(f"Column '{dataframe[c].name}' is not visualized, the number of nunique values ({nunique}) either exceeds {max_nunique} or is lower then {min_nunique}.")
+
+    for i in range(n, rows*cols):
+        fig.delaxes(axs[i])
 
 
 ########################################################################################################################
@@ -308,6 +364,7 @@ def plot_prediction_confidence_hist(y_true, y_pred, class_names, figsize=(8, 4))
 
     if mlint.is_label_dense(y_true):
         fig, axs = plt.subplots(nrows=max(int(len(class_names) / 4), 1), ncols=min(4, len(class_names)), figsize=figsize)
+        axs = axs.flatten()
 
         # Spacing between the graphs
         fig.tight_layout(h_pad=5, w_pad=5)

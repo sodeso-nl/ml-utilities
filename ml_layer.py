@@ -10,7 +10,7 @@ from keras import Model
 # Predicting / evaluating models
 ########################################################################################################################
 
-def plot_classification_dataset(model, dataset):
+def predict_classification_dataset(model, dataset):
     """
     Performs predictions on the given model for all entries in the dataset, will
     return y_pred and y_true as a tuple. Use full for when the dataset has shuffling enabled

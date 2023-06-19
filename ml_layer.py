@@ -1,6 +1,6 @@
 import os
 import pickle
-
+import ml_data as mld
 import numpy as np
 
 from keras import Model
@@ -10,7 +10,7 @@ from keras import Model
 # Predicting / evaluating models
 ########################################################################################################################
 
-def predict_dataset(model, dataset):
+def plot_classification_dataset(model, dataset):
     """
     Performs predictions on the given model for all entries in the dataset, will
     return y_pred and y_true as a tuple. Use full for when the dataset has shuffling enabled
@@ -32,6 +32,26 @@ def predict_dataset(model, dataset):
         else:
             y_true = np.concatenate((y_true, y), axis=0)
     return y_true, y_pred
+
+
+def predict_regression(model, x):
+    """
+    Performs predictions on the given model for all entries in the dataset, will
+    return y_pred and y_true as a tuple. Use full for when the dataset has shuffling enabled
+    :param model: model to perform the predictions on
+    :param dataset: dataset containing the data to use for the predictions
+    :return: y_true, y_pred
+    """
+    y_pred = None
+    for values in x:
+        batch_pred = model.predict(x=mld.add_batch_to_tensor(values))
+        if y_pred is None:
+            y_pred = batch_pred
+        else:
+            y_pred = np.concatenate((y_pred, batch_pred), axis=0)
+
+    return y_pred
+
 
 
 ########################################################################################################################

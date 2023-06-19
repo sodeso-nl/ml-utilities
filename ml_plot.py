@@ -20,7 +20,7 @@ from tensorflow.data import Dataset
 ########################################################################################################################
 
 
-def plot_histogram_from_dataframe(dataframe, column_names=None, min_nunique=3, max_nunique=50, figsize=None, cols=3, verbose=1):
+def plot_histogram_from_dataframe(dataframe, column_names=None, log=False, min_nunique=3, max_nunique=50, figsize=None, cols=3, verbose=1):
     """
     Plots a histogram for each of the numeric columns in the DataFrame.
 
@@ -66,21 +66,52 @@ def plot_histogram_from_dataframe(dataframe, column_names=None, min_nunique=3, m
 
     n = 0
     for c in columns:
-        nunique = dataframe[c].nunique()
+        v = dataframe[c]
+        nunique = v.nunique()
 
-        if (is_object_dtype(dataframe[c]) and min_nunique < nunique <= max_nunique) or \
-                (is_numeric_dtype(dataframe[c]) and min_nunique < nunique):
-            dataframe[c].hist(ax=axs[n], facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1, width = 1)
-            axs[n].set(title=dataframe[c].name)
-            # axs[n].tick_params(labelrotation=90)
-            # xlabels = axs[n].get_xticklabels()
-            # axs[n].set_xticklabels(xlabels, rotation=45, ha='right')
-            n += 1
-        elif verbose:
-            print(f"Column '{dataframe[c].name}' is not visualized, the number of nunique values ({nunique}) either exceeds {max_nunique} or is lower then {min_nunique}.")
+        if is_numeric_dtype(v) and min_nunique < nunique:
+
+            z_min = -3 * v.std() + v.mean()
+            z_max = 3 * v.std() + v.mean()
+
+            # Make sure we do not get more then 50 bins.
+            nunique = 50 if nunique > 50 else nunique
+            v.hist(ax=axs[n], bins=nunique + 1, log=log, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1)
+
+            # Only show z_min when it is not before the graph starts.
+            legend = False
+            if z_max < v.max():
+                axs[n].plot([z_max, z_max], plt.ylim(), label='Z-Max')
+                legend = True
+
+            # Only show z_min when it is not before the graph starts.
+            if z_min > v.min():
+                axs[n].plot([z_min, z_min], plt.ylim(), label='Z-Min')
+                legend = True
+
+            if legend:
+                axs[n].legend()
+        elif is_object_dtype(v) and min_nunique < nunique <= max_nunique:
+            v.hist(ax=axs[n], bins=range(nunique + 1), log=log, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1, width = .5)
+        else:
+            if verbose:
+                print(f"Column '{v.name}' is not visualized, the number of nunique values ({nunique}) either exceeds {max_nunique} or is lower then {min_nunique}.")
+            continue
+
+        axs[n].set(title=v.name)
+
+        # Only rotate the x labels
+        for tick in axs[n].get_xticklabels():
+            tick.set_rotation(45)
+
+        # Remove unnecessary white space on the left/right side of the graph.
+        axs[n].margins(x=0)
+        n += 1
 
     for i in range(n, rows*cols):
         fig.delaxes(axs[i])
+
+    plt.show()
 
 
 ########################################################################################################################
@@ -170,7 +201,6 @@ def plot_history(history, figsize=(10, 6)):
 # Plotting methods for linear / logistic regression
 ########################################################################################################################
 
-
 def plot_xy_data_with_label(x, y) -> None:
     """
     Plots a graph of the values of x whereas x contains vectors of x/y coordinates and y
@@ -232,7 +262,11 @@ def plot_decision_boundary(model, x, y) -> None:
     plt.ylim(yy.min(), yy.max())
 
 
-def plot_confusion_matrix(y_true, y_pred, class_names=None, figsize=(15, 15), text_size=10, norm=False, savefig=False) -> None:
+########################################################################################################################
+# Plotting methods for classification models
+########################################################################################################################
+
+def plot_classification_confusion_matrix(y_true, y_pred, class_names=None, figsize=(15, 15), text_size=10, norm=False, savefig=False) -> None:
     """
       Plots a confusion matrix of the given data.
 
@@ -359,7 +393,7 @@ def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10
     plt.show()
 
 
-def plot_prediction_confidence_hist(y_true, y_pred, class_names, figsize=(8, 4)):
+def plot_classification_prediction_confidence_histogram(y_true, y_pred, class_names, figsize=(8, 4)):
     bins = range(0, 110, 10)
 
     if mlint.is_label_dense(y_true):
@@ -432,7 +466,7 @@ def plot_prediction_confidence_hist(y_true, y_pred, class_names, figsize=(8, 4))
             axs[n].set(title=class_name, xlabel='Confidence (%)', ylabel='Predictions')
 
 
-def plot_prediction_confidence(y_true, y_pred, class_names, figsize=(10, 8)):
+def plot_classification_prediction_confidence(y_true, y_pred, class_names, figsize=(10, 8)):
     plt.figure(figsize=figsize)
 
     if mlint.is_label_dense(y_true):
@@ -491,6 +525,56 @@ def plot_prediction_confidence(y_true, y_pred, class_names, figsize=(10, 8)):
     # Displaying the plot.
     plt.show()
 
+
+########################################################################################################################
+# Plotting methods for regression models
+########################################################################################################################
+
+def plot_regression_y_pred_vs_y_true(y_true, y_pred, figsize=(10, 8)):
+    # Merge the two columns into a single new numpy array.
+    m = np.append(y_true.round(2), y_pred.round(2), axis=1)
+
+    # Add a third column with the difference
+    m_a = np.append(m, y_true - y_pred, axis=1)
+
+    # sort based on y_true
+    s = m_a[m_a[:,0].argsort()]
+    plt.figure(figsize=figsize, facecolor='#FFFFFF')
+    plt.plot(s[:,0], label="y_true", color="#0000FF", linestyle="solid", linewidth=1.5)
+    plt.plot(s[:,1], label="y_pred", color="#FF0000", linestyle="solid", linewidth=1.5)
+    plt.plot(s[:,2], label="diff", color="#FF0000", linestyle="solid", linewidth=1.5)
+    plt.title('y_true vs y_pred with difference', size=20)
+    plt.xlabel('Predictions', size=14)
+    plt.ylabel('Value', size=14)
+    plt.legend()
+
+
+def show_outliers_positive_and_negative(x, y_true, y_pred, top=10):
+    """
+    Displays the top X (default 10) outliers between y_true and y_pred.
+    :param x: data to display
+    :param y_true: labels
+    :param y_pred: predictions
+    :param top: how many rows to display
+    :return: dataframe containing the top X.
+    """
+    x_copy = x.copy()
+    x_copy["y_true"] = y_true.round(0)
+    x_copy["y_pred"] = y_pred.round(0)
+
+    diff = y_true - y_pred
+    x_copy["diff"] = diff.round(0)
+
+    mean_positive = diff[diff['price'] > 0].mean()[0]
+    mean_negative = diff[diff['price'] < 0].mean()[0]
+
+    positive_outliers = x_copy[x_copy["diff"] > mean_positive]
+    negative_outliers = x_copy[x_copy["diff"] < mean_negative]
+
+    positive_outliers_sorted = positive_outliers.sort_values(['diff'], ascending=False, inplace=False)[:top]
+    negative_outliers_sorted = negative_outliers.sort_values(['diff'], ascending=True, inplace=False)[:top]
+
+    return pd.concat([positive_outliers_sorted, negative_outliers_sorted])
 
 ########################################################################################################################
 # Internal methods for plotting history

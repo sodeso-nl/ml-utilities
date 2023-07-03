@@ -5,7 +5,8 @@ import urllib
 
 import tensorflow as tf
 
-def download_file(source, destination) -> None:
+
+def download_file(source='http://www.download.com/file.zip', destination='./data/file.zip') -> None:
     """
     Download a file from source location and store it at the specified destination location.
     :param source: the source URL
@@ -21,7 +22,7 @@ def download_file(source, destination) -> None:
     urllib.request.urlretrieve(source, destination)
 
 
-def extract_tgz(file, folder='.') -> None:
+def extract_tgz(file='./data/file.tar.gz', folder='./data') -> None:
     """
     Extracts a .tgz file in the specified destination.
     :param file: the .tgz file
@@ -34,7 +35,7 @@ def extract_tgz(file, folder='.') -> None:
     tgz_file.close()
 
 
-def extract_zip(file, folder='.') -> None:
+def extract_zip(file='./data/file.zip', folder='./data') -> None:
     """
     Extracts a .zip file in the specified destination.
 
@@ -48,7 +49,7 @@ def extract_zip(file, folder='.') -> None:
     zip_file.close()
 
 
-def list_dir_summary(folder) -> None:
+def list_dir_summary(folder='./data') -> None:
     """
     Lists a summary of the specified folder
     :param folder: the folder to list the contents of

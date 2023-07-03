@@ -48,10 +48,10 @@ def dataframe_describe(dataframe, column_names=None, round=2):
         columns = list(dataframe.columns)
 
     data = []
-    _mean = _std = _min = _q25 = _q50 = _q75 = _max = z_min = z_max = np.NAN
     for c in columns:
         v = dataframe[c]
 
+        _mean = _std = _min = _q25 = _q50 = _q75 = _max = z_min = z_max = np.NAN
         if is_numeric_dtype(v):
             _mean = v.mean()
             _std = v.std()

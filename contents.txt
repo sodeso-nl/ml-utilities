@@ -8,3 +8,4 @@ https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_data.py
 https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_view.py
 https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_analyze.py
 https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_transformer.py
+https://raw.githubusercontent.com/sodeso-nl/ml-utilities/main/ml_shell.py

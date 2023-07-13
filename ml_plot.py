@@ -10,6 +10,7 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_object_dtype
 
 from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from scipy.interpolate import interp1d
 
 from tensorflow.data import Dataset
@@ -343,6 +344,27 @@ def plot_classification_confusion_matrix(y_true, y_pred, class_names=None, figsi
 
     if savefig:
         fig.savefig("./confusion_matrix.png")
+
+
+def table_quality_metrics(y_true, y_pred):
+    """
+    calculates model accuracy, precision, recall and F1-Score
+    :param y_true:
+    :param y_pred:
+    :return:
+    """
+    # Calculate model accuracy
+    model_accuracy = accuracy_score(y_true, y_pred) * 100
+    # Calculate precision, recall and F1-score using "weighted" average, weighted will also take the amount of samples for each in mind.
+    model_precission, model_recall, model_f1_score, _ = precision_recall_fscore_support(y_true, y_pred, average="weighted")
+    model_results = \
+        {
+            "accuracy" : model_accuracy,
+            "precision": model_precission,
+            "recall": model_recall,
+            "f1": model_f1_score
+        }
+    return model_results
 
 
 def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10, 8)) -> None:

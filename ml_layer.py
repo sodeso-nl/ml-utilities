@@ -1,7 +1,10 @@
 import os
+import io
 import pickle
 import ml_data as mld
 import numpy as np
+import tensorflow_hub as hub
+import tensorflow as tf
 
 from keras import Model
 
@@ -146,10 +149,40 @@ def list_layers(layers, include_trainable=True, include_non_trainable=True) -> N
 # Saving / loading models
 ########################################################################################################################
 
+def save_model(model, filepath="./models/model.h5", save_format="h5") -> None:
+    """
+    This method will call the default model.save method.
+
+    :param model: the model to save
+    :param filepath: String or PathLike, path to the file to save the model to.
+    :param save_format: The format to store the data (tf/h5)
+    """
+    model.save(filepath=filepath, save_format=save_format)
+
+
+def load_model(filepath="./models/model.h5", custom_objects = None) -> Model:
+    """
+    This method will call the default load_model method.
+
+    Important: When loading a model containing TensorFlow Hub layers you will need to provide this
+    as a custom object:
+
+    custom_objects={"KerasLayer": hub.KerasLayer}
+
+    However this is not needed when the model was saved in the SaveModel format since these
+    details are present in the saved state.
+
+    :param filepath: String or PathLike, path to the file to save the model to.
+    :param custom_objects: custom objects for example KerasLayer from TensorFlow Hub
+    :return: the loaded model
+    """
+    return tf.keras.models.load_model(filepath=filepath, custom_objects=custom_objects)
+
 
 def save_weights(model, filepath, save_format="h5") -> None:
     """
-    Saves
+    Saves only the weights of the model.
+
     :param model:
     :param filepath:
     :param save_format:
@@ -157,11 +190,13 @@ def save_weights(model, filepath, save_format="h5") -> None:
     path = os.path.dirname(filepath)
     if path:
         os.makedirs(path, exist_ok=True)
-    model.save(filepath, save_format=save_format)
+    model.save_weights(filepath, save_format=save_format)
 
 
 def load_weights(model, filepath) -> None:
     """
+    Loads the weights into the given model.
+
     Disables trainable on the model and on all the layers, then loads the weights and
     restores the trainable configuration on the model and weights.
 
@@ -186,9 +221,10 @@ def load_weights(model, filepath) -> None:
 
 def save_model_alt(model, name, directory="./models", format='h5') -> None:
     """
-    Alternative solution to saving a model since the default implementation has issues with augemntation layers.
+    Alternative solution to saving a model since the default implementation has issues with augmentation layers.
 
-    Use in conjunction with load_model_alt
+    Use in conjunction with load_model_alt, this method will create two files, one .pkl file
+    with the configuration of the model, and a (for example .h5) file containing the weights of the model.
 
     :param model: The model to save
     :param directory: The target directory to save the model to
@@ -205,12 +241,15 @@ def save_model_alt(model, name, directory="./models", format='h5') -> None:
         pickle.dump(config, fp)
 
     model_file = os.path.join(directory, name + '.' + format)
-    model.save(model_file, save_format=format)
+    model.save_weights(model_file, save_format=format)
 
 
 def load_model_alt(name, directory="./models", format='h5'):
     """
     Alternative solution to saving a model since the default implementation has issues with augemntation layers.
+
+    This method will create a new model based on the configuration stored in a .pkl file and the weights stored in
+    a (for example .h5) file.
 
     Use in conjunction with save_model_alt
 
@@ -225,3 +264,34 @@ def load_model_alt(name, directory="./models", format='h5'):
         model_file = os.path.join(directory, name + '.' + format)
         model.load_weights(model_file)
         return model
+
+
+def export_embeddings(directory, text_vectorizer, embedding_layer) -> None:
+    """
+    Exports the embedding weights and the vocabulary of the text vectorizer.
+
+    Use in conjunction with:
+
+    https://projector.tensorflow.org
+
+    :param directory: The target directory to save the weights and vocabulary to.
+    :param text_vectorizer: A TextVectorization layer
+    :param embedding_layer: An Embedding layer
+    """
+    # Check if target directory exists, if not, create it
+    os.makedirs(directory, exist_ok=True)
+
+    out_v = io.open(os.path.join(directory, 'vectors.tsv'), 'w', encoding='utf-8')
+    out_m = io.open(os.path.join(directory, 'metadata.tsv'), 'w', encoding='utf-8')
+
+    vocabulary = text_vectorizer.get_vocabulary()
+    embed_weights = embedding_layer.get_weights()[0]
+
+    for index, word in enumerate(vocabulary):
+        if index == 0:
+            continue  # skip 0, it's padding.
+        vec = embed_weights[index]
+        out_v.write('\t'.join([str(x) for x in vec]) + "\n")
+        out_m.write(word + "\n")
+    out_v.close()
+    out_m.close()

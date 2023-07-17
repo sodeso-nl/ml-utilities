@@ -6,6 +6,7 @@ import random
 import itertools
 import collections.abc
 import pandas as pd
+import tensorflow as tf
 
 from pandas.api.types import is_numeric_dtype, is_object_dtype
 
@@ -21,16 +22,18 @@ from tensorflow.data import Dataset
 ########################################################################################################################
 
 
-def plot_histogram_from_dataframe(dataframe, column_names=None, log=False, min_nunique=3, max_nunique=50, figsize=None, cols=3, verbose=1):
+def plot_histogram_from_dataframe(dataframe: pd.DataFrame, column_names: list[str] = None, log=False, min_nunique=3, max_nunique=50, figsize=None, cols=3, verbose=1):
     """
     Plots a histogram for each of the numeric columns in the DataFrame.
 
-    :param dataframe: the dataframe dataframe
+    :param dataframe: the pandas dataframe
     :param column_names: columns which exist within the DataFrame if none specified all columns will be processed
+    :param log: set to True to enable logarithmic scaling
     :param min_nunique: minimum number of unique values present, if lower then this then no graph will be displayed (since it is basically boolean)
     :param max_nunique: maximum number of unique values present, only applicable to object column types since these cannot be binned
     :param figsize: size of the plot, if None specified then one is calculated
     :param cols: number of plots on the horizontal axis
+    :param verbose: display messages when columns are not visualized
     """
     # assert column_names is not None, "column_names cannot be None"
 
@@ -120,7 +123,7 @@ def plot_histogram_from_dataframe(dataframe, column_names=None, log=False, min_n
 ########################################################################################################################
 
 
-def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
+def plot_consecutive_histories(histories: list[tf.keras.callbacks.History], labels: list[str], figsize=(10, 6)):
     """
     Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
 
@@ -194,7 +197,7 @@ def plot_consecutive_histories(histories, labels, figsize=(10, 6)):
         plt.legend()
 
 
-def plot_history(history, figsize=(10, 6)):
+def plot_history(history: tf.keras.callbacks.History, figsize=(10, 6)):
     plot_consecutive_histories([history], ["Start history"], figsize=figsize)
 
 
@@ -221,7 +224,7 @@ def plot_xy_data_with_label(x, y) -> None:
     plt.show()
 
 
-def plot_decision_boundary(model, x, y) -> None:
+def plot_decision_boundary(model: tf.keras.Model, x, y) -> None:
     """
     Plots the decision boundary created by a model predicting on X.
 
@@ -267,7 +270,7 @@ def plot_decision_boundary(model, x, y) -> None:
 # Plotting methods for classification models
 ########################################################################################################################
 
-def plot_classification_confusion_matrix(y_true, y_pred, class_names=None, figsize=(15, 15), text_size=10, norm=False, savefig=False) -> None:
+def plot_classification_confusion_matrix(y_true, y_pred, class_names: list[str] = None, figsize=(15, 15), text_size=10, norm=False, savefig=False) -> None:
     """
       Plots a confusion matrix of the given data.
 
@@ -367,7 +370,7 @@ def table_quality_metrics(y_true, y_pred):
     return model_results
 
 
-def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10, 8)) -> None:
+def plot_classification_report_f1_score(y_true, y_pred, class_names: list[str], figsize=(10, 8)) -> None:
     """
     Creates a horizontal bar graph with the F1-Scores of the y_true / y_pred.
     :param y_true: Array of truth labels (must be same shape as y_pred).
@@ -415,7 +418,7 @@ def plot_classification_report_f1_score(y_true, y_pred, class_names, figsize=(10
     plt.show()
 
 
-def plot_classification_prediction_confidence_histogram(y_true, y_pred, class_names, figsize=(8, 4)):
+def plot_classification_prediction_confidence_histogram(y_true, y_pred, class_names: list[str], figsize=(8, 4)):
     bins = range(0, 110, 10)
 
     if mlint.is_label_dense(y_true):
@@ -488,7 +491,7 @@ def plot_classification_prediction_confidence_histogram(y_true, y_pred, class_na
             axs[n].set(title=class_name, xlabel='Confidence (%)', ylabel='Predictions')
 
 
-def plot_classification_prediction_confidence(y_true, y_pred, class_names, figsize=(10, 8)):
+def plot_classification_prediction_confidence(y_true, y_pred, class_names: list[str], figsize=(10, 8)):
     plt.figure(figsize=figsize)
 
     if mlint.is_label_dense(y_true):
@@ -603,7 +606,7 @@ def show_outliers_positive_and_negative(x, y_true, y_pred, top=10):
 ########################################################################################################################
 
 
-def _plot_history_ends(histories, labels) -> None:
+def _plot_history_ends(histories: list[tf.keras.callbacks.History], labels: list[str]) -> None:
     """
     Internal method which will plot a vertical line showing where a histories last epoch is visible.
 

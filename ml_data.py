@@ -12,22 +12,22 @@ from keras.utils import image_dataset_from_directory
 # General
 ########################################################################################################################
 
-def dataframe_convert_column_as_type(dataframe, column_name, dtype=np.float64, inplace=True):
+def dataframe_convert_column_as_type(dataframe: pd.DataFrame, column_name: str, dtype=np.float64, inplace=True):
     if inplace:
         dataframe[column_name] = dataframe[column_name].astype(dtype)
 
     return dataframe
 
 
-def dataframe_delete_null_rows(dataframe, column_name, inplace=True):
+def dataframe_delete_null_rows(dataframe: pd.DataFrame, column_name: str, inplace=True):
     dataframe.drop(dataframe[dataframe[column_name].isnull()].index, inplace = inplace)
 
 
-def dataframe_delete_rows_not_number(dataframe, column_name, inplace=True):
+def dataframe_delete_rows_not_number(dataframe: pd.DataFrame, column_name: str, inplace=True):
     return dataframe.drop(dataframe[pd.to_numeric(dataframe[column_name], errors='coerce').isna()].index, inplace=inplace)
 
 
-def dataframe_drop_columns(dataframe, column_names):
+def dataframe_drop_columns(dataframe: pd.DataFrame, column_names: list[str]):
     if not type(column_names) == list and column_names is not None:
         column_names = [column_names]
 
@@ -35,8 +35,7 @@ def dataframe_drop_columns(dataframe, column_names):
         dataframe.drop(c, axis=1, inplace=True)
 
 
-def dataframe_describe(dataframe, column_names=None, round=2):
-
+def dataframe_describe(dataframe: pd.DataFrame, column_names: list[str] = None, round=2):
     # If the column_names argument is not a list then create a list
     if not type(column_names) == list and column_names is not None:
         column_names = [column_names]
@@ -76,7 +75,7 @@ def dataframe_describe(dataframe, column_names=None, round=2):
     return pd.DataFrame(columns=["Column", "DType", "NotNull", "Null", "Unique", "Mean", "Std", "Z-Min", "Z-Max", "Min", "25%", "50%", "75%", "Max"], data=data).round(round)
 
 
-def add_batch_to_tensor(x):
+def add_batch_to_tensor(x: tf.Tensor):
     """
     Adds a batch size to the given tensor if x = (224, 224, 3) then the result will be (0, 224, 224, 3)
     :param x: The tensor
@@ -171,7 +170,7 @@ def get_class_names_from_dataset_info(ds_info):
 # (Batched)Dataset
 ########################################################################################################################
 
-def load_image_dataset_from_directory(directory,
+def load_image_dataset_from_directory(directory: str,
                                       label_mode='categorical',
                                       image_size=(256, 256),
                                       batch_size=32,
@@ -189,16 +188,19 @@ def load_image_dataset_from_directory(directory,
                                         )
 
 
-def get_class_names_from_dataset(dataset):
+def get_class_names_from_dataset(dataset: tf.data.Dataset):
     """
     Returns the class names from the dataset
     :param dataset: the dataset from which we want the class names.
     :return: the class names
     """
+    if not isinstance(dataset, tf.data.Dataset):
+      raise TypeError('dataset is not a tf.data.Dataset')
+
     return dataset.class_names
 
 
-def get_labels_from_dataset(dataset):
+def get_labels_from_dataset(dataset: tf.data.Dataset):
     """
     Returns the labels from a (batched)Dataset
 

@@ -49,7 +49,7 @@ def create_early_stopping_callback(monitor='val_loss',
                          start_from_epoch=start_from_epoch)
 
 
-def create_model_checkpoint_callback(experiment_name,
+def create_model_checkpoint_callback(experiment_name: str,
                                      dir_name='./checkpoints',
                                      metric='val_loss',
                                      save_weights_only=False,
@@ -79,7 +79,7 @@ def create_learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50
     return LearningRateScheduler(lambda epoch: learning_rate_start * 10 ** (epoch / division))
 
 
-def create_tensorboard_callback(experiment_name, dir_name='./logs'):
+def create_tensorboard_callback(experiment_name: str, dir_name='./logs'):
     log_dir = dir_name + '/' + experiment_name + '/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     print(f"Saving TensorBoard log files to: {log_dir}")
     return TensorBoard(log_dir=log_dir)
@@ -99,7 +99,7 @@ def create_stop_training_on_target_callback(metric="val_loss",
                                 restore_best_weights=restore_best_weights)
 
 
-def _find_learning_rate_division(learning_rate, epochs):
+def _find_learning_rate_division(learning_rate: float, epochs: int):
     """
     Finds the optimal division which can be used in a learning rate scheduler.
 

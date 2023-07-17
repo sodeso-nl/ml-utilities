@@ -6,45 +6,47 @@ import urllib
 import tensorflow as tf
 
 
-def download_file(source='http://www.download.com/file.zip', destination='./data/file.zip') -> None:
+def download_file(source='http://www.download.com/file.zip', filepath='./data/file.zip') -> None:
     """
     Download a file from source location and store it at the specified destination location.
     :param source: the source URL
-    :param destination: the destination path and filename
+    :param filepath: the destination path and filename
     """
-    path = os.path.dirname(destination)
+    path = os.path.dirname(filepath)
     if path:
         os.makedirs(path, exist_ok=True)
     else:
-        os.path.join('./', destination)
+        os.path.join('./', filepath)
 
     # noinspection PyUnresolvedReferences
-    urllib.request.urlretrieve(source, destination)
+    urllib.request.urlretrieve(source, filepath)
+    print(f'Download of {source} completed.')
 
 
-def extract_tgz(file='./data/file.tar.gz', folder='./data') -> None:
+def extract_tgz(filepath='./data/file.tar.gz', folder='./data') -> None:
     """
     Extracts a .tgz file in the specified destination.
-    :param file: the .tgz file
+    :param filepath: the .tgz file
     :param folder: the destination location, if not specified then same path as source file.
     """
     if folder is None:
-        folder = os.path.dirname(file)
-    tgz_file = tarfile.open(file)
+        folder = os.path.dirname(filepath)
+    tgz_file = tarfile.open(filepath)
     tgz_file.extractall(path=folder)
     tgz_file.close()
+    print(f"Extraction of {filepath} completed.")
 
 
-def extract_zip(file='./data/file.zip', folder='./data') -> None:
+def extract_zip(filepath='./data/file.zip', folder='./data') -> None:
     """
     Extracts a .zip file in the specified destination.
 
-    :param file: the path and filename
+    :param filepath: the path and filename
     :param folder: the destination location, if not specified then same path as source file.
     """
     if folder is None:
-        folder = os.path.dirname(file)
-    zip_file = zipfile.ZipFile(file)
+        folder = os.path.dirname(filepath)
+    zip_file = zipfile.ZipFile(filepath)
     zip_file.extractall(path=folder)
     zip_file.close()
 
@@ -58,7 +60,7 @@ def list_dir_summary(folder='./data') -> None:
         print(f"There are {len(dirnames)} directories, and {len(filenames)} in {dirpath}")
 
 
-def load_image_as_tensor(filename, img_shape=(224, 224), scale=True):
+def load_image_as_tensor(filename: str, img_shape=(224, 224), scale=True):
     """
     Reads in an image from filename, turns it into a tensor and reshapes into
     specified shape (img_shape, img_shape, channels)

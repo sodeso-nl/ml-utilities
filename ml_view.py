@@ -10,8 +10,6 @@ import matplotlib.image as mpimg
 
 import ml_internal as mlint
 
-from tensorflow.data import Dataset
-
 
 def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gray') -> None:
     """
@@ -43,8 +41,8 @@ def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gr
         logging.error(e)
 
 
-def show_images_from_dataset(dataset, shape=(4, 8)):
-    assert isinstance(dataset, Dataset), f"The dataset supplied is not a tensorflow.data.Dataset."
+def show_images_from_dataset(dataset: tf.data.Dataset, shape=(4, 8)):
+    assert isinstance(dataset, tf.data.Dataset), f"The dataset supplied is not a tensorflow.data.Dataset."
 
     # Retrieve first batch, depending on the initalization of the dataset the batch size is default 32
     # so when performing a take of (1) we retreive the first batch
@@ -64,7 +62,7 @@ def show_images_from_dataset(dataset, shape=(4, 8)):
     plt.show()
 
 
-def show_images_from_nparray_or_tensor(x, y, class_names=None, indices=None, shape=(4, 6), cmap='gray'):
+def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indices=None, shape=(4, 6), cmap='gray'):
     """
     Shows images stored in a tensor / numpy array. The array should be a vector of images.
 

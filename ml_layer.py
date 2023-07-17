@@ -13,7 +13,7 @@ from keras import Model
 # Predicting / evaluating models
 ########################################################################################################################
 
-def predict_classification_dataset(model, dataset):
+def predict_classification_dataset(model: tf.keras.Model, dataset: tf.data.Dataset):
     """
     Performs predictions on the given model for all entries in the dataset, will
     return y_pred and y_true as a tuple. Use full for when the dataset has shuffling enabled
@@ -37,7 +37,7 @@ def predict_classification_dataset(model, dataset):
     return y_true, y_pred
 
 
-def predict_regression(model, x):
+def predict_regression(model: tf.keras.Model, x):
     """
     Performs predictions on the given model for all entries in the dataset, will
     return y_pred and y_true as a tuple. Use full for when the dataset has shuffling enabled
@@ -62,7 +62,7 @@ def predict_regression(model, x):
 ########################################################################################################################
 
 
-def collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
+def collect_layers(model: tf.keras.Model, recursive=True, include_trainable=True, include_non_trainable=True):
     """
     Collects layers from the given model, if the model is functional then there might be sub-branches
     inside the model, for example:
@@ -103,24 +103,24 @@ def collect_layers(model, recursive=True, include_trainable=True, include_non_tr
     return layers
 
 
-def collect_layer_names(model, recursive=True, include_trainable=True, include_non_trainable=True):
+def collect_layer_names(model: tf.keras.Model, recursive=True, include_trainable=True, include_non_trainable=True):
     layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
     return list(map(lambda layer: layer.name, layers))
 
 
-def set_trainable_on_layers(model, layer_names=None, trainable=True) -> None:
+def set_trainable_on_layers(model: tf.keras.Model, layer_names=None, trainable=True) -> None:
     for layer in collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True):
         if layer_names is None or layer.name in layer_names:
             layer.trainable = trainable
 
 
-def set_trainable_on_first_n_layers(model, n, trainable=True) -> None:
+def set_trainable_on_first_n_layers(model: tf.keras.Model, n, trainable=True) -> None:
     layers = collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True)
     for layer in layers[:n]:
         layer.trainable = trainable
 
 
-def set_trainable_on_last_n_layers(model, n, trainable=True) -> None:
+def set_trainable_on_last_n_layers(model: tf.keras.Model, n, trainable=True) -> None:
     layers = collect_layers(model, recursive=True, include_trainable=True, include_non_trainable=True)
     for layer in layers[-n:]:
         layer.trainable = trainable
@@ -131,7 +131,7 @@ def list_model(model, recursive=True, include_trainable=True, include_non_traina
     list_layers(layers=layers, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
 
 
-def list_layers(layers, include_trainable=True, include_non_trainable=True) -> None:
+def list_layers(layers: list[tf.keras.layers.Layer], include_trainable=True, include_non_trainable=True) -> None:
     layer_name_col_width = len(max(list(map(lambda l: l.name, layers)), key=len))
     layer_type_col_width = len(max(list(map(lambda l: type(l).__name__, layers)), key=len))
     layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), layers)), key=len))
@@ -149,7 +149,7 @@ def list_layers(layers, include_trainable=True, include_non_trainable=True) -> N
 # Saving / loading models
 ########################################################################################################################
 
-def save_model(model, filepath="./models/model.h5", save_format="h5") -> None:
+def save_model(model: tf.keras.Model, filepath="./models/model.h5", save_format="h5") -> None:
     """
     This method will call the default model.save method.
 
@@ -179,7 +179,7 @@ def load_model(filepath="./models/model.h5", custom_objects = None) -> Model:
     return tf.keras.models.load_model(filepath=filepath, custom_objects=custom_objects)
 
 
-def save_weights(model, filepath, save_format="h5") -> None:
+def save_weights(model: tf.keras.Model, filepath: str, save_format="h5") -> None:
     """
     Saves only the weights of the model.
 
@@ -193,7 +193,7 @@ def save_weights(model, filepath, save_format="h5") -> None:
     model.save_weights(filepath, save_format=save_format)
 
 
-def load_weights(model, filepath) -> None:
+def load_weights(model: tf.keras.Model, filepath: str) -> None:
     """
     Loads the weights into the given model.
 
@@ -219,7 +219,7 @@ def load_weights(model, filepath) -> None:
     set_trainable_on_layers(model, layer_names=trainable_layer_names, trainable=True)
 
 
-def save_model_alt(model, name, directory="./models", format='h5') -> None:
+def save_model_alt(model: tf.keras.Model, name: str, directory="./models", format='h5') -> None:
     """
     Alternative solution to saving a model since the default implementation has issues with augmentation layers.
 
@@ -244,7 +244,7 @@ def save_model_alt(model, name, directory="./models", format='h5') -> None:
     model.save_weights(model_file, save_format=format)
 
 
-def load_model_alt(name, directory="./models", format='h5'):
+def load_model_alt(name: str, directory="./models", format='h5'):
     """
     Alternative solution to saving a model since the default implementation has issues with augemntation layers.
 
@@ -266,7 +266,7 @@ def load_model_alt(name, directory="./models", format='h5'):
         return model
 
 
-def export_embeddings(directory, text_vectorizer, embedding_layer) -> None:
+def export_embeddings(directory: str, text_vectorizer, embedding_layer) -> None:
     """
     Exports the embedding weights and the vocabulary of the text vectorizer.
 

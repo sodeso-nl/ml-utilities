@@ -14,9 +14,6 @@ from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from scipy.interpolate import interp1d
 
-from tensorflow.data import Dataset
-
-
 ########################################################################################################################
 # Plotting pandas Dataframe
 ########################################################################################################################
@@ -287,7 +284,7 @@ def plot_classification_confusion_matrix(y_true, y_pred, class_names: list[str] 
       https://cs231n.github.io/neural-networks-case-study
     """
 
-    if isinstance(y_true, Dataset):
+    if isinstance(y_true, tf.data.Dataset):
         raise TypeError('y_true is a dataset, please get the labels from the dataset using '
                         '\'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')
 
@@ -378,7 +375,7 @@ def plot_classification_report_f1_score(y_true, y_pred, class_names: list[str], 
     :param class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
     :param figsize: Size of output figure (default=(10, 8)).
     """
-    if isinstance(y_true, Dataset):
+    if isinstance(y_true, tf.data.Dataset):
         raise TypeError(
             'y_true is a dataset, please get the labels from the dataset using '
             '\'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')

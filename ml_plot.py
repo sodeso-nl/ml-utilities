@@ -364,7 +364,7 @@ def table_quality_metrics(y_true, y_pred):
             "recall": model_recall,
             "f1": model_f1_score
         }
-    return model_results
+    return dict(sorted(model_results.items()))
 
 
 def plot_classification_report_f1_score(y_true, y_pred, class_names: list[str], figsize=(10, 8)) -> None:

@@ -1,7 +1,7 @@
 import os
 import io
 import pickle
-import ml_data as mld
+import ml_data as ml_data
 import numpy as np
 import tensorflow_hub as hub
 import tensorflow as tf
@@ -47,7 +47,7 @@ def predict_regression(model: tf.keras.Model, x):
     """
     y_pred = None
     for values in x:
-        batch_pred = model.predict(x=mld.add_batch_to_tensor(values))
+        batch_pred = model.predict(x=ml_data.add_batch_to_tensor(values))
         if y_pred is None:
             y_pred = batch_pred
         else:

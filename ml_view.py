@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-import ml_internal as mlint
+import ext.ml_internal as mlint
 
 
 def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gray') -> None:

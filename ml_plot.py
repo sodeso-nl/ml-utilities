@@ -1,4 +1,4 @@
-import ml_internal as mlint
+import ext.ml_internal as mlint
 
 import matplotlib.pyplot as plt
 import numpy as np

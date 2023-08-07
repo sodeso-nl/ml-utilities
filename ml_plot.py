@@ -571,7 +571,24 @@ def plot_regression_y_pred_vs_y_true(y_true, y_pred, figsize=(10, 8)):
     plt.legend()
 
 
-def show_outliers_positive_and_negative(x, y_true, y_pred, top=10):
+def show_outliers_multiclass(x, y_true, y_pred, y_prob, top=10):
+    """
+    Displays the top X (default 10) outliers between y_true and y_pred.
+    :param x: data to display
+    :param y_true: actual labels [3, 3, 2, ..., 4, 4, 1]
+    :param y_pred: predictions [3, 3, 2, ..., 4, 2, 1]
+    :param y_prob: probabilities (multiclass) [[0.30974227, ...], [0.32494593, ...], ..]
+    :param top: how many outliers to return
+    :return: the outliers
+    """
+    data = [[y_true[i], x.numpy().item(), y_prob[i][x]] for i, x in enumerate(y_pred)]
+    data_df = pd.DataFrame(data, columns=['y_true', 'y_pred', 'y_prob'])
+    all_df = pd.concat([x, data_df], axis=1)
+    outliers = all_df[all_df['y_true'] != all_df['y_pred']].sort_values('y_prob', ascending=False)[:top]
+    return outliers
+
+
+def show_outliers_binary(x, y_true, y_pred, top=10):
     """
     Displays the top X (default 10) outliers between y_true and y_pred.
     :param x: data to display

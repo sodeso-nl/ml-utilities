@@ -583,6 +583,7 @@ def show_outliers_multiclass(x, y_true, y_pred, y_prob, top=10):
     """
     data = [[y_true[i], x.numpy().item(), y_prob[i][x]] for i, x in enumerate(y_pred)]
     data_df = pd.DataFrame(data, columns=['y_true', 'y_pred', 'y_prob'])
+    # Functions like zip()
     all_df = pd.concat([x, data_df], axis=1)
     outliers = all_df[all_df['y_true'] != all_df['y_pred']].sort_values('y_prob', ascending=False)[:top]
     return outliers

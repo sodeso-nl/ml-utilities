@@ -10,6 +10,8 @@ setup(
     version=VERSION,
     author="Ronald Mathies",
     description="Utilities library for TensorFlow",
+    long_description_content_type="text/plain",
+    long_description="A various set of utility functions that can be used in conjunction with Tensorflow.",
     packages=find_packages(),
     install_requires=[
         # 'scikit-learn>=1.2.2',

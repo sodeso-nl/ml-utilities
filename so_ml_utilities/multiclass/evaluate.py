@@ -1,7 +1,7 @@
 import pandas as pd
 import sklearn as sklearn
 import tensorflow as tf
-import ml_utilities as ml
+import so_ml_utilities as somlu
 
 
 def determine_outliers(x, y_true, y_pred = None, y_prob = None, top=10) -> pd.DataFrame:
@@ -27,15 +27,15 @@ def determine_outliers(x, y_true, y_pred = None, y_prob = None, top=10) -> pd.Da
     # If y_pred is None then determine the predictions, otherwise check if we need to convert to numpy.
     _y_pred = y_pred
     if y_pred is None:
-        _y_pred = ml.util.label.to_prediction(y_prob=_y_prob)
+        _y_pred = somlu.util.label.to_prediction(y_prob=_y_prob)
     elif tf.is_tensor(x=y_pred):
         _y_pred = y_pred.numpy()
 
     # Create a matrix containing the y_true, y_pred and y_prob value in columns.
     data = None
-    if ml.util.label.is_multiclass_classification(_y_prob):
+    if somlu.util.label.is_multiclass_classification(_y_prob):
         data = [[y_true[i], x, _y_prob[i][x]] for i, x in enumerate(_y_pred)]
-    elif ml.util.label.is_binary_classification(_y_prob):
+    elif somlu.util.label.is_binary_classification(_y_prob):
         data = [[y_true[i], x[0], _y_prob[i][0]] for i, x in enumerate(_y_pred)]
 
     if data is None:

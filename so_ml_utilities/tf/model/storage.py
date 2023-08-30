@@ -3,7 +3,7 @@ import pickle
 
 import tensorflow as tf
 import keras as keras
-import ml_utilities as ml
+import so_ml_utilities as somlu
 
 
 def save_model(model: tf.keras.Model, filepath="./models/model.h5", save_format="h5") -> None:

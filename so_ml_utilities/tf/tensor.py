@@ -1,5 +1,5 @@
 import tensorflow as tf
-import ml_utilities as ml
+import so_ml_utilities as somlu
 
 
 def add_batch_to_tensor(x: tf.Tensor) -> tf.Tensor:
@@ -19,18 +19,18 @@ def probability_to_class(y_prob: tf.Tensor) -> tf.Tensor:
     """
     See ml.util.label.probability_to_class
     """
-    return ml.util.label.probability_to_class(y_prob=y_prob)
+    return somlu.util.label.probability_to_class(y_prob=y_prob)
 
 
 def probability_to_binary(y_prob: tf.Tensor) -> tf.Tensor:
     """
     See ml.util.label.probability_to_binary
     """
-    return ml.util.label.probability_to_binary(y_prob=y_prob)
+    return somlu.util.label.probability_to_binary(y_prob=y_prob)
 
 
 def to_prediction(y_prob: tf.Tensor, dtype=None) -> tf.Tensor:
     """
     See ml.util.label.to_prediction
     """
-    return ml.util.label.to_prediction(y_prob=y_prob, dtype=dtype)
+    return somlu.util.label.to_prediction(y_prob=y_prob, dtype=dtype)

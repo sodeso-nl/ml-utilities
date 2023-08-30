@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-import ml_utilities as ml
+import so_ml_utilities as somlu
 
 
 def predict_classification_dataset_without_labels(model: tf.keras.Model, dataset: tf.data.Dataset):
@@ -57,7 +57,7 @@ def predict_regression(model: tf.keras.Model, x):
     """
     y_pred = None
     for values in x:
-        batch_pred = model.predict(x=ml.tf.tensor.add_batch_to_tensor(values))
+        batch_pred = model.predict(x=somlu.tf.tensor.add_batch_to_tensor(values))
         if y_pred is None:
             y_pred = batch_pred
         else:

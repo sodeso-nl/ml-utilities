@@ -1,5 +1,5 @@
 import pandas as pd
-import ml_utilities as ml
+import so_ml_utilities as somlu
 
 
 def determine_outliers(x, y_true, y_pred, target_column: str, top=10):

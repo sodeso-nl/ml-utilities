@@ -25,7 +25,8 @@ jobs:
           pip3 install build
       - name: Build
         run: |
-          python3 -m build --sdist --wheel --outdir dist/ .
+          python3 setup.py sdist bdist_wheel
+#          python3 -m build --sdist --wheel --outdir dist/ .
       - name: Publish
         uses: pypa/gh-action-pypi-publish@release/v1
         with:

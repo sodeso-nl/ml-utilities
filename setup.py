@@ -6,7 +6,7 @@ DESCRIPTION = 'Machine Learning Convenience Functions'
 # Setting up
 setup(
     # the name must match the folder name 'verysimplemodule'
-    name="ml_utilities",
+    name="ml-utilities",
     version=VERSION,
     author="Ronald Mathies",
     description="Utilities library for TensorFlow",

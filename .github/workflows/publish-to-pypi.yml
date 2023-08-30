@@ -25,7 +25,7 @@ jobs:
           pip install build
       - name: Build
         run: |
-          python3 -m build --sdist --wheel --outdir dist/ .
+          python -m build --sdist --wheel --outdir dist/ .
       - name: Publish
         uses: pypa/gh-action-pypi-publish@release/v1
         with:

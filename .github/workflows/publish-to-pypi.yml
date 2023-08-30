@@ -14,21 +14,20 @@ jobs:
     environment: development
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    - name: Install pypa/build
-      run: |
-#        python3 -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install build
-    - name: Build
-      run: |
-        python3 -m build --sdist --wheel --outdir dist/ .
-    - name: Publish
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.PYPI_PASSWORD }}
-        verbose: true
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install pypa/build
+        run: |
+          pip install -r requirements.txt
+          pip install build
+      - name: Build
+        run: |
+          python3 -m build --sdist --wheel --outdir dist/ .
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_PASSWORD }}
+          verbose: true

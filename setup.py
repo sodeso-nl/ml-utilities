@@ -1,13 +1,13 @@
 from setuptools import setup, find_packages
+from so_ml_tools import __version__
 
-VERSION = '0.0.1'
 DESCRIPTION = 'Machine Learning Convenience Functions'
 
 # Setting up
 setup(
     # the name must match the folder name 'verysimplemodule'
-    name="so-ml-utilities",
-    version=VERSION,
+    name="so-ml-tools",
+    version=__version__,
     author="Ronald Mathies",
     description="Utilities library for TensorFlow",
     long_description_content_type="text/plain",

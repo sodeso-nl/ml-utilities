@@ -1,6 +1,6 @@
 import tensorflow as tf
 import matplotlib as plt
-import so_ml_utilities as somlu
+import so_ml_tools as soml
 
 
 def get_class_names_from_dataset_info(ds_info):
@@ -67,5 +67,5 @@ def show_images_from_dataset(dataset: tf.data.Dataset, shape=(4, 8)):
     if len(x) != shape[0] * shape[1]:
         raise TypeError('dataset is not a Dataset')
 
-    somlu.data.image.show_images_from_nparray_or_tensor(x=x, y=y_true, class_names=dataset.class_names, shape=shape)
+    soml.data.image.show_images_from_nparray_or_tensor(x=x, y=y_true, class_names=dataset.class_names, shape=shape)
     plt.show()

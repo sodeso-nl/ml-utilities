@@ -3,7 +3,7 @@ import itertools
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-import so_ml_utilities as somlu
+import so_ml_tools as soml
 import sklearn as sklearn
 
 
@@ -28,8 +28,8 @@ def confusion_matrix(y_true, y_prob, class_names: list[str] = None, figsize=(15,
         raise TypeError('y_true is a dataset, please get the labels from the dataset using '
                         '\'y_labels = ml.tf.dataset.get_labels(dataset=dataset)\'')
 
-    y_true = somlu.util.label.to_prediction(y_prob=y_true)
-    y_pred = somlu.util.label.to_prediction(y_prob=y_prob)
+    y_true = soml.util.label.to_prediction(y_prob=y_true)
+    y_pred = soml.util.label.to_prediction(y_prob=y_prob)
 
     # Create the confusion matrix
     cm = sklearn.metrics.confusion_matrix(y_true, y_pred)
@@ -164,8 +164,8 @@ def report_f1_score(y_true, y_pred, class_names: list[str], figsize=(10, 8)) -> 
             'y_true is a dataset, please get the labels from the dataset using '
             '\'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')
 
-    y_true = somlu.util.label.to_prediction(y_prob=y_true)
-    y_pred = somlu.util.label.to_prediction(y_prob=y_pred)
+    y_true = soml.util.label.to_prediction(y_prob=y_true)
+    y_pred = soml.util.label.to_prediction(y_prob=y_pred)
 
     # Generate classification report from SKLearn.
     report_dict = sklearn.metrics.classification_report(y_true=y_true, y_pred=y_pred, target_names=class_names, output_dict=True)

@@ -2,7 +2,7 @@ import random
 
 import tensorflow as tf
 import matplotlib as plt
-import so_ml_utilities as somlu
+import so_ml_tools as soml
 import numpy as np
 
 
@@ -51,7 +51,7 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
     :param shape: is the number of images to display
     :param cmap: is the color map to use, use "gray" for gray scale images, use None for default.
     """
-    y = somlu.util.label.to_prediction(y_prob=y, dtype=np.float32)
+    y = soml.util.label.to_prediction(y_prob=y, dtype=np.float32)
 
     if is_image_float32_and_not_normalized(x):
         x = tf.cast(x=x, dtype=tf.uint8)
@@ -77,8 +77,8 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
 
         plt.imshow(x[rand_index], cmap=cmap)
 
-        if somlu.util.label.is_multiclass_classification(y):
-            class_index = somlu.util.label.probability_to_class(y)
+        if soml.util.label.is_multiclass_classification(y):
+            class_index = soml.util.label.probability_to_class(y)
         else:
             # Integer encoded labels
             class_index = y[rand_index]

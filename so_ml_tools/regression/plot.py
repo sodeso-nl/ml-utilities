@@ -2,7 +2,7 @@ import matplotlib as plt
 import numpy as np
 import tensorflow as tf
 
-import so_ml_utilities as somlu
+import so_ml_tools as soml
 
 from scipy.interpolate import interp1d
 
@@ -23,7 +23,7 @@ def confusion_matrix(y_true, y_prob, class_names: list[str] = None, figsize=(15,
       Inspired by the following two websites:
       https://cs231n.github.io/neural-networks-case-study
     """
-    somlu.multiclass.plot.confusion_matrix(y_true, y_prob, class_names, figsize, text_size, norm, savefig)
+    soml.multiclass.plot.confusion_matrix(y_true, y_prob, class_names, figsize, text_size, norm, savefig)
 
 
 def classification_prediction_confidence(y_true, y_pred, class_names: list[str], figsize=(10, 8)):
@@ -38,7 +38,7 @@ def classification_prediction_confidence(y_true, y_pred, class_names: list[str],
     positivate_range_translation = interp1d([0.,1.],[0,100])
     negative_range_translation = interp1d([0.,1.],[100,0])
 
-    y_true_int = somlu.util.label.probability_to_binary(y_true, dtype=np.int32)
+    y_true_int = soml.util.label.probability_to_binary(y_true, dtype=np.int32)
     for n in range(2):
         # Filter out only the rows thar are applicatie to the n'th class
         y_pred_single_class = y_pred[np.in1d(y_true_int[:, 0], [n])]
@@ -86,7 +86,7 @@ def classification_prediction_confidence_histogram(y_true, y_pred, class_names: 
     positivate_range_translation = interp1d([0.,1.],[0,100])
     negative_range_translation = interp1d([0.,1.],[100,0])
 
-    y_true_int = somlu.util.label.probability_to_binary(y_true, dtype=np.int32)
+    y_true_int = soml.util.label.probability_to_binary(y_true, dtype=np.int32)
     for n in range(2):
         # Filter out only the rows thar are applicatie to the n'th class
         y_pred_single_class = y_pred[np.in1d(y_true_int[:, 0], [n])]
@@ -109,7 +109,7 @@ def classification_prediction_confidence_histogram(y_true, y_pred, class_names: 
 
 
 def report_f1_score(y_true, y_pred, class_names: list[str], figsize=(10, 8)) -> None:
-    somlu.multiclass.plot.report_f1_score(y_true, y_pred, class_names, figsize)
+    soml.multiclass.plot.report_f1_score(y_true, y_pred, class_names, figsize)
 
 
 def xy_data_with_label(x, y) -> None:

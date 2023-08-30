@@ -21,11 +21,11 @@ jobs:
           python-version: '3.11'
       - name: Install pypa/build
         run: |
-          pip install -r requirements.txt
-          pip install build setuptools
+          pip3 install -r requirements.txt
+          pip3 install build
       - name: Build
         run: |
-          python -m build --sdist --wheel --outdir dist/ .
+          python3 -m build --sdist --wheel --outdir dist/ .
       - name: Publish
         uses: pypa/gh-action-pypi-publish@release/v1
         with:

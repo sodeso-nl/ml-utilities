@@ -1,6 +1,3 @@
-import string
-from collections import Counter
-
 import numpy as np
 import re
 
@@ -28,9 +25,9 @@ def count_unique_words(lines: list[str], standardize = "lower_and_strip_punctuat
     return len(unique)
 
 
-def calculate_word_lengths(lines: list[str]) -> list[int]:
+def count_words_for_each_sentence(lines: list[str]) -> list[int]:
     """
-    Calculates the length for each string valaue and returns a list containing
+    Calculates the length for each string value and returns a list containing
     these lengths.
 
     :param lines: a list of string values
@@ -47,17 +44,17 @@ def calculate_q_precentile_word_lengths(lines: list[str], q=95) -> int:
     :param q: q-percentile (default 95%)
     :return: the percentile
     """
-    return int(np.percentile(a=calculate_word_lengths(lines), q=q))
+    return int(np.percentile(a=count_words_for_each_sentence(lines), q=q))
 
 
-def calculate_average_word_length(lines: list[str]) -> int:
+def average_number_of_word_per_sentence(lines: list[str]) -> int:
     """
     Returns the average length of the strings.
 
     :param lines: a list of string values
     :return: the average sentence length
     """
-    return round(sum(calculate_word_lengths(lines)) / len(lines))
+    return round(sum(count_words_for_each_sentence(lines)) / len(lines))
 
 
 ########################################################################################################################
@@ -77,9 +74,9 @@ def count_unique_chars(lines: list[str], standardize = "lower_and_strip_punctuat
     return len(unique), unique
 
 
-def calculate_character_lengths(lines: list[str]) -> list[int]:
+def length_per_sentence(lines: list[str]) -> list[int]:
     """
-    Calculates the length for each string valaue and returns a list containing
+    Calculates the length for each string value and returns a list containing
     these lengths.
 
     :param lines: a list of string values
@@ -88,7 +85,7 @@ def calculate_character_lengths(lines: list[str]) -> list[int]:
     return [len(sentence) for sentence in lines]
 
 
-def calculate_q_precentile_character_lengths(lines: list[str], q=95) -> int:
+def calculate_q_precentile_character_lengths_for_all_sentence(lines: list[str], q=95) -> int:
     """
     Calculates the q-percentile based on the lengths of the strings.
 
@@ -96,14 +93,14 @@ def calculate_q_precentile_character_lengths(lines: list[str], q=95) -> int:
     :param q: q-percentile (default 95%)
     :return: the percentile
     """
-    return int(np.percentile(a=calculate_character_lengths(lines), q=q))
+    return int(np.percentile(a=length_per_sentence(lines), q=q))
 
 
-def calculate_average_character_length(lines: list[str]) -> int:
+def calculate_average_character_length_for_all_sentences(lines: list[str]) -> int:
     """
     Returns the average length of the strings.
 
     :param lines: a list of string values
     :return: the average sentence length
     """
-    return round(sum(calculate_character_lengths(lines)) / len(lines))
+    return round(sum(length_per_sentence(lines)) / len(lines))

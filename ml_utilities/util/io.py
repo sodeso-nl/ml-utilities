@@ -6,11 +6,13 @@ import urllib
 import tensorflow as tf
 
 
-def download_file(source='http://www.download.com/file.zip', filepath='./data/file.zip') -> None:
+def download_file(source='https://www.download.com/file.zip', filepath='./data/file.zip') -> None:
     """
     Download a file from source location and store it at the specified destination location.
-    :param source: the source URL
-    :param filepath: the destination path and filename
+
+    Args:
+        source: the source URL
+        filepath: the destination path and filename
     """
     path = os.path.dirname(filepath)
     if path:
@@ -26,8 +28,10 @@ def download_file(source='http://www.download.com/file.zip', filepath='./data/fi
 def extract_tgz(filepath='./data/file.tar.gz', folder='./data') -> None:
     """
     Extracts a .tgz file in the specified destination.
-    :param filepath: the .tgz file
-    :param folder: the destination location, if not specified then same path as source file.
+
+    Args:
+        filepath: the .tgz file
+        folder: the destination location, if not specified then same path as source file.
     """
     if folder is None:
         folder = os.path.dirname(filepath)
@@ -41,8 +45,9 @@ def extract_zip(filepath='./data/file.zip', folder='./data') -> None:
     """
     Extracts a .zip file in the specified destination.
 
-    :param filepath: the path and filename
-    :param folder: the destination location, if not specified then same path as source file.
+    Args:
+        filepath: the path and filename
+        folder: the destination location, if not specified then same path as source file.
     """
     if folder is None:
         folder = os.path.dirname(filepath)
@@ -54,7 +59,9 @@ def extract_zip(filepath='./data/file.zip', folder='./data') -> None:
 def list_dir_summary(folder='./data') -> None:
     """
     Lists a summary of the specified folder
-    :param folder: the folder to list the contents of
+
+    Args:
+        folder: the folder to list the contents of
     """
     for dirpath, dirnames, filenames in os.walk(folder):
         print(f"There are {len(dirnames)} directories, and {len(filenames)} in {dirpath}")
@@ -65,10 +72,13 @@ def load_image_as_tensor(filename: str, img_shape=(224, 224), scale=True):
     Reads in an image from filename, turns it into a tensor and reshapes into
     specified shape (img_shape, img_shape, channels)
 
-    :param filename: path to target image
-    :param img_shape: tuple with height/width dimension of target image size
-    :param scale: scale pixel values from 0-255 to 0-1 or not
-    :return: Image tensor of shape (img_shape, img_shape, 3)
+    Args:
+        filename: path to target image
+        img_shape: tuple with height/width dimension of target image size
+        scale: scale pixel values from 0-255 to 0-1 or not
+
+    Returns:
+        Image tensor of shape (img_shape, img_shape, 3)
     """
 
     # Read in the image

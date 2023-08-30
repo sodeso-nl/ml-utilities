@@ -1,7 +1,6 @@
 from tensorflow.python.platform import tf_logging as logging
 
 from keras.utils import io_utils
-
 from keras.callbacks import \
     Callback, \
     TensorBoard, \
@@ -10,10 +9,11 @@ from keras.callbacks import \
     EarlyStopping, \
     ReduceLROnPlateau
 
+
 import datetime
 
 
-def create_reduce_lr_on_plateau_callback(monitor="val_loss",
+def reduce_lr_on_plateau_callback(monitor="val_loss",
                                          factor=0.5,
                                          patience=4,
                                          verbose=1,
@@ -31,7 +31,7 @@ def create_reduce_lr_on_plateau_callback(monitor="val_loss",
                              min_lr=min_lr)
 
 
-def create_early_stopping_callback(monitor='val_loss',
+def early_stopping_callback(monitor='val_loss',
                                    min_delta=0,
                                    patience=6,
                                    verbose=1,
@@ -49,7 +49,7 @@ def create_early_stopping_callback(monitor='val_loss',
                          start_from_epoch=start_from_epoch)
 
 
-def create_model_checkpoint_callback(experiment_name: str,
+def model_checkpoint_callback(experiment_name: str,
                                      dir_name='./checkpoints',
                                      metric='val_loss',
                                      save_weights_only=False,
@@ -65,7 +65,7 @@ def create_model_checkpoint_callback(experiment_name: str,
                            verbose=verbose)
 
 
-def create_learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50) -> LearningRateScheduler:
+def learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50) -> LearningRateScheduler:
     """
     Creates a LearningRateScheduler which will be pre-configured with a division. The division
     is calculated using find_learning_rate_division.
@@ -79,7 +79,7 @@ def create_learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50
     return LearningRateScheduler(lambda epoch: learning_rate_start * 10 ** (epoch / division))
 
 
-def create_tensorboard_callback(experiment_name: str, dir_name='./logs'):
+def tensorboard_callback(experiment_name: str, dir_name='./logs'):
     log_dir = dir_name + '/' + experiment_name + '/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     print(f"Saving TensorBoard log files to: {log_dir}")
     return TensorBoard(log_dir=log_dir)

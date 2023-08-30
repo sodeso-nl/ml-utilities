@@ -11,20 +11,21 @@ permissions:
 jobs:
   build-n-publish:
     runs-on: ubuntu-latest
+    environment: development
 
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.x'
     - name: Install pypa/build
       run: >-
         python3 -m
         pip install
         build
         --user
-    - name: Build a binary wheel and a source tarball
+    - name: Build
       run: >-
         python3 -m
         build
@@ -32,7 +33,7 @@ jobs:
         --wheel
         --outdir dist/
         .
-    - name: Build and publish
+    - name: Publish
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.PYPI_PASSWORD }}

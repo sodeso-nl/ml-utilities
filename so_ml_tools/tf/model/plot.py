@@ -2,7 +2,7 @@ import matplotlib.pyplot as _plt
 import tensorflow as _tf
 
 
-def plot_consecutive_histories(histories: list[tf.keras.callbacks.History], labels: list[str], figsize=(10, 6)):
+def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], labels: list[str], figsize=(10, 6)):
     """
     Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
 

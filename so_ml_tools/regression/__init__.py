@@ -1,2 +1,4 @@
-import so_ml_tools.regression.plot
-import so_ml_tools.regression.evaluate
+__all__ = [
+    "evaluate",
+    "plot"
+]

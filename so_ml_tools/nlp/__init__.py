@@ -1,1 +1,4 @@
-import so_ml_tools.nlp.text
+__all__ = [
+    "evaluate",
+    "plot"
+]

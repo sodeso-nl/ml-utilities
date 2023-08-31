@@ -1,5 +1,5 @@
-import pandas as pd
-import so_ml_tools as soml
+import pandas as _pd
+import so_ml_tools as _soml
 
 
 def determine_outliers(x, y_true, y_pred, target_column: str, top=10):
@@ -28,7 +28,7 @@ def determine_outliers(x, y_true, y_pred, target_column: str, top=10):
     positive_outliers_sorted = positive_outliers.sort_values(['diff'], ascending=False, inplace=False)[:top]
     negative_outliers_sorted = negative_outliers.sort_values(['diff'], ascending=True, inplace=False)[:top]
 
-    return pd.concat([positive_outliers_sorted, negative_outliers_sorted])
+    return _pd.concat([positive_outliers_sorted, negative_outliers_sorted])
 
 
 def quality_metrics(y_true, y_pred):
@@ -38,4 +38,4 @@ def quality_metrics(y_true, y_pred):
     :param y_pred: the predictions
     :return: dictionary containing accuracy, precision, recall and f1 score.
     """
-    return ml_utilities.multiclass.score.quality_metrics(y_true, y_pred)
+    return _soml.multiclass.score.quality_metrics(y_true, y_pred)

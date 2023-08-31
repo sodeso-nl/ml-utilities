@@ -1,12 +1,13 @@
-import os
-import pickle
+import os as _os
+import pickle as _pickle
 
-import tensorflow as tf
-import keras as keras
-import so_ml_tools as soml
+import tensorflow as _tf
+import keras as _keras
+
+import so_ml_tools as _soml
 
 
-def save_model(model: tf.keras.Model, filepath="./models/model.h5", save_format="h5") -> None:
+def save_model(model: _tf.keras.Model, filepath="./models/model.h5", save_format="h5") -> None:
     """
     This method will call the default model.save method.
 
@@ -17,7 +18,7 @@ def save_model(model: tf.keras.Model, filepath="./models/model.h5", save_format=
     model.save(filepath=filepath, save_format=save_format)
 
 
-def load_model(filepath="./models/model.h5", custom_objects = None) -> keras.Model:
+def load_model(filepath="./models/model.h5", custom_objects = None) -> _keras.Model:
     """
     This method will call the default load_model method.
 
@@ -33,10 +34,10 @@ def load_model(filepath="./models/model.h5", custom_objects = None) -> keras.Mod
     :param custom_objects: custom objects for example KerasLayer from TensorFlow Hub
     :return: the loaded model
     """
-    return tf.keras.models.load_model(filepath=filepath, custom_objects=custom_objects)
+    return _tf.keras.models.load_model(filepath=filepath, custom_objects=custom_objects)
 
 
-def save_weights(model: tf.keras.Model, filepath: str, save_format="h5") -> None:
+def save_weights(model: _tf.keras.Model, filepath: str, save_format="h5") -> None:
     """
     Saves only the weights of the model (see model.save_weights )
 
@@ -44,13 +45,13 @@ def save_weights(model: tf.keras.Model, filepath: str, save_format="h5") -> None
     :param filepath:
     :param save_format:
     """
-    path = os.path.dirname(filepath)
+    path = _os.path.dirname(filepath)
     if path:
-        os.makedirs(path, exist_ok=True)
+        _os.makedirs(path, exist_ok=True)
     model.save_weights(filepath, save_format=save_format)
 
 
-def load_weights(model: tf.keras.Model, filepath: str) -> None:
+def load_weights(model: _tf.keras.Model, filepath: str) -> None:
     """
     Loads the weights into the given model.
 
@@ -65,18 +66,18 @@ def load_weights(model: tf.keras.Model, filepath: str) -> None:
     """
 
     # Collect all layers that are trainable
-    trainable_layer_names = ml_utilities.tf.model.layer.collect_layer_names(model, recursive=True, include_trainable=True, include_non_trainable=False)
+    trainable_layer_names = _soml.tf.model.layer.collect_layer_names(model, recursive=True, include_trainable=True, include_non_trainable=False)
 
     # Disable training completely
-    ml_utilities.tf.model.layer.set_trainable_on_layers(model, trainable=False)
+    _soml.tf.model.layer.set_trainable_on_layers(model, trainable=False)
 
     # Load the weights
     model.load_weights(filepath)
 
-    ml_utilities.tf.model.layer.set_trainable_on_layers(model, layer_names=trainable_layer_names, trainable=True)
+    _soml.tf.model.layer.set_trainable_on_layers(model, layer_names=trainable_layer_names, trainable=True)
 
 
-def save_model_alt(model: tf.keras.Model, name: str, directory="./models", format='h5') -> None:
+def save_model_alt(model: _tf.keras.Model, name: str, directory="./models", format='h5') -> None:
     """
     Alternative solution to saving a model since the default implementation has issues with augmentation layers.
 
@@ -91,13 +92,13 @@ def save_model_alt(model: tf.keras.Model, name: str, directory="./models", forma
     config = model.get_config()
 
     # Check if target directory exists, if not, create it
-    os.makedirs(directory, exist_ok=True)
+    _os.makedirs(directory, exist_ok=True)
 
-    config_file = os.path.join(directory, name + '.pkl')
+    config_file = _os.path.join(directory, name + '.pkl')
     with open(config_file, 'wb') as fp:
-        pickle.dump(config, fp)
+        _pickle.dump(config, fp)
 
-    model_file = os.path.join(directory, name + '.' + format)
+    model_file = _os.path.join(directory, name + '.' + format)
     model.save_weights(model_file, save_format=format)
 
 
@@ -115,9 +116,9 @@ def load_model_alt(name: str, directory="./models", format='h5'):
     :param format: The format to store the data (tf/h5)
     :return: the loaded model
     """
-    config_file = os.path.join(directory, name + '.pkl')
+    config_file = _os.path.join(directory, name + '.pkl')
     with open(config_file, 'rb') as fp:
-        model = keras.Model.from_config(pickle.load(fp))
-        model_file = os.path.join(directory, name + '.' + format)
+        model = _keras.Model.from_config(_pickle.load(fp))
+        model_file = _os.path.join(directory, name + '.' + format)
         model.load_weights(model_file)
         return model

@@ -1,11 +1,11 @@
-import random
+import random as _random
 
-import tensorflow as tf
-import matplotlib.pyplot as plt
-import so_ml_tools as soml
+import tensorflow as _tf
+import matplotlib.pyplot as _plt
+import so_ml_tools as _soml
 
 
-def image_as_tensor(image, img_shape: tuple = (224, 224), scale: bool = True) -> tf.Tensor:
+def image_as_tensor(image, img_shape: tuple = (224, 224), scale: bool = True) -> _tf.Tensor:
     """
     Reads in an image from filename, turns it into a tensor and reshapes into
     specified shape (img_shape, img_shape, channels)
@@ -19,14 +19,14 @@ def image_as_tensor(image, img_shape: tuple = (224, 224), scale: bool = True) ->
         A 'tf.Tensor' of shape (img_shape, 3) with of dtype 'tf.int32'.
     """
     # Decode image into tensor
-    img = tf.io.decode_image(contents=image, channels=3)
+    img = _tf.io.decode_image(contents=image, channels=3)
 
     # # Resize the image (height / width)
-    img = tf.image.convert_image_dtype(img, tf.float32)
-    img = tf.image.resize(images=img, size=[img_shape[0], img_shape[1]])
+    img = _tf.image.convert_image_dtype(img, _tf.float32)
+    img = _tf.image.resize(images=img, size=[img_shape[0], img_shape[1]])
 
     if not scale:
-        return tf.cast(x=img * 255, dtype=tf.int32)
+        return _tf.cast(x=img * 255, dtype=_tf.int32)
     else:
         return img
 
@@ -42,7 +42,7 @@ def is_image_float32_and_not_normalized(x):
     Returns:
         A `bool` indicating if the tensor is of type `float32` but not normalized.
     """
-    return x.dtype == tf.float32 and tf.math.reduce_max(x).numpy() > 1.0
+    return x.dtype == _tf.float32 and _tf.math.reduce_max(x).numpy() > 1.0
 
 
 def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indices=None, shape: tuple = (4, 6), cmap: str = 'gray'):
@@ -60,10 +60,10 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
     Returns:
 
     """
-    y = soml.util.label.to_prediction(y_prob=y)
+    y = _soml.util.label.to_prediction(y_prob=y)
 
     if is_image_float32_and_not_normalized(x):
-        x = tf.cast(x=x, dtype=tf.uint8)
+        x = _tf.cast(x=x, dtype=_tf.uint8)
 
     if indices:
         assert shape[0] * shape[1] <= len(
@@ -73,30 +73,30 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
             if i > len(x):
                 assert False, f"Values of indices point to an index ({i}) which is out of bounds of X (length: {len(x)})"
 
-    fig = plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
+    fig = _plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
     fig.patch.set_facecolor('gray')
     for i in range(shape[0] * shape[1]):
-        ax = plt.subplot(shape[0], shape[1], i + 1)
+        ax = _plt.subplot(shape[0], shape[1], i + 1)
         ax.axis('off')
 
         if indices is None:
-            rand_index = random.choice(range(len(x)))
+            rand_index = _random.choice(range(len(x)))
         else:
             rand_index = indices[i]
 
-        plt.imshow(x[rand_index], cmap=cmap)
+        _plt.imshow(x[rand_index], cmap=cmap)
 
-        if soml.util.label.is_multiclass_classification(y):
-            class_index = soml.util.label.probability_to_class(y)
+        if _soml.util.label.is_multiclass_classification(y):
+            class_index = _soml.util.label.probability_to_class(y)
         else:
             # Integer encoded labels
             class_index = y[rand_index]
 
         if class_names is None:
-            plt.title(class_index, color='white')
+            _plt.title(class_index, color='white')
         else:
-            plt.title(f", {class_index}, {x[rand_index].shape}", color='white')
-    plt.show()
+            _plt.title(f", {class_index}, {x[rand_index].shape}", color='white')
+    _plt.show()
 
 
 def show_single_image_from_nparray_or_tensor(image, title="", figsize=(10, 8), cmap='gray'):
@@ -108,9 +108,9 @@ def show_single_image_from_nparray_or_tensor(image, title="", figsize=(10, 8), c
     :param figsize: Size of output figure (default=(10, 8)).
     :param cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
     """
-    fig = plt.figure(figsize=figsize)
+    fig = _plt.figure(figsize=figsize)
     fig.patch.set_facecolor('gray')
-    plt.imshow(image, cmap=cmap)
-    plt.axis('off')
-    plt.title(f"{title} {image.shape}", color='white')
-    plt.show()
+    _plt.imshow(image, cmap=cmap)
+    _plt.axis('off')
+    _plt.title(f"{title} {image.shape}", color='white')
+    _plt.show()

@@ -1,9 +1,8 @@
-import os
-import tarfile
-import zipfile
-import urllib
+import os as _os
+import tarfile as _tarfile
+import zipfile as _zipfile
 
-import tensorflow as tf
+import tensorflow as _tf
 
 
 def download_file(source='https://www.download.com/file.zip', filepath='./data/file.zip') -> None:
@@ -14,11 +13,11 @@ def download_file(source='https://www.download.com/file.zip', filepath='./data/f
         source: the source URL
         filepath: the destination path and filename
     """
-    path = os.path.dirname(filepath)
+    path = _os.path.dirname(filepath)
     if path:
-        os.makedirs(path, exist_ok=True)
+        _os.makedirs(path, exist_ok=True)
     else:
-        os.path.join('./', filepath)
+        _os.path.join('./', filepath)
 
     # noinspection PyUnresolvedReferences
     urllib.request.urlretrieve(source, filepath)
@@ -34,8 +33,8 @@ def extract_tgz(filepath='./data/file.tar.gz', folder='./data') -> None:
         folder: the destination location, if not specified then same path as source file.
     """
     if folder is None:
-        folder = os.path.dirname(filepath)
-    tgz_file = tarfile.open(filepath)
+        folder = _os.path.dirname(filepath)
+    tgz_file = _tarfile.open(filepath)
     tgz_file.extractall(path=folder)
     tgz_file.close()
     print(f"Extraction of {filepath} completed.")
@@ -50,8 +49,8 @@ def extract_zip(filepath='./data/file.zip', folder='./data') -> None:
         folder: the destination location, if not specified then same path as source file.
     """
     if folder is None:
-        folder = os.path.dirname(filepath)
-    zip_file = zipfile.ZipFile(filepath)
+        folder = _os.path.dirname(filepath)
+    zip_file = _zipfile.ZipFile(filepath)
     zip_file.extractall(path=folder)
     zip_file.close()
 
@@ -63,7 +62,7 @@ def list_dir_summary(folder='./data') -> None:
     Args:
         folder: the folder to list the contents of
     """
-    for dirpath, dirnames, filenames in os.walk(folder):
+    for dirpath, dirnames, filenames in _os.walk(folder):
         print(f"There are {len(dirnames)} directories, and {len(filenames)} in {dirpath}")
 
 
@@ -82,16 +81,16 @@ def load_image_as_tensor(filename: str, img_shape=(224, 224), scale=True):
     """
 
     # Read in the image
-    img = tf.io.read_file(filename=filename)
+    img = _tf.io.read_file(filename=filename)
 
     # Decode image into tensor
-    img = tf.io.decode_image(contents=img, channels=3)
+    img = _tf.io.decode_image(contents=img, channels=3)
 
     # # Resize the image (height / width)
-    img = tf.image.convert_image_dtype(img, tf.float32)
-    img = tf.image.resize(images=img, size=[img_shape[0], img_shape[1]])
+    img = _tf.image.convert_image_dtype(img, _tf.float32)
+    img = _tf.image.resize(images=img, size=[img_shape[0], img_shape[1]])
 
     if not scale:
-        return tf.cast(img * 255, tf.int32)
+        return _tf.cast(img * 255, _tf.int32)
     else:
         return img

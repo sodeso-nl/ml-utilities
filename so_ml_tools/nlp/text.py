@@ -1,5 +1,5 @@
-import numpy as np
-import re
+import numpy as _np
+import re as _re
 
 ########################################################################################################################
 # Word level functions
@@ -13,7 +13,7 @@ LOWER = "lower"
 
 
 def count_unique_words(lines: list[str], standardize = "lower_and_strip_punctuation") -> int:
-    regex = re.compile(PUNCTUATION)
+    regex = _re.compile(PUNCTUATION)
 
     unique = set()
     for line in lines:
@@ -44,7 +44,7 @@ def calculate_q_precentile_word_lengths(lines: list[str], q=95) -> int:
     :param q: q-percentile (default 95%)
     :return: the percentile
     """
-    return int(np.percentile(a=count_words_for_each_sentence(lines), q=q))
+    return int(_np.percentile(a=count_words_for_each_sentence(lines), q=q))
 
 
 def average_number_of_word_per_sentence(lines: list[str]) -> int:
@@ -62,7 +62,7 @@ def average_number_of_word_per_sentence(lines: list[str]) -> int:
 ########################################################################################################################
 
 def count_unique_chars(lines: list[str], standardize = "lower_and_strip_punctuation") -> (int, list[chr]):
-    regex = re.compile(PUNCTUATION)
+    regex = _re.compile(PUNCTUATION)
 
     unique = set()
     for line in lines:
@@ -93,7 +93,7 @@ def calculate_q_precentile_character_lengths_for_all_sentence(lines: list[str], 
     :param q: q-percentile (default 95%)
     :return: the percentile
     """
-    return int(np.percentile(a=length_per_sentence(lines), q=q))
+    return int(_np.percentile(a=length_per_sentence(lines), q=q))
 
 
 def calculate_average_character_length_for_all_sentences(lines: list[str]) -> int:

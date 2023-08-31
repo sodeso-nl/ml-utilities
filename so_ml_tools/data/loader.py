@@ -1,9 +1,9 @@
-import os
-import random
-import logging
+import os as _os
+import random as _random
+import logging as _logging
 
-import matplotlib.pyplot as plt
-import tensorflow as tf
+import matplotlib.pyplot as _plt
+import tensorflow as _tf
 
 
 def load_image_dataset_from_directory(directory: str,
@@ -13,7 +13,7 @@ def load_image_dataset_from_directory(directory: str,
                                       class_names=None,
                                       color_mode='rgb',
                                       shuffle=True, validation_split=None):
-    return tf.data.Dataset.image_dataset_from_directory(directory=directory,
+    return _tf.keras.utils.image_dataset_from_directory(directory=directory,
                                                         label_mode=label_mode,
                                                         image_size=image_size,
                                                         batch_size=batch_size,
@@ -34,21 +34,20 @@ def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gr
     """
     # Setup the target directory (we'll view images from here)
     try:
-        target_folder = os.path.join(target_dir, target_class)
+        target_folder = _os.path.join(target_dir, target_class)
 
         # Get a random image path
-        fig = plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
+        fig = _plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
         fig.patch.set_facecolor('gray')
         for i in range(0, shape[0] * shape[1]):
-            ax = plt.subplot(shape[0], shape[1], i + 1)
+            ax = _plt.subplot(shape[0], shape[1], i + 1)
             ax.axis('off')
+            image_filename = _random.sample(_os.listdir(target_folder), 1)
+            image_fullpath = _os.path.join(target_folder, image_filename[0])
+            img = _plt.imread(image_fullpath)
+            _plt.imshow(img, cmap=cmap)
+            _plt.title(f"{image_filename[0]}: {img.shape}", color='white')
 
-            image_filename = random.sample(os.listdir(target_folder), 1)
-            image_fullpath = os.path.join(target_folder, image_filename[0])
-            img = plt.image.mpimg.imread(image_fullpath)
-            plt.imshow(img, cmap=cmap)
-            plt.title(f"{image_filename[0]}: {img.shape}", color='white')
-
-        plt.show()
+        _plt.show()
     except Exception as e:
-        logging.error(e)
+        _logging.error(e)

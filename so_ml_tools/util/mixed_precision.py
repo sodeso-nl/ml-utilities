@@ -1,12 +1,12 @@
-from keras import mixed_precision
+from keras import mixed_precision as _mixed_precision
 
 
 def set_single_precision_policy() -> None:
     """
     Disable mixed precision by using the float32 policy.
     """
-    policy = mixed_precision.Policy("float32")
-    mixed_precision.set_global_policy(policy)
+    policy = _mixed_precision.Policy("float32")
+    _mixed_precision.set_global_policy(policy)
 
 
 def set_mixed_precision_policy_for_gpu() -> None:
@@ -16,8 +16,8 @@ def set_mixed_precision_policy_for_gpu() -> None:
 
     For details: https://www.tensorflow.org/guide/mixed_precision
     """
-    policy = mixed_precision.Policy("mixed_float16")
-    mixed_precision.set_global_policy(policy)
+    policy = _mixed_precision.Policy("mixed_float16")
+    _mixed_precision.set_global_policy(policy)
 
 
 def set_mixed_precision_policy_for_tpu() -> None:
@@ -27,8 +27,8 @@ def set_mixed_precision_policy_for_tpu() -> None:
 
     For details: https://www.tensorflow.org/guide/mixed_precision
     """
-    policy = mixed_precision.Policy("mixed_bfloat16")
-    mixed_precision.set_global_policy(policy)
+    policy = _mixed_precision.Policy("mixed_bfloat16")
+    _mixed_precision.set_global_policy(policy)
 
 
 def get_mixed_precision_policy():
@@ -36,4 +36,4 @@ def get_mixed_precision_policy():
     Returns the current configured mixed-precision policy.
     :return: the current configured mixed-precision policy.
     """
-    return mixed_precision.global_policy()
+    return _mixed_precision.global_policy()

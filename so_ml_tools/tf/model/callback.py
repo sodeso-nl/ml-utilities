@@ -1,14 +1,12 @@
-from tensorflow.python.platform import tf_logging as logging
+from tensorflow.python.platform import tf_logging as _logging
+from keras.callbacks import Callback as _Callback
+from keras.callbacks import TensorBoard as _TensorBoard
+from keras.callbacks import LearningRateScheduler as _LearningRateScheduler
+from keras.callbacks import ModelCheckpoint as _ModelCheckpoint
+from keras.callbacks import EarlyStopping as _EarlyStopping
+from keras.callbacks import ReduceLROnPlateau as _ReduceLROnPlateau
 
-from keras.utils import io_utils
-from keras.callbacks import \
-    Callback, \
-    TensorBoard, \
-    LearningRateScheduler, \
-    ModelCheckpoint, \
-    EarlyStopping, \
-    ReduceLROnPlateau
-
+from keras.utils import io_utils as _io_utils
 
 import datetime
 
@@ -22,58 +20,58 @@ __all__ = [
 
 
 def reduce_lr_on_plateau_callback(monitor="val_loss",
-                                         factor=0.5,
-                                         patience=4,
-                                         verbose=1,
-                                         mode="auto",
-                                         min_delta=1e-4,
-                                         cooldown=0,
-                                         min_lr=1e-6) -> ReduceLROnPlateau:
-    return ReduceLROnPlateau(monitor=monitor,
-                             factor=factor,
-                             patience=patience,
-                             verbose=verbose,
-                             mode=mode,
-                             min_delta=min_delta,
-                             cooldown=cooldown,
-                             min_lr=min_lr)
+                                  factor=0.5,
+                                  patience=4,
+                                  verbose=1,
+                                  mode="auto",
+                                  min_delta=1e-4,
+                                  cooldown=0,
+                                  min_lr=1e-6) -> _ReduceLROnPlateau:
+    return _ReduceLROnPlateau(monitor=monitor,
+                              factor=factor,
+                              patience=patience,
+                              verbose=verbose,
+                              mode=mode,
+                              min_delta=min_delta,
+                              cooldown=cooldown,
+                              min_lr=min_lr)
 
 
 def early_stopping_callback(monitor='val_loss',
-                                   min_delta=0,
-                                   patience=6,
-                                   verbose=1,
-                                   mode='auto',
-                                   baseline=None,
-                                   restore_best_weights=True,
-                                   start_from_epoch=0) -> EarlyStopping:
-    return EarlyStopping(monitor=monitor,
-                         min_delta=min_delta,
-                         patience=patience,
-                         verbose=verbose,
-                         mode=mode,
-                         baseline=baseline,
-                         restore_best_weights=restore_best_weights,
-                         start_from_epoch=start_from_epoch)
+                            min_delta=0,
+                            patience=6,
+                            verbose=1,
+                            mode='auto',
+                            baseline=None,
+                            restore_best_weights=True,
+                            start_from_epoch=0) -> _EarlyStopping:
+    return _EarlyStopping(monitor=monitor,
+                          min_delta=min_delta,
+                          patience=patience,
+                          verbose=verbose,
+                          mode=mode,
+                          baseline=baseline,
+                          restore_best_weights=restore_best_weights,
+                          start_from_epoch=start_from_epoch)
 
 
 def model_checkpoint_callback(experiment_name: str,
-                                     dir_name='./checkpoints',
-                                     metric='val_loss',
-                                     save_weights_only=False,
-                                     save_best_only=False,
-                                     save_freq='epoch',
-                                     verbose=1) -> ModelCheckpoint:
+                              dir_name='./checkpoints',
+                              metric='val_loss',
+                              save_weights_only=False,
+                              save_best_only=False,
+                              save_freq='epoch',
+                              verbose=1) -> _ModelCheckpoint:
     log_dir = dir_name + '/' + experiment_name + f'/model-epoch-{{epoch:02d}}-{metric}-{{{metric}:.2f}}.hdf5'
-    return ModelCheckpoint(filepath=log_dir,
-                           monitor=metric,
-                           save_weights_only=save_weights_only,
-                           save_best_only=save_best_only,
-                           save_freq=save_freq,
-                           verbose=verbose)
+    return _ModelCheckpoint(filepath=log_dir,
+                            monitor=metric,
+                            save_weights_only=save_weights_only,
+                            save_best_only=save_best_only,
+                            save_freq=save_freq,
+                            verbose=verbose)
 
 
-def learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50) -> LearningRateScheduler:
+def learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50) -> _LearningRateScheduler:
     """
     Creates a LearningRateScheduler which will be pre-configured with a division. The division
     is calculated using find_learning_rate_division.
@@ -84,13 +82,13 @@ def learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50) -> Le
     """
     min, max, division = _find_learning_rate_division(learning_rate=learning_rate_start, epochs=epochs)
     print(f"Min learning rate: {min}\nMax learning rate: {max}\nDivision: {division}")
-    return LearningRateScheduler(lambda epoch: learning_rate_start * 10 ** (epoch / division))
+    return _LearningRateScheduler(lambda epoch: learning_rate_start * 10 ** (epoch / division))
 
 
 def tensorboard_callback(experiment_name: str, dir_name='./logs'):
     log_dir = dir_name + '/' + experiment_name + '/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     print(f"Saving TensorBoard log files to: {log_dir}")
-    return TensorBoard(log_dir=log_dir)
+    return _TensorBoard(log_dir=log_dir)
 
 
 def create_stop_training_on_target_callback(metric="val_loss",
@@ -131,7 +129,7 @@ def _find_learning_rate_division(learning_rate: float, epochs: int):
     return min_lr, max_lr, division
 
 
-class StopTrainingOnTarget(Callback):
+class StopTrainingOnTarget(_Callback):
 
     def __init__(self,
                  metric="val_loss",
@@ -180,7 +178,7 @@ class StopTrainingOnTarget(Callback):
             self.model.stop_training = True
             if self.restore_best_weights and self.best_weights is not None:
                 if self.verbose > 0:
-                    io_utils.print_msg(
+                    _io_utils.print_msg(
                         "Restoring model weights from "
                         "the end of the best epoch: "
                         f"{self.best_epoch + 1}."
@@ -189,7 +187,7 @@ class StopTrainingOnTarget(Callback):
 
     def on_train_end(self, logs=None):
         if self.stopped_epoch > 0 and self.verbose > 0:
-            io_utils.print_msg(
+            _io_utils.print_msg(
                 f"Epoch {self.stopped_epoch + 1}: training stopped "
                 f"on metric a`{self.metric}` with a target value of {self.target}), "
                 f"epoch {self.best_epoch} achieved {round(self.best_value * 100, 2)}% accuracy"
@@ -199,7 +197,7 @@ class StopTrainingOnTarget(Callback):
         logs = logs or {}
         value = logs.get(self.metric)
         if value is None:
-            logging.warning(
+            _logging.warning(
                 f"Stop training goal condition on metric `{self.monitor}` "
                 f"which is not available. Available metrics are: {','.join(list(logs.keys()))}"
             )

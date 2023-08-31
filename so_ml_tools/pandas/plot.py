@@ -1,8 +1,8 @@
-import matplotlib.pyplot as plt
-import pandas as pd
+import matplotlib.pyplot as _plt
+import pandas as _pd
 
 
-def plot_histogram_from_dataframe(dataframe: pd.DataFrame, column_names: list[str] = None, log=False,
+def plot_histogram_from_dataframe(dataframe: _pd.DataFrame, column_names: list[str] = None, log=False,
                                   min_nunique: int = 3, max_nunique: int = 50, figsize: tuple = None, cols=3,
                                   verbose=1):
     """
@@ -38,7 +38,7 @@ def plot_histogram_from_dataframe(dataframe: pd.DataFrame, column_names: list[st
     if figsize is None:
         figsize = (17, rows * 4)
 
-    fig, axs = plt.subplots(nrows=rows, ncols=cols, figsize=figsize)
+    fig, axs = _plt.subplots(nrows=rows, ncols=cols, figsize=figsize)
 
     # If we have more then one column then flatten the axis so we can loop through them,
     # if we have only one column then create list containing the axis so we can still loop through it.
@@ -55,7 +55,7 @@ def plot_histogram_from_dataframe(dataframe: pd.DataFrame, column_names: list[st
         v = dataframe[c]
         nunique = v.nunique()
 
-        if pd.api.types.is_numeric_dtype(v) and min_nunique < nunique:
+        if _pd.api.types.is_numeric_dtype(v) and min_nunique < nunique:
 
             z_min = -3 * v.std() + v.mean()
             z_max = 3 * v.std() + v.mean()
@@ -67,17 +67,17 @@ def plot_histogram_from_dataframe(dataframe: pd.DataFrame, column_names: list[st
             # Only show z_min when it is not before the graph starts.
             legend = False
             if z_max < v.max():
-                axs[n].plot([z_max, z_max], plt.ylim(), label='Z-Max')
+                axs[n].plot([z_max, z_max], _plt.ylim(), label='Z-Max')
                 legend = True
 
             # Only show z_min when it is not before the graph starts.
             if z_min > v.min():
-                axs[n].plot([z_min, z_min], plt.ylim(), label='Z-Min')
+                axs[n].plot([z_min, z_min], _plt.ylim(), label='Z-Min')
                 legend = True
 
             if legend:
                 axs[n].legend()
-        elif pd.api.types.is_object_dtype(v) and min_nunique < nunique <= max_nunique:
+        elif _pd.api.types.is_object_dtype(v) and min_nunique < nunique <= max_nunique:
             v.hist(ax=axs[n], bins=range(nunique + 1), log=log, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1, width = .5)
         else:
             if verbose:
@@ -97,4 +97,4 @@ def plot_histogram_from_dataframe(dataframe: pd.DataFrame, column_names: list[st
     for i in range(n, rows*cols):
         fig.delaxes(axs[i])
 
-    plt.show()
+    _plt.show()

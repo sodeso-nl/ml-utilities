@@ -1,4 +1,4 @@
 __all__ = [
-    "evaluate",
-    "plot"
+    "text",
+    "embedding"
 ]

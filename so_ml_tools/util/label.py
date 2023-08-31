@@ -1,10 +1,10 @@
-import numpy as np
-import tensorflow as tf
+import numpy as _np
+import tensorflow as _tf
 
-from typing import Union
+from typing import Union as _Union
 
 
-def is_multiclass_classification(y_prob: Union[tf.Tensor, np.array]) -> bool:
+def is_multiclass_classification(y_prob: _Union[_tf.Tensor, _np.array]) -> bool:
     """Return True if the y value is a multiclass classification where the values represent the probability of the result
     to be that specific class, for example, when we have three possible outcomes:
     [
@@ -21,15 +21,15 @@ def is_multiclass_classification(y_prob: Union[tf.Tensor, np.array]) -> bool:
     Raises:
         TypeError: If `x` is neither a tf.Tensor or np.array.
     """
-    if tf.is_tensor(y_prob):
+    if _tf.is_tensor(y_prob):
         return y_prob.get_shape().ndims == 2 and y_prob.shape[1] > 1
-    elif isinstance(y_prob, np.ndarray):
+    elif isinstance(y_prob, _np.ndarray):
         return y_prob.ndim == 2 and y_prob.shape[1] > 1
 
     raise TypeError('y should be of type tf.Tensor or np.array.')
 
 
-def is_binary_classification(y_prob: Union[tf.Tensor, np.array]) -> bool:
+def is_binary_classification(y_prob: _Union[_tf.Tensor, _np.array]) -> bool:
     """Return True if the y value is a binary classification prediction where the value represents a probability between 0 and 1,
     for example, when we have three different predictions:
     [
@@ -47,15 +47,15 @@ def is_binary_classification(y_prob: Union[tf.Tensor, np.array]) -> bool:
     Raises:
         TypeError: If `x` is neither a tf.Tensor or np.array.
     """
-    if tf.is_tensor(y_prob):
+    if _tf.is_tensor(y_prob):
         return y_prob.get_shape().ndims == 2 and y_prob.shape[1] == 1
-    elif isinstance(y_prob, np.ndarray):
+    elif isinstance(y_prob, _np.ndarray):
         return y_prob.ndim == 2 and y_prob.shape[1] == 1
 
     raise TypeError('y should be of type tf.Tensor or np.array.')
 
 
-def probability_to_class(y_prob: Union[tf.Tensor, np.array]) -> Union[tf.Tensor, np.array]:
+def probability_to_class(y_prob: _Union[_tf.Tensor, _np.array]) -> _Union[_tf.Tensor, _np.array]:
     """Converts multiclass dense label predictions to sparse labels:
 
     Probability:
@@ -77,15 +77,15 @@ def probability_to_class(y_prob: Union[tf.Tensor, np.array]) -> Union[tf.Tensor,
     Raises:
         TypeError: If `x` is neither a tf.Tensor or np.array.
     """
-    if tf.is_tensor(y_prob):
-        return tf.argmax(y_prob, axis=1)
-    elif isinstance(y_prob, np.ndarray):
-        return np.argmax(y_prob, axis=1)
+    if _tf.is_tensor(y_prob):
+        return _tf.argmax(y_prob, axis=1)
+    elif isinstance(y_prob, _np.ndarray):
+        return _np.argmax(y_prob, axis=1)
 
     raise TypeError('y should be of type tf.Tensor or np.array.')
 
 
-def probability_to_binary(y_prob: Union[tf.Tensor, np.array]):
+def probability_to_binary(y_prob: _Union[_tf.Tensor, _np.array]):
     """
     Converts scaled classification prediction labels to binarized classification prediction labels:
 
@@ -113,17 +113,17 @@ def probability_to_binary(y_prob: Union[tf.Tensor, np.array]):
     Raises:
         TypeError: If `x` is neither a tf.Tensor or np.array.
     """
-    if tf.is_tensor(y_prob):
-        y1 = tf.round(y_prob)
-        return tf.cast(y1, dtype=tf.int8)
-    elif isinstance(y_prob, np.ndarray):
-        y1 = np.round(a=y_prob, decimals=0)
+    if _tf.is_tensor(y_prob):
+        y1 = _tf.round(y_prob)
+        return _tf.cast(y1, dtype=_tf.int8)
+    elif isinstance(y_prob, _np.ndarray):
+        y1 = _np.round(a=y_prob, decimals=0)
         return y1.astype(int)
 
     raise TypeError('y should be of type tf.Tensor or np.array.')
 
 
-def to_prediction(y_prob: Union[tf.Tensor, np.array]) -> Union[tf.Tensor, np.array]:
+def to_prediction(y_prob: _Union[_tf.Tensor, _np.array]) -> _Union[_tf.Tensor, _np.array]:
     """
     Determines if the probability is a multiclass or binary classification and then will
     return the prediction in either class or binary form.

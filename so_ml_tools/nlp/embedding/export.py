@@ -1,5 +1,5 @@
-import io
-import os
+import io as _io
+import os as _os
 
 
 def embeddings(directory: str, text_vectorizer, embedding_layer) -> None:
@@ -15,10 +15,10 @@ def embeddings(directory: str, text_vectorizer, embedding_layer) -> None:
     :param embedding_layer: An Embedding layer
     """
     # Check if target directory exists, if not, create it
-    os.makedirs(directory, exist_ok=True)
+    _os.makedirs(directory, exist_ok=True)
 
-    out_v = io.open(os.path.join(directory, 'vectors.tsv'), 'w', encoding='utf-8')
-    out_m = io.open(os.path.join(directory, 'metadata.tsv'), 'w', encoding='utf-8')
+    out_v = _io.open(_os.path.join(directory, 'vectors.tsv'), 'w', encoding='utf-8')
+    out_m = _io.open(_os.path.join(directory, 'metadata.tsv'), 'w', encoding='utf-8')
 
     vocabulary = text_vectorizer.get_vocabulary()
     embed_weights = embedding_layer.get_weights()[0]

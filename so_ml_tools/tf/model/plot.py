@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
-import tensorflow as tf
+import matplotlib.pyplot as _plt
+import tensorflow as _tf
 
 
 def plot_consecutive_histories(histories: list[tf.keras.callbacks.History], labels: list[str], figsize=(10, 6)):
@@ -41,46 +41,46 @@ def plot_consecutive_histories(histories: list[tf.keras.callbacks.History], labe
 
     epoch_labels = range(first_epoch + 1, last_epoch + 2)
     ticks = range(len(epoch_labels))
-    plt.figure(figsize=figsize, facecolor='#FFFFFF')
+    _plt.figure(figsize=figsize, facecolor='#FFFFFF')
     _plot_history_graph_line(all_loss_history, label='Training loss', color='#0000FF')
     _plot_history_graph_line(all_val_loss_history, label='Validation loss', color='#00FF00')
     _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
     _plot_history_ends(histories, labels)
-    plt.title('Loss', size=20)
-    plt.xticks(ticks, epoch_labels)
-    plt.xlabel('Epoch', size=14)
-    plt.legend()
+    _plt.title('Loss', size=20)
+    _plt.xticks(ticks, epoch_labels)
+    _plt.xlabel('Epoch', size=14)
+    _plt.legend()
 
     if all_accuracy_history:
         # Start a new figure
-        plt.figure(figsize=figsize, facecolor='#FFFFFF')
+        _plt.figure(figsize=figsize, facecolor='#FFFFFF')
         _plot_history_graph_line(all_accuracy_history, label='Training accuracy', color='#0000FF')
         _plot_history_graph_line(all_val_accuracy_history, label='Validation accuracy', color='#00FF00')
         _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
         _plot_history_ends(histories, labels)
-        plt.title('Accuracy', size=20)
-        plt.xticks(ticks, epoch_labels)
-        plt.xlabel('Epoch', size=14)
-        plt.legend()
+        _plt.title('Accuracy', size=20)
+        _plt.xticks(ticks, epoch_labels)
+        _plt.xlabel('Epoch', size=14)
+        _plt.legend()
 
     if all_mae_history:
         # Start a new figure
-        plt.figure(figsize=figsize, facecolor='#FFFFFF')
+        _plt.figure(figsize=figsize, facecolor='#FFFFFF')
         _plot_history_graph_line(all_mae_history, label='Training mae', color='#0000FF')
         _plot_history_graph_line(all_val_mae_history, label='Validation mae', color='#00FF00')
         _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
         _plot_history_ends(histories, labels)
-        plt.title('Mean Absolute Accuracy', size=20)
-        plt.xticks(ticks, epoch_labels)
-        plt.xlabel('Epoch', size=14)
-        plt.legend()
+        _plt.title('Mean Absolute Accuracy', size=20)
+        _plt.xticks(ticks, epoch_labels)
+        _plt.xlabel('Epoch', size=14)
+        _plt.legend()
 
 
-def plot_history(history: tf.keras.callbacks.History, figsize=(10, 6)):
+def plot_history(history: _tf.keras.callbacks.History, figsize=(10, 6)):
     plot_consecutive_histories([history], ["Start history"], figsize=figsize)
 
 
-def _plot_history_ends(histories: list[tf.keras.callbacks.History], labels: list[str]) -> None:
+def _plot_history_ends(histories: list[_tf.keras.callbacks.History], labels: list[str]) -> None:
     """
     Internal method which will plot a vertical line showing where a histories last epoch is visible.
 
@@ -88,7 +88,7 @@ def _plot_history_ends(histories: list[tf.keras.callbacks.History], labels: list
     :param labels: the labels for each history object for seperating the epochs
     """
     for idx, history in enumerate(histories):
-        plt.plot([min(history.epoch), min(history.epoch)], plt.ylim(), label=f'{labels[idx]}')
+        _plt.plot([min(history.epoch), min(history.epoch)], _plt.ylim(), label=f'{labels[idx]}')
 
 
 def _plot_history_graph_line(data, label, color, linestyle='solid') -> None:
@@ -101,4 +101,4 @@ def _plot_history_graph_line(data, label, color, linestyle='solid') -> None:
     :param linestyle: line-style of the line (default: solid)
     """
     if data:
-        plt.plot(data, label=label, color=color, linestyle=linestyle, linewidth=1.5)
+        _plt.plot(data, label=label, color=color, linestyle=linestyle, linewidth=1.5)

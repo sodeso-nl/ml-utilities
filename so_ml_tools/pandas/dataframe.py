@@ -1,7 +1,6 @@
 import pandas as _pd
 import numpy as _np
 
-
 def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_np.float64, inplace=True) -> _pd.DataFrame:
     """
     Converts the dtype of the given column to the specified dtype.

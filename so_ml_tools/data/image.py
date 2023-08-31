@@ -1,9 +1,8 @@
 import random
 
 import tensorflow as tf
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import so_ml_tools as soml
-import numpy as np
 
 
 def image_as_tensor(image, img_shape: tuple = (224, 224), scale: bool = True) -> tf.Tensor:

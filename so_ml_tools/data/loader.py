@@ -2,7 +2,7 @@ import os
 import random
 import logging
 
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import tensorflow as tf
 
 

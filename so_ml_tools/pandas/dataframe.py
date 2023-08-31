@@ -2,20 +2,24 @@ import pandas as pd
 import numpy as np
 
 
-def convert_column_to_type(dataframe: pd.DataFrame, column_name: str, dtype=np.float64, inplace=True) -> pd.DataFrame:
+def convert_column_to_type(dataframe: pd.DataFrame, columns: list[str], dtype=np.float64, inplace=True) -> pd.DataFrame:
     """
     Converts the dtype of the given column to the specified dtype.
 
     :param dataframe: the pd.DataFrame
-    :param column_name: the column name
+    :param columns: A `list` of column names
     :param dtype: the newly to assign dtype.
-    :param inplace: return a new instance of the DataFrame (False) or adjust the given DataFrame
+    :param inplace: return a new instance of the DataFrame or adjust the given DataFrame
     :return: see inplace
     """
-    if inplace:
-        dataframe[column_name] = dataframe[column_name].astype(dtype)
+    result = dataframe
+    if not inplace:
+        result = dataframe.copy(deep=True)
 
-    return dataframe
+    for column in columns:
+        result[column] = result[column].astype(dtype)
+
+    return result
 
 
 def delete_null_rows(dataframe: pd.DataFrame, column_name: str, inplace=True) -> pd.DataFrame:

@@ -1,5 +1,5 @@
 import tensorflow as tf
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import so_ml_tools as soml
 
 

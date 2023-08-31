@@ -1,4 +1,4 @@
-from _version import __version__
+import _version as __version__
 
 __all__ = [
     "data",

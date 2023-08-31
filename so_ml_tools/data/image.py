@@ -6,17 +6,19 @@ import so_ml_tools as soml
 import numpy as np
 
 
-def image_as_tensor(image, img_shape=(224, 224), scale=True):
+def image_as_tensor(image, img_shape: tuple = (224, 224), scale: bool = True) -> tf.Tensor:
     """
-        Reads in an image from filename, turns it into a tensor and reshapes into
-        specified shape (img_shape, img_shape, channels)
+    Reads in an image from filename, turns it into a tensor and reshapes into
+    specified shape (img_shape, img_shape, channels)
+            
+    Args:
+        image: A `Tensor` of type `string`. 0-D. The encoded image bytes.
+        img_shape: A `tuple` with the dimensions of the image.
+        scale: A `bool` indicating if scaling needs to be performed (0-255 -> 0-1)
 
-        :param filename: path to target image
-        :param img_shape: tuple with height/width dimension of target image size
-        :param scale: scale pixel values from 0-255 to 0-1 or not
-        :return: Image tensor of shape (img_shape, img_shape, 3)
-        """
-
+    Returns:
+        A 'tf.Tensor' of shape (img_shape, 3) with of dtype 'tf.int32'.
+    """
     # Decode image into tensor
     img = tf.io.decode_image(contents=image, channels=3)
 
@@ -25,33 +27,41 @@ def image_as_tensor(image, img_shape=(224, 224), scale=True):
     img = tf.image.resize(images=img, size=[img_shape[0], img_shape[1]])
 
     if not scale:
-        return tf.cast(img * 255, tf.int32)
+        return tf.cast(x=img * 255, dtype=tf.int32)
     else:
         return img
 
 
 def is_image_float32_and_not_normalized(x):
     """
-    Convenience method to check if an image in Tensor format is of type float32 but not normalized (values between
+    Convenience method to check if an image in `tf.Tensor` format is of type `float32` but not normalized (values between
     0..255 instead of 0..1)
-    :param x: Tensor containing the image(s)
-    :return:
+
+    Args:
+        x: A `tf.Tensor`
+
+    Returns:
+        A `bool` indicating if the tensor is of type `float32` but not normalized.
     """
     return x.dtype == tf.float32 and tf.math.reduce_max(x).numpy() > 1.0
 
 
-def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indices=None, shape=(4, 6), cmap='gray'):
+def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indices=None, shape: tuple = (4, 6), cmap: str = 'gray'):
     """
     Shows images stored in a tensor / numpy array. The array should be a vector of images.
+    
+    Args:
+        x: a `tf.Tensor` containg the images
+        y: a 'tf.Tensor' containing the labels associated with `x`
+        class_names: a `list` of class names 
+        indices: a `list` of indices for the images to display, `None` to pick random images
+        shape: A `tuple` specifying the number of images to display (width, height)
+        cmap: A 'str' with the color map to use for displaying the images.
 
-    :param X: is an array containing vectors of images.
-    :param y: are the associated labels
-    :param class_names: the labels of the classes
-    :param indices: None to pick random, otherwise an array of indexes to display
-    :param shape: is the number of images to display
-    :param cmap: is the color map to use, use "gray" for gray scale images, use None for default.
+    Returns:
+
     """
-    y = soml.util.label.to_prediction(y_prob=y, dtype=np.float32)
+    y = soml.util.label.to_prediction(y_prob=y)
 
     if is_image_float32_and_not_normalized(x):
         x = tf.cast(x=x, dtype=tf.uint8)

@@ -6,8 +6,6 @@ from keras.callbacks import ModelCheckpoint as _ModelCheckpoint
 from keras.callbacks import EarlyStopping as _EarlyStopping
 from keras.callbacks import ReduceLROnPlateau as _ReduceLROnPlateau
 
-from keras.utils import io_utils as _io_utils
-
 import datetime
 
 __all__ = [
@@ -178,27 +176,21 @@ class StopTrainingOnTarget(_Callback):
             self.model.stop_training = True
             if self.restore_best_weights and self.best_weights is not None:
                 if self.verbose > 0:
-                    _io_utils.print_msg(
-                        "Restoring model weights from "
-                        "the end of the best epoch: "
-                        f"{self.best_epoch + 1}."
-                    )
+                    print(f'Restoring model weights from the end of the best epoch: {self.best_epoch +1})')
                 self.model.set_weights(self.best_weights)
 
     def on_train_end(self, logs=None):
         if self.stopped_epoch > 0 and self.verbose > 0:
-            _io_utils.print_msg(
-                f"Epoch {self.stopped_epoch + 1}: training stopped "
+            print(f"Epoch {self.stopped_epoch + 1}: training stopped "
                 f"on metric a`{self.metric}` with a target value of {self.target}), "
-                f"epoch {self.best_epoch} achieved {round(self.best_value * 100, 2)}% accuracy"
-            )
+                f"epoch {self.best_epoch} achieved {round(self.best_value * 100, 2)}% accuracy")
 
     def _get_metric_value(self, logs):
         logs = logs or {}
         value = logs.get(self.metric)
         if value is None:
             _logging.warning(
-                f"Stop training goal condition on metric `{self.monitor}` "
+                f"Stop training goal condition on metric `{self.target}` "
                 f"which is not available. Available metrics are: {','.join(list(logs.keys()))}"
             )
         return value

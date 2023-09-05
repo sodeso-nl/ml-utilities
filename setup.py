@@ -6,8 +6,6 @@ DESCRIPTION = 'Machine Learning Convenience Functions'
 with open("requirements.txt", "r") as fh:
     install_requires = fh.read()
 
-print(install_requires)
-
 # Setting up
 setup(
     # the name must match the folder name 'verysimplemodule'

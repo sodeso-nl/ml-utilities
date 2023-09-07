@@ -24,10 +24,27 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
       Inspired by the following two websites:
       https://cs231n.github.io/neural-networks-case-study
     """
-    _soml.multiclass.plot.confusion_matrix(y_true, y_prob, class_names, figsize, text_size, norm, savefig)
+    _soml.multiclass.plot.confusion_matrix(y_true=y_true, y_pred=y_pred, y_prob=y_prob, class_names=class_names,
+                                           figsize=figsize, text_size=text_size, norm=norm, savefig=savefig)
 
 
-def prediction_confidence(y_true, y_pred, class_names: list[str], figsize=(10, 8)):
+def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8)) -> None:
+    """
+    Creates a plot showing the confidence of the predictions, the plot will display the number of predictions vs
+    the confidence (how close was the prediction to the actual truth label). In a perfect world the
+    plot would be a straight vertical line on the right (all predictions are exactly 1 or 0 compared with their
+    truth label). Since this is never the case the more optimal plot would be a vertical line around 0 on the x-axis
+    with a small bend in the top left corner following a horizontal line around 100%.
+
+    Args:
+        y_true: Array of truth labels, must be same shape as y_pred.
+        y_prob: Array of probabilities, must be same shape as y_true.
+        class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
+        figsize: Size of output figure (default=(10, 8)).
+
+    Returns:
+        None
+    """
     _plt.figure(figsize=figsize)
 
     # In binary classification we have two possible best outcomes, 0 and 1, both ends mean that something has
@@ -42,7 +59,7 @@ def prediction_confidence(y_true, y_pred, class_names: list[str], figsize=(10, 8
     y_true_int = _soml.util.label.probability_to_binary(y_true)
     for n in range(2):
         # Filter out only the rows thar are applicatie to the n'th class
-        y_pred_single_class = y_pred[_np.in1d(y_true_int[:, 0], [n])]
+        y_pred_single_class = y_prob[_np.in1d(y_true_int[:, 0], [n])]
 
         # Convert ranges as described above
         if n == 1:

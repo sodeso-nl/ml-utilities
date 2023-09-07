@@ -5,6 +5,8 @@ import numpy as _np
 import tensorflow as _tf
 import so_ml_tools as _soml
 import sklearn as _sklearn
+from sklearn.metrics import confusion_matrix as _confusion_matrix
+from sklearn.metrics import classification_report as _classification_report
 
 
 def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = None, figsize=(15, 15), text_size=10,
@@ -35,7 +37,7 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
         y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
 
     # Create the confusion matrix
-    cm = _sklearn.metrics.confusion_matrix(y_true, y_pred)
+    cm = _confusion_matrix(y_true, y_pred)
     cm_norm = cm.astype("float") / cm.sum(axis=1)[:, _np.newaxis]  # normalize our confusion matrix
     n_classes = cm.shape[0]
 
@@ -171,7 +173,7 @@ def report_f1_score(y_true, y_pred, class_names: list[str], figsize=(10, 8)) -> 
     y_pred = _soml.util.label.to_prediction(y_prob=y_pred)
 
     # Generate classification report from SKLearn.
-    report_dict = _sklearn.metrics.classification_report(y_true=y_true, y_pred=y_pred, target_names=class_names,
+    report_dict = _classification_report(y_true=y_true, y_pred=y_pred, target_names=class_names,
                                                          output_dict=True)
 
     # Collect all the F1-scores

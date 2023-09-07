@@ -7,7 +7,8 @@ import so_ml_tools as _soml
 from scipy.interpolate import interp1d as _interp1d
 
 
-def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = None, figsize=(15, 15), text_size=10, norm=False, savefig=False) -> None:
+def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = None, figsize=(15, 15), text_size=10,
+                     norm=False, savefig=False) -> None:
     """
       Plots a confusion matrix of the given data.
 
@@ -53,8 +54,8 @@ def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8
     # of class 1 (y_true[:] == 1) the closer the number to 1 the higher de confidence, and for results
     # of class 0 (y_true[:] == 0) the close the number to 0 the higher de confidence.
     # For this we use the interp1d function.
-    positivate_range_translation = _interp1d([0.,1.],[0,100])
-    negative_range_translation = _interp1d([0.,1.],[100,0])
+    positivate_range_translation = _interp1d([0., 1.], [0, 100])
+    negative_range_translation = _interp1d([0., 1.], [100, 0])
 
     y_true_int = _soml.util.label.probability_to_binary(y_true)
     for n in range(2):
@@ -68,7 +69,8 @@ def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8
             y_pred_single_class_translated = negative_range_translation(y_pred_single_class)
 
         # Sort the values
-        y_pred_single_class_translated_sorted = y_pred_single_class_translated[y_pred_single_class_translated[:, 0].argsort()]
+        y_pred_single_class_translated_sorted = y_pred_single_class_translated[
+            y_pred_single_class_translated[:, 0].argsort()]
 
         # Plot a graph with the given values.
         class_name = str(n) if class_names is None else class_names[n]
@@ -84,7 +86,20 @@ def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8
     _plt.show()
 
 
-def prediction_confidence_histogram(y_true, y_pred, class_names: list[str], figsize=(8, 4)):
+def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], figsize=(8, 4)):
+    """
+        Creates a histogram showing the confidence of the predictions. The digest of this method is the same
+        as for the ´prediction_confidence´ method except that it displays the information as a histogram.
+
+        Args:
+            y_true: Array of truth labels, must be same shape as y_pred.
+            y_prob: Array of probabilities, must be same shape as y_true.
+            class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
+            figsize: Size of output figure (default=(10, 8)).
+
+        Returns:
+            None
+        """
     bins = range(0, 110, 10)
 
     fig, axs = _plt.subplots(nrows=1, ncols=2, figsize=figsize)
@@ -101,13 +116,13 @@ def prediction_confidence_histogram(y_true, y_pred, class_names: list[str], figs
     # of class 1 (y_true[:] == 1) the closer the number to 1 the higher de confidence, and for results
     # of class 0 (y_true[:] == 0) the close the number to 0 the higher de confidence.
     # For this we use the interp1d function.
-    positivate_range_translation = _interp1d([0.,1.],[0,100])
-    negative_range_translation = _interp1d([0.,1.],[100,0])
+    positivate_range_translation = _interp1d([0., 1.], [0, 100])
+    negative_range_translation = _interp1d([0., 1.], [100, 0])
 
     y_true_int = _soml.util.label.probability_to_binary(y_true)
     for n in range(2):
         # Filter out only the rows thar are applicatie to the n'th class
-        y_pred_single_class = y_pred[_np.in1d(y_true_int[:, 0], [n])]
+        y_pred_single_class = y_prob[_np.in1d(y_true_int[:, 0], [n])]
 
         # Convert ranges as described above
         if n == 1:
@@ -165,7 +180,7 @@ def decision_boundary(model: _tf.keras.Model, x, y) -> None:
     y_min, y_max = x[:, 1].min() - 0.1, x[:, 1].max() + 0.1
 
     xx, yy = _np.meshgrid(_np.linspace(x_min, x_max, 100),
-                         _np.linspace(y_min, y_max, 100))
+                          _np.linspace(y_min, y_max, 100))
 
     # Create X value (we're going to make predictions on these)
     x_in = _np.c_[xx.ravel(), yy.ravel()]  # Stack 2D arrays together
@@ -205,11 +220,11 @@ def y_pred_vs_y_true(y_true, y_pred, figsize=(10, 8)) -> None:
     m_a = _np.append(m, y_true - y_pred, axis=1)
 
     # sort based on y_true
-    s = m_a[m_a[:,0].argsort()]
+    s = m_a[m_a[:, 0].argsort()]
     _plt.figure(figsize=figsize, facecolor='#FFFFFF')
-    _plt.plot(s[:,0], label="y_true", color="#0000FF", linestyle="solid", linewidth=1.5)
-    _plt.plot(s[:,1], label="y_pred", color="#FF0000", linestyle="solid", linewidth=1.5)
-    _plt.plot(s[:,2], label="diff", color="#FF0000", linestyle="solid", linewidth=1.5)
+    _plt.plot(s[:, 0], label="y_true", color="#0000FF", linestyle="solid", linewidth=1.5)
+    _plt.plot(s[:, 1], label="y_pred", color="#FF0000", linestyle="solid", linewidth=1.5)
+    _plt.plot(s[:, 2], label="diff", color="#FF0000", linestyle="solid", linewidth=1.5)
     _plt.title('y_true vs y_pred with difference', size=20)
     _plt.xlabel('Predictions', size=14)
     _plt.ylabel('Value', size=14)

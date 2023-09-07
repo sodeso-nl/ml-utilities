@@ -4,7 +4,7 @@ import matplotlib.pyplot as _plt
 import numpy as _np
 import tensorflow as _tf
 import so_ml_tools as _soml
-import sklearn as _sklearn
+
 from sklearn.metrics import confusion_matrix as _confusion_matrix
 from sklearn.metrics import classification_report as _classification_report
 
@@ -91,13 +91,29 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
         fig.savefig("./confusion_matrix.png")
 
 
-def prediction_confidence(y_true, y_pred, class_names: list[str], figsize=(10, 8)):
+def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8)):
+    """
+        Creates a plot showing the confidence of the predictions, the plot will display the number of predictions vs
+        the confidence (how close was the prediction to the actual truth label). In a perfect world the
+        plot would be a straight vertical line on the right (all predictions are exactly 1 or 0 compared with their
+        truth label). Since this is never the case the more optimal plot would be a vertical line around 0 on the x-axis
+        with a small bend in the top left corner following a horizontal line around 100%.
+
+        Args:
+            y_true: Array of truth labels, must be same shape as y_pred.
+            y_prob: Array of probabilities, must be same shape as y_true.
+            class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
+            figsize: Size of output figure (default=(10, 8)).
+
+        Returns:
+            None
+        """
     _plt.figure(figsize=figsize)
 
     # For each column (class) in y_true
     for n in range(y_true.shape[1]):
         # Concatenate the y_true for the n'th class and y_pred for the n'th class together.
-        y_combined = _np.concatenate((y_true[:, [n]], y_pred[:, [n]]), axis=1)
+        y_combined = _np.concatenate((y_true[:, [n]], y_prob[:, [n]]), axis=1)
 
         # Filter out only the rows that are applicable to the n'th class (where y_true == 1)
         y_combined_class = y_combined[_np.in1d(y_combined[:, 0], [1])]
@@ -122,7 +138,20 @@ def prediction_confidence(y_true, y_pred, class_names: list[str], figsize=(10, 8
     _plt.show()
 
 
-def prediction_confidence_histogram(y_true, y_pred, class_names: list[str], figsize=(8, 4)):
+def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], figsize=(8, 4)):
+    """
+        Creates a histogram showing the confidence of the predictions. The digest of this method is the same
+        as for the ´prediction_confidence´ method except that it displays the information as a histogram.
+
+        Args:
+            y_true: Array of truth labels, must be same shape as y_pred.
+            y_prob: Array of probabilities, must be same shape as y_true.
+            class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
+            figsize: Size of output figure (default=(10, 8)).
+
+        Returns:
+            None
+        """
     bins = range(0, 110, 10)
 
     fig, axs = _plt.subplots(nrows=max(int(len(class_names) / 4), 1), ncols=min(4, len(class_names)), figsize=figsize)
@@ -137,7 +166,7 @@ def prediction_confidence_histogram(y_true, y_pred, class_names: list[str], figs
     # For each column (class) in y_true
     for n in range(y_true.shape[1]):
         # Concatenate the y_true for the n'th class and y_pred for the n'th class together.
-        y = _np.concatenate((y_true[:, [n]], y_pred[:, [n]]), axis=1)
+        y = _np.concatenate((y_true[:, [n]], y_prob[:, [n]]), axis=1)
 
         # Filter out only the rows that are applicable to the n'th class (where y_true == 1)
         y = y[_np.in1d(y[:, 0], [1])]
@@ -174,7 +203,7 @@ def report_f1_score(y_true, y_pred, class_names: list[str], figsize=(10, 8)) -> 
 
     # Generate classification report from SKLearn.
     report_dict = _classification_report(y_true=y_true, y_pred=y_pred, target_names=class_names,
-                                                         output_dict=True)
+                                         output_dict=True)
 
     # Collect all the F1-scores
     f1_scores = {}

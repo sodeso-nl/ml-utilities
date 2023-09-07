@@ -7,12 +7,13 @@ import so_ml_tools as _soml
 from scipy.interpolate import interp1d as _interp1d
 
 
-def confusion_matrix(y_true, y_prob, class_names: list[str] = None, figsize=(15, 15), text_size=10, norm=False, savefig=False) -> None:
+def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = None, figsize=(15, 15), text_size=10, norm=False, savefig=False) -> None:
     """
       Plots a confusion matrix of the given data.
 
       :param y_true: Array of truth labels (must be same shape as y_pred).
-      :param y_prob: Array of probability labels (must be same shape as y_true).
+      :param y_pred: Array of predictions (then y_prob is not necessary), must be same shape as y_true.
+      :param y_prob: Array of probabilities (then y_pred is not necessary), must be same shape as y_true.
       :param class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
       :param figsize: Size of output figure (default=(15, 15)).
       :param text_size: Size of output figure text (default=10).

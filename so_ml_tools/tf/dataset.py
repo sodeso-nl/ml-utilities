@@ -51,21 +51,4 @@ def get_labels(dataset: _tf.data.Dataset):
 
 
 def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)):
-    assert isinstance(dataset, _tf.data.Dataset), f"The dataset supplied is not a tensorflow.data.Dataset."
-
-    # Retrieve first batch, depending on the initalization of the dataset the batch size is default 32
-    # so when performing a take of (1) we retreive the first batch
-    batches = dataset.take(1)
-
-    # Use an iterator to get the first batch of images and labels
-    batch_iter = iter(batches)
-    x, y_true = batch_iter.next()
-
-    assert shape[0] * shape[1] == len(x), f"Size of shape ({shape[0]}, {shape[1]}), with a total of " \
-                  f"{shape[0] * shape[1]} images, is not equal to the batch size of the dataset ({len(x)})."
-
-    if len(x) != shape[0] * shape[1]:
-        raise TypeError('dataset is not a Dataset')
-
-    _soml.data.image.show_images_from_nparray_or_tensor(x=x, y=y_true, class_names=dataset.class_names, shape=shape)
-    _plt.show()
+    _soml.data.image.show_images_from_dataset(dataset=dataset, shape=shape)

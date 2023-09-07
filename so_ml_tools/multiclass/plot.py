@@ -7,12 +7,14 @@ import so_ml_tools as _soml
 import sklearn as _sklearn
 
 
-def confusion_matrix(y_true, y_prob, class_names: list[str] = None, figsize=(15, 15), text_size=10, norm=False, savefig=False) -> None:
+def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = None, figsize=(15, 15), text_size=10,
+                     norm=False, savefig=False) -> None:
     """
       Plots a confusion matrix of the given data.
 
       :param y_true: Array of truth labels (must be same shape as y_pred).
-      :param y_prob: Array of probability labels (must be same shape as y_true).
+      :param y_pred: Array of predictions (then y_prob is not necessary), must be same shape as y_true.
+      :param y_prob: Array of probabilities (then y_pred is not necessary), must be same shape as y_true.
       :param class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
       :param figsize: Size of output figure (default=(15, 15)).
       :param text_size: Size of output figure text (default=10).
@@ -29,7 +31,8 @@ def confusion_matrix(y_true, y_prob, class_names: list[str] = None, figsize=(15,
                         '\'y_labels = ml.tf.dataset.get_labels(dataset=dataset)\'')
 
     y_true = _soml.util.label.to_prediction(y_prob=y_true)
-    y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
+    if y_pred is None and y_prob is not None:
+        y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
 
     # Create the confusion matrix
     cm = _sklearn.metrics.confusion_matrix(y_true, y_pred)
@@ -146,7 +149,7 @@ def classification_prediction_confidence_histogram(y_true, y_pred, class_names: 
         # Plot a histogram with the given values.
         class_name = str(n) if class_names is None else class_names[n]
         axs[n].hist(y, log=True, bins=11, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.5,
-                 label=class_name)
+                    label=class_name)
         axs[n].set(title=class_name, xlabel='Confidence (%)', ylabel='Predictions')
     _plt.show()
 
@@ -168,7 +171,8 @@ def report_f1_score(y_true, y_pred, class_names: list[str], figsize=(10, 8)) -> 
     y_pred = _soml.util.label.to_prediction(y_prob=y_pred)
 
     # Generate classification report from SKLearn.
-    report_dict = _sklearn.metrics.classification_report(y_true=y_true, y_pred=y_pred, target_names=class_names, output_dict=True)
+    report_dict = _sklearn.metrics.classification_report(y_true=y_true, y_pred=y_pred, target_names=class_names,
+                                                         output_dict=True)
 
     # Collect all the F1-scores
     f1_scores = {}

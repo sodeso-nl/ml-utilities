@@ -1,11 +1,10 @@
 from . import (
     data,
-    multiclass,
     nlp,
-    pandas,
-    regression,
+    pd,
     tf,
-    util
+    util,
+    evaluate
 )
 
 # We follow Semantic Versioning (https://semver.org/spec/v2.0.0.html)
@@ -21,12 +20,11 @@ __version__ = '.'.join([
 
 __all__ = [
     "data",
-    "multiclass",
     "nlp",
-    "pandas",
-    "regression",
+    "pd",
     "tf",
     "util",
+    "evaluate",
     "__version__"
 ]
 

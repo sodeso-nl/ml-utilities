@@ -1,11 +1,17 @@
 from . import (
     dataset,
     tensor,
-    model
+    model,
+    fit,
+    mixed_precision,
+    tensorboard
 )
 
 __all__ = [
     "dataset",
     "tensor",
-    "model"
+    "model",
+    "fit",
+    "mixed_precision",
+    "tensorboard"
 ]

@@ -2,7 +2,7 @@ import matplotlib.pyplot as _plt
 import pandas as _pd
 
 
-def plot_histogram_from_dataframe(dataframe: _pd.DataFrame, column_names: list[str] = None, log=False,
+def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = None, log=False,
                                   min_nunique: int = 3, max_nunique: int = 50, figsize: tuple = None, cols=3,
                                   verbose=1):
     """

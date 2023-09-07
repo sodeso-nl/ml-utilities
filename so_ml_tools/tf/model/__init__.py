@@ -1,5 +1,4 @@
 from . import (
-    callback,
     layer,
     plot,
     predict,
@@ -7,7 +6,6 @@ from . import (
 )
 
 __all__ = [
-    "callback",
     "layer",
     "plot",
     "predict",

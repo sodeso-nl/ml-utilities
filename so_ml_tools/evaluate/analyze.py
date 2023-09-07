@@ -1,10 +1,10 @@
 import pandas as _pd
-import sklearn as _sklearn
 import tensorflow as _tf
+import sklearn as _sklearn
 import so_ml_tools as _soml
 
 
-def determine_outliers(x, y_true, y_pred = None, y_prob = None, top=10) -> _pd.DataFrame:
+def determine_outliers_for_multiclass_classification(x, y_true, y_pred=None, y_prob=None, top=10) -> _pd.DataFrame:
     """
     Displays the top X (default 10) outliers between y_true and y_pred.
 
@@ -12,13 +12,12 @@ def determine_outliers(x, y_true, y_pred = None, y_prob = None, top=10) -> _pd.D
         x: data to display
         y_true: actual labels [3, 3, 2, ..., 4, 4, 1]
         y_pred: predictions [3, 3, 2, ..., 4, 2, 1]
-        y_prob: probabilities (multiclass) [[0.30974227, ...], [0.32494593, ...], ..]
+        y_prob: probabilities (multiclass) [[0.30974227, ...], [0.32494593, ...], ..] this field is optional, if not provided the y_prob will be determined by y_pred.
         top: how many outliers to return
 
     Returns:
         The outliers
     """
-
     # Check if we need to convert y_prob to numpy.
     _y_prob = y_prob
     if _tf.is_tensor(x=y_prob):
@@ -58,6 +57,35 @@ def determine_outliers(x, y_true, y_pred = None, y_prob = None, top=10) -> _pd.D
     return outliers
 
 
+def determine_outliers_for_binary_classification(x, y_true, y_pred, target_column: str, top=10):
+    """
+    Displays the top X (default 10) outliers between y_true and y_pred.
+    :param x: data to display
+    :param y_true: labels
+    :param y_pred: predictions
+    :param target_column: column on which we can calculate the mean negative / positive.
+    :param top: how many rows to display
+    :return: dataframe containing the top X.
+    """
+    x_copy = x.copy()
+    x_copy["y_true"] = y_true.round(0)
+    x_copy["y_pred"] = y_pred.round(0)
+
+    diff = y_true - y_pred
+    x_copy["diff"] = diff.round(0)
+
+    mean_positive = diff[diff[target_column] > 0].mean()[0]
+    mean_negative = diff[diff[target_column] < 0].mean()[0]
+
+    positive_outliers = x_copy[x_copy["diff"] > mean_positive]
+    negative_outliers = x_copy[x_copy["diff"] < mean_negative]
+
+    positive_outliers_sorted = positive_outliers.sort_values(['diff'], ascending=False, inplace=False)[:top]
+    negative_outliers_sorted = negative_outliers.sort_values(['diff'], ascending=True, inplace=False)[:top]
+
+    return _pd.concat([positive_outliers_sorted, negative_outliers_sorted])
+
+
 def quality_metrics(y_true, y_pred):
     """
     calculates model accuracy, precision, recall and F1-Score
@@ -74,7 +102,7 @@ def quality_metrics(y_true, y_pred):
         _sklearn.metrics.precision_recall_fscore_support(y_true, y_pred, average="weighted")
     model_results = \
         {
-            "accuracy" : model_accuracy,
+            "accuracy": model_accuracy,
             "precision": model_precission,
             "recall": model_recall,
             "f1-score": model_f1_score,

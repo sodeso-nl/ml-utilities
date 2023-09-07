@@ -1,9 +1,9 @@
 from . import (
-    evaluate,
+    analyze,
     plot
 )
 
 __all__ = [
-    "evaluate",
+    "analyze",
     "plot"
 ]

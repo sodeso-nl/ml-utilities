@@ -7,6 +7,24 @@ import matplotlib.pyplot as _plt
 import so_ml_tools as _soml
 
 
+def load_image_as_tensor(filename: str, img_shape=(224, 224), scale=True):
+    """
+    Reads in an image from filename, turns it into a tensor and reshapes into
+    specified shape (img_shape, img_shape, channels)
+
+    Args:
+        filename: path to target image
+        img_shape: A `tuple` with the dimensions of the image.
+        scale: A `bool` indicating if scaling needs to be performed (0-255 -> 0-1)
+
+    Returns:
+        A 'tf.Tensor' of shape (img_shape, 3) with of dtype 'tf.int32'.
+    """
+
+    img = _tf.io.read_file(filename=filename)
+    return image_as_tensor(image=img, img_shape=img_shape, scale=scale)
+
+
 def image_as_tensor(image, img_shape: tuple = (224, 224), scale: bool = True) -> _tf.Tensor:
     """
     Reads in an image from filename, turns it into a tensor and reshapes into

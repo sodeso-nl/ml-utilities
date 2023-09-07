@@ -89,7 +89,7 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
         fig.savefig("./confusion_matrix.png")
 
 
-def classification_prediction_confidence(y_true, y_pred, class_names: list[str], figsize=(10, 8)):
+def prediction_confidence(y_true, y_pred, class_names: list[str], figsize=(10, 8)):
     _plt.figure(figsize=figsize)
 
     # For each column (class) in y_true
@@ -120,7 +120,7 @@ def classification_prediction_confidence(y_true, y_pred, class_names: list[str],
     _plt.show()
 
 
-def classification_prediction_confidence_histogram(y_true, y_pred, class_names: list[str], figsize=(8, 4)):
+def prediction_confidence_histogram(y_true, y_pred, class_names: list[str], figsize=(8, 4)):
     bins = range(0, 110, 10)
 
     fig, axs = _plt.subplots(nrows=max(int(len(class_names) / 4), 1), ncols=min(4, len(class_names)), figsize=figsize)

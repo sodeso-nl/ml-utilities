@@ -3,7 +3,7 @@ from . import (
     layer,
     plot,
     predict,
-    storage
+    io
 )
 
 __all__ = [
@@ -11,5 +11,5 @@ __all__ = [
     "layer",
     "plot",
     "predict",
-    "storage"
+    "io"
 ]

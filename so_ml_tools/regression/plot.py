@@ -27,7 +27,7 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
     _soml.multiclass.plot.confusion_matrix(y_true, y_prob, class_names, figsize, text_size, norm, savefig)
 
 
-def classification_prediction_confidence(y_true, y_pred, class_names: list[str], figsize=(10, 8)):
+def prediction_confidence(y_true, y_pred, class_names: list[str], figsize=(10, 8)):
     _plt.figure(figsize=figsize)
 
     # In binary classification we have two possible best outcomes, 0 and 1, both ends mean that something has
@@ -39,7 +39,7 @@ def classification_prediction_confidence(y_true, y_pred, class_names: list[str],
     positivate_range_translation = _interp1d([0.,1.],[0,100])
     negative_range_translation = _interp1d([0.,1.],[100,0])
 
-    y_true_int = _soml.util.label.probability_to_binary(y_true, dtype=_np.int32)
+    y_true_int = _soml.util.label.probability_to_binary(y_true)
     for n in range(2):
         # Filter out only the rows thar are applicatie to the n'th class
         y_pred_single_class = y_pred[_np.in1d(y_true_int[:, 0], [n])]
@@ -67,7 +67,7 @@ def classification_prediction_confidence(y_true, y_pred, class_names: list[str],
     _plt.show()
 
 
-def classification_prediction_confidence_histogram(y_true, y_pred, class_names: list[str], figsize=(8, 4)):
+def prediction_confidence_histogram(y_true, y_pred, class_names: list[str], figsize=(8, 4)):
     bins = range(0, 110, 10)
 
     fig, axs = _plt.subplots(nrows=1, ncols=2, figsize=figsize)
@@ -87,7 +87,7 @@ def classification_prediction_confidence_histogram(y_true, y_pred, class_names: 
     positivate_range_translation = _interp1d([0.,1.],[0,100])
     negative_range_translation = _interp1d([0.,1.],[100,0])
 
-    y_true_int = _soml.util.label.probability_to_binary(y_true, dtype=_np.int32)
+    y_true_int = _soml.util.label.probability_to_binary(y_true)
     for n in range(2):
         # Filter out only the rows thar are applicatie to the n'th class
         y_pred_single_class = y_pred[_np.in1d(y_true_int[:, 0], [n])]

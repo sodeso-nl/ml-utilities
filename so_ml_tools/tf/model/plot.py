@@ -26,7 +26,8 @@ def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], lab
         last_epoch = max(last_epoch, max(history.epoch))
 
         all_loss_history = [*all_loss_history, *history.history['loss']]
-        all_val_loss_history = [*all_val_loss_history, *history.history['val_loss']]
+        if 'val_loss' in history.history:
+            all_val_loss_history = [*all_val_loss_history, *history.history['val_loss']]
 
         if 'accuracy' in history.history:
             all_accuracy_history = [*all_accuracy_history, *history.history['accuracy']]
@@ -43,8 +44,11 @@ def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], lab
     ticks = range(len(epoch_labels))
     _plt.figure(figsize=figsize, facecolor='#FFFFFF')
     _plot_history_graph_line(all_loss_history, label='Training loss', color='#0000FF')
-    _plot_history_graph_line(all_val_loss_history, label='Validation loss', color='#00FF00')
     _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
+
+    if all_val_loss_history:
+        _plot_history_graph_line(all_val_loss_history, label='Validation loss', color='#00FF00')
+
     _plot_history_ends(histories, labels)
     _plt.title('Loss', size=20)
     _plt.xticks(ticks, epoch_labels)

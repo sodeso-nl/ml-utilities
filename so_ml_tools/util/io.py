@@ -4,14 +4,18 @@ import zipfile as _zipfile
 import urllib as _urllib
 
 
-def download_file(source='https://www.download.com/file.zip', filepath='./data/file.zip') -> None:
+def download_file(source='https://www.download.com/file.zip', filepath='./data/file.zip', overwrite=False) -> None:
     """
     Download a file from source location and store it at the specified destination location.
 
     Args:
         source: the source URL
         filepath: the destination path and filename
+        overwrite: if the file already exists then skip the download
     """
+    if not overwrite and _os.path.exists(filepath):
+        print(f'Download of {source} skipped, file {filepath} exists.')
+
     path = _os.path.dirname(filepath)
     if path:
         _os.makedirs(path, exist_ok=True)

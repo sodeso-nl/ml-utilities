@@ -7,7 +7,7 @@ import matplotlib.pyplot as _plt
 import so_ml_tools as _soml
 
 
-def load_image_as_tensor(filename: str, img_shape=(224, 224), scale=True):
+def load_image_as_tensor(filename: str, img_shape=(224, 224), scale=True) -> _tf.Tensor:
     """
     Reads in an image from filename, turns it into a tensor and reshapes into
     specified shape (img_shape, img_shape, channels)
@@ -51,7 +51,7 @@ def image_as_tensor(image, img_shape: tuple = (224, 224), scale: bool = True) ->
         return img
 
 
-def is_image_float32_and_not_normalized(x):
+def is_image_float32_and_not_normalized(x) -> bool:
     """
     Convenience method to check if an image in `tf.Tensor` format is of type `float32` but not normalized (values between
     0..255 instead of 0..1)
@@ -65,7 +65,8 @@ def is_image_float32_and_not_normalized(x):
     return x.dtype == _tf.float32 and _tf.math.reduce_max(x).numpy() > 1.0
 
 
-def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indices=None, shape: tuple = (4, 6), cmap: str = 'gray'):
+def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indices=None, shape: tuple = (4, 6),
+                                       cmap: str = 'gray') -> None:
     """
     Shows images stored in a tensor / numpy array. The array should be a vector of images.
     
@@ -119,7 +120,7 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
     _plt.show()
 
 
-def show_single_image_from_nparray_or_tensor(image, title="", figsize=(10, 8), cmap='gray'):
+def show_single_image_from_nparray_or_tensor(image, title="", figsize=(10, 8), cmap='gray') -> None:
     """
     Shows images stored in a tensor / numpy array. The array should be a vector of images.
 
@@ -144,7 +145,6 @@ def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gr
     :param shape: is the number of images in a grid to display
     :param cmap: is the color map to use, use "gray" for gray scale images, use None for default.
     """
-    # Setup the target directory (we'll view images from here)
     try:
         target_folder = _os.path.join(target_dir, target_class)
 
@@ -165,7 +165,7 @@ def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gr
         _logging.error(e)
 
 
-def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)):
+def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)) -> None:
     assert isinstance(dataset, _tf.data.Dataset), f"The dataset supplied is not a tensorflow.data.Dataset."
 
     # Retrieve first batch, depending on the initalization of the dataset the batch size is default 32
@@ -177,7 +177,7 @@ def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)):
     x, y_true = batch_iter.next()
 
     assert shape[0] * shape[1] == len(x), f"Size of shape ({shape[0]}, {shape[1]}), with a total of " \
-                  f"{shape[0] * shape[1]} images, is not equal to the batch size of the dataset ({len(x)})."
+                                          f"{shape[0] * shape[1]} images, is not equal to the batch size of the dataset ({len(x)})."
 
     if len(x) != shape[0] * shape[1]:
         raise TypeError('dataset is not a Dataset')

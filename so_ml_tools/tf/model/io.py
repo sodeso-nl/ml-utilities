@@ -18,7 +18,7 @@ def save_model(model: _tf.keras.Model, filepath="./models/model.h5", save_format
     model.save(filepath=filepath, save_format=save_format)
 
 
-def load_model(filepath="./models/model.h5", custom_objects = None) -> _keras.Model:
+def load_model(filepath="./models/model.h5", custom_objects=None) -> _keras.Model:
     """
     This method will call the default load_model method.
 
@@ -66,7 +66,8 @@ def load_weights(model: _tf.keras.Model, filepath: str) -> None:
     """
 
     # Collect all layers that are trainable
-    trainable_layer_names = _soml.tf.model.layer.collect_layer_names(model, recursive=True, include_trainable=True, include_non_trainable=False)
+    trainable_layer_names = _soml.tf.model.layer.collect_layer_names(model, recursive=True, include_trainable=True,
+                                                                     include_non_trainable=False)
 
     # Disable training completely
     _soml.tf.model.layer.set_trainable_on_layers(model, trainable=False)

@@ -29,8 +29,8 @@ def probability_to_binary(y_prob: _tf.Tensor) -> _tf.Tensor:
     return _soml.util.label.probability_to_binary(y_prob=y_prob)
 
 
-def to_prediction(y_prob: _tf.Tensor, dtype=None) -> _tf.Tensor:
+def to_prediction(y_prob: _tf.Tensor) -> _tf.Tensor:
     """
     See ml.util.label.to_prediction
     """
-    return _soml.util.label.to_prediction(y_prob=y_prob, dtype=dtype)
+    return _soml.util.label.to_prediction(y_prob=y_prob)

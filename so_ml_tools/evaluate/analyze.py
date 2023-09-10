@@ -86,7 +86,7 @@ def determine_outliers_for_binary_classification(x, y_true, y_pred, target_colum
     return _pd.concat([positive_outliers_sorted, negative_outliers_sorted])
 
 
-def quality_metrics(y_true, y_pred):
+def quality_metrics(y_true, y_pred) -> dict:
     """
     calculates model accuracy, precision, recall and F1-Score
     :param y_true: the truth labels

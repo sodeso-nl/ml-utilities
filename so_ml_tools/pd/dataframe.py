@@ -1,7 +1,9 @@
 import pandas as _pd
 import numpy as _np
 
-def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_np.float64, inplace=True) -> _pd.DataFrame:
+
+def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_np.float64,
+                           inplace=True) -> _pd.DataFrame:
     """
     Converts the dtype of the given column to the specified dtype.
 
@@ -30,7 +32,7 @@ def delete_null_rows(dataframe: _pd.DataFrame, column_name: str, inplace=True) -
     :param inplace: return a new instance of the DataFrame (False) or adjust the given DataFrame
     :return: see inplace
     """
-    return dataframe.drop(dataframe[dataframe[column_name].isnull()].index, inplace = inplace)
+    return dataframe.drop(dataframe[dataframe[column_name].isnull()].index, inplace=inplace)
 
 
 def delete_rows_not_numeric(dataframe: _pd.DataFrame, column_name: str, inplace=True) -> _pd.DataFrame:
@@ -42,7 +44,8 @@ def delete_rows_not_numeric(dataframe: _pd.DataFrame, column_name: str, inplace=
     :param inplace: return a new instance of the DataFrame (False) or adjust the given DataFrame
     :return: see inplace
     """
-    return dataframe.drop(dataframe[_pd.to_numeric(dataframe[column_name], errors='coerce').isna()].index, inplace=inplace)
+    return dataframe.drop(dataframe[_pd.to_numeric(dataframe[column_name], errors='coerce').isna()].index,
+                          inplace=inplace)
 
 
 def drop_columns(dataframe: _pd.DataFrame, column_names: list[str]) -> None:
@@ -96,4 +99,6 @@ def describe(dataframe: _pd.DataFrame, column_names: list[str] = None, round=2):
         ])
 
     print(f"Total number of rows: {len(dataframe)}")
-    return _pd.DataFrame(columns=["Column", "DType", "NotNull", "Null", "Unique", "Mean", "Std", "Z-Min", "Z-Max", "Min", "25%", "50%", "75%", "Max"], data=data).round(round)
+    return _pd.DataFrame(
+        columns=["Column", "DType", "NotNull", "Null", "Unique", "Mean", "Std", "Z-Min", "Z-Max", "Min", "25%", "50%",
+                 "75%", "Max"], data=data).round(round)

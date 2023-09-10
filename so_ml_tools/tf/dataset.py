@@ -1,9 +1,8 @@
 import tensorflow as _tf
-import matplotlib.pyplot as _plt
 import so_ml_tools as _soml
 
 
-def get_class_names_from_dataset_info(ds_info):
+def get_class_names_from_dataset_info(ds_info: dict):
     """
     Returns the labels from the dataset info object which is created from loading a
     TensorFlow Dataset (tensorflow_datasets)
@@ -11,7 +10,7 @@ def get_class_names_from_dataset_info(ds_info):
     :param ds_info: The dataset info object
     :return: The labels / class names
     """
-    return ds_info.features["label"].names
+    return ds_info["features"]["label"].names
 
 
 def get_class_names(dataset: _tf.data.Dataset):

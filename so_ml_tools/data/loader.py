@@ -1,8 +1,3 @@
-import os as _os
-import random as _random
-import logging as _logging
-
-import matplotlib.pyplot as _plt
 import tensorflow as _tf
 
 

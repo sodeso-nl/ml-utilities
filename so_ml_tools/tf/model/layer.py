@@ -1,7 +1,7 @@
 import tensorflow as _tf
 
 
-def collect_layers(model: _tf.keras.Model, recursive=True, include_trainable=True, include_non_trainable=True):
+def collect_layers(model: _tf.keras.Model, recursive=True, include_trainable=True, include_non_trainable=True) -> list:
     """
     Collects layers from the given model, if the model is functional then there might be sub-branches
     inside the model, for example:
@@ -34,7 +34,8 @@ def collect_layers(model: _tf.keras.Model, recursive=True, include_trainable=Tru
 
     for layer in model.layers:
         if hasattr(layer, 'layers') and recursive:
-            layers = [*layers, *collect_layers(layer, recursive=recursive, include_trainable=include_trainable, include_non_trainable=include_non_trainable)]
+            layers = [*layers, *collect_layers(layer, recursive=recursive, include_trainable=include_trainable,
+                                               include_non_trainable=include_non_trainable)]
         else:
             if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable is False):
                 layers.append(layer)
@@ -42,8 +43,10 @@ def collect_layers(model: _tf.keras.Model, recursive=True, include_trainable=Tru
     return layers
 
 
-def collect_layer_names(model: _tf.keras.Model, recursive=True, include_trainable=True, include_non_trainable=True):
-    layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
+def collect_layer_names(model: _tf.keras.Model, recursive=True, include_trainable=True, include_non_trainable=True) -> \
+        list[str]:
+    layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable,
+                            include_non_trainable=include_non_trainable)
     return list(map(lambda layer: layer.name, layers))
 
 
@@ -66,7 +69,8 @@ def set_trainable_on_last_n_layers(model: _tf.keras.Model, n, trainable=True) ->
 
 
 def list_model(model, recursive=True, include_trainable=True, include_non_trainable=True) -> None:
-    layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
+    layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable,
+                            include_non_trainable=include_non_trainable)
     list_layers(layers=layers, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
 
 
@@ -77,8 +81,10 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
     layer_dtype_col_width = len(max(list(map(lambda l: str(l.dtype), layers)), key=len))
     layer_dtype_policy_col_width = len(max(list(map(lambda l: str(l.dtype_policy.name), layers)), key=len))
 
-    print(f"{'row':<5} | {'name (type)':<{layer_name_col_width + layer_type_col_width + 3}} | {'dtype':<{layer_dtype_col_width}} | {'policy':<{layer_dtype_policy_col_width}} | trainable | output shape")
+    print(
+        f"{'row':<5} | {'name (type)':<{layer_name_col_width + layer_type_col_width + 3}} | {'dtype':<{layer_dtype_col_width}} | {'policy':<{layer_dtype_policy_col_width}} | trainable | output shape")
     for layer_number, layer in enumerate(layers):
         if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable is False):
-            print(f"{layer_number:<5} | {layer.name:<{layer_name_col_width}} ({type(layer).__name__:<{layer_type_col_width}}) | {str(layer.dtype):<{layer_dtype_col_width}} | {str(layer.dtype_policy.name):<{layer_dtype_policy_col_width}} | {str(layer.trainable):<9} | "
-                  f"{str(layer.output_shape):<{layer_shape_col_width}}")
+            print(
+                f"{layer_number:<5} | {layer.name:<{layer_name_col_width}} ({type(layer).__name__:<{layer_type_col_width}}) | {str(layer.dtype):<{layer_dtype_col_width}} | {str(layer.dtype_policy.name):<{layer_dtype_policy_col_width}} | {str(layer.trainable):<9} | "
+                f"{str(layer.output_shape):<{layer_shape_col_width}}")

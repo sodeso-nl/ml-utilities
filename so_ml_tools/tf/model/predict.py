@@ -3,7 +3,7 @@ import numpy as _np
 import so_ml_tools as _soml
 
 
-def classification_dataset_without_labels(model: _tf.keras.Model, dataset: _tf.data.Dataset):
+def classification_dataset_without_labels(model: _tf.keras.Model, dataset: _tf.data.Dataset) -> _np.ndarray:
     """
     Performs predictions on the given model for all entries in the dataset, will
     return y_prob. Does not work well when dataset is being shuffled.
@@ -23,7 +23,7 @@ def classification_dataset_without_labels(model: _tf.keras.Model, dataset: _tf.d
     return y_prob
 
 
-def classification_dataset_with_labels(model: _tf.keras.Model, dataset: _tf.data.Dataset):
+def classification_dataset_with_labels(model: _tf.keras.Model, dataset: _tf.data.Dataset) -> (_np.ndarray, _np.ndarray):
     """
     Performs predictions on the given model for all entries in the dataset, will
     return y_pred and y_true as a tuple. Useful for when the dataset has shuffling enabled
@@ -47,7 +47,7 @@ def classification_dataset_with_labels(model: _tf.keras.Model, dataset: _tf.data
     return y_true, y_prob
 
 
-def regression(model: _tf.keras.Model, x):
+def regression(model: _tf.keras.Model, x) -> _np.ndarray:
     """
     Performs predictions on the given model for all entries in the dataset, will
     return y_pred and y_true as a tuple. Usefull for when the dataset has shuffling enabled

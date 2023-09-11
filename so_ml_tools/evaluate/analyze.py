@@ -109,7 +109,7 @@ def quality_metrics(y_true, y_pred=None, y_prob=None) -> _pd.DataFrame:
 
     # Calculate precision, recall and F1-score using "weighted" average,
     # weighted will also take the amount of samples for each in mind.
-    model_precission, model_recall, model_f1_score = \
+    model_precission, model_recall, model_f1_score, _ = \
         _sklearn.metrics.precision_recall_fscore_support(y_true, y_pred, average="weighted")
     model_results = \
         {

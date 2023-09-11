@@ -160,13 +160,19 @@ def y_pred_vs_y_true(y_true, y_pred, figsize=(10, 8)) -> None:
     _plt.legend()
 
 
-def report_f1_score(y_true, y_pred, class_names: list[str], figsize=(10, 8)) -> None:
+def report_f1_score(y_true, y_pred=None, y_prob=None, class_names: list[str] = None, figsize=(10, 8)) -> None:
     """
     Creates a horizontal bar graph with the F1-Scores of the y_true / y_pred.
-    :param y_true: Array of truth labels (must be same shape as y_pred).
-    :param y_pred: Array of predicted labels (must be same shape as y_true).
-    :param class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
-    :param figsize: Size of output figure (default=(10, 8)).
+
+    Args:
+        y_true: the truth labels
+        y_pred: (optional) the predictions (either y_pred or y_prob should be supplied)
+        y_prob: (optional) the probabilities (either y_pred or y_prob should be supplied)
+        class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
+        figsize: Size of output figure (default=(10, 8)).
+
+    Returns:
+        A 'dict' containing accuracy, precision, recall, f1 score and support
     """
     if isinstance(y_true, _tf.data.Dataset):
         raise TypeError(
@@ -174,7 +180,10 @@ def report_f1_score(y_true, y_pred, class_names: list[str], figsize=(10, 8)) -> 
             '\'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')
 
     y_true = _soml.util.label.to_prediction(y_prob=y_true)
-    y_pred = _soml.util.label.to_prediction(y_prob=y_pred)
+    if y_pred is None and y_prob is not None:
+        y_pred = _soml.util.label.to_prediction(y_prob=y_pred)
+    elif y_pred is None and y_prob is None:
+        raise "y_pred or y_prob argument should be provided."
 
     # Generate classification report from SKLearn.
     report_dict = _classification_report(y_true=y_true, y_pred=y_pred, target_names=class_names,

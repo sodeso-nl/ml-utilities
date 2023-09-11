@@ -86,13 +86,24 @@ def determine_outliers_for_binary_classification(x, y_true, y_pred, target_colum
     return _pd.concat([positive_outliers_sorted, negative_outliers_sorted])
 
 
-def quality_metrics(y_true, y_pred) -> dict:
+def quality_metrics(y_true, y_pred=None, y_prob=None) -> dict:
     """
     calculates model accuracy, precision, recall and F1-Score
-    :param y_true: the truth labels
-    :param y_pred: the predictions
-    :return: dictionary containing accuracy, precision, recall, f1 score and support
+
+    Args:
+        y_true: the truth labels
+        y_pred: (optional) the predictions (either y_pred or y_prob should be supplied)
+        y_prob: (optional) the probabilities (either y_pred or y_prob should be supplied)
+
+    Returns:
+        A 'dict' containing accuracy, precision, recall, f1 score and support
     """
+    # If y_pred is not supplied but y_prob is then calculatwe y_pred
+    if y_pred is None and y_prob is not None:
+        y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
+    elif y_pred is None and y_prob is None:
+        raise "y_pred or y_prob argument should be provided."
+
     # Calculate model accuracy
     model_accuracy = _sklearn.metrics.accuracy_score(y_true, y_pred) * 100
 

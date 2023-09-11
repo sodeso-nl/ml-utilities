@@ -19,8 +19,10 @@ def is_multiclass_classification(y_prob: any) -> bool:
         True if it is a multiclass classification, False if not.
 
     Raises:
-        TypeError: If `y_prob` is neither a list, tf.Tensor or np.array.
+        TypeError: If `y_prob` is neither a 'list', 'tf.Tensor' or 'np.array'.
     """
+    assert y_prob is not None, "y_prob is null"
+
     if isinstance(y_prob, list):
         return len(y_prob) > 0 and isinstance(y_prob[0], list) and len(y_prob[0]) > 1  # [[0.60, 0.10, 0.30], [....]]
     elif _tf.is_tensor(y_prob):
@@ -47,8 +49,10 @@ def is_binary_classification(y_prob: any) -> bool:
         True if it is a binary classification, False if not.
 
     Raises:
-        TypeError: If `y_prob` is neither a list, tf.Tensor or np.array.
+        TypeError: If `y_prob` is neither a  'list', 'tf.Tensor' or 'np.array'.
     """
+    assert y_prob is not None, "y_prob is null"
+
     if isinstance(y_prob, list):
         if len(y_prob) > 0 and isinstance(y_prob[0], list):
             if len(y_prob[0]) == 1: # [[1], [0], [1]]
@@ -91,14 +95,16 @@ def probability_to_class(y_prob: any) -> any:
     [1, 0, 2]
 
     Args:
-        y_prob: the probabilities matrix either a 'tf.Tensor' or a 'np.array'
+        y_prob: the probabilities matrix either a 'list', 'tf.Tensor' or a 'np.array'
 
     Returns:
         The sparse encoded classes
 
     Raises:
-        TypeError: If `x` is neither a tf.Tensor or np.array.
+        TypeError: If `y_prob` is neither a 'list', 'tf.Tensor' or 'np.array'.
     """
+    assert y_prob is not None, "y_prob is null"
+
     if isinstance(y_prob, list):
         return list(_np.argmax(y_prob, axis=1))
     elif _tf.is_tensor(y_prob):
@@ -128,15 +134,17 @@ def probability_to_binary(y_prob: any) -> any:
     ]
 
     Args:
-        y_prob: the probabilities matrix either a 'tf.Tensor' or a 'np.array'
+        y_prob: the probabilities matrix either a 'list', 'tf.Tensor' or a 'np.array'
         dtype: (optional) the destination type.
 
     Returns:
         Binarized prediction labels
 
     Raises:
-        TypeError: If `x` is neither a tf.Tensor or np.array.
+        TypeError: If `y_prob` is neither a 'list', 'tf.Tensor' or 'np.array'.
     """
+    assert y_prob is not None, "y_prob is null"
+
     if isinstance(y_prob, list):
         return list(_np.round(y_prob))
     if _tf.is_tensor(y_prob):
@@ -149,18 +157,20 @@ def probability_to_binary(y_prob: any) -> any:
     raise TypeError('y_prob should be of type list, tf.Tensor or np.array.')
 
 
-def to_prediction(y_prob: _Union[_tf.Tensor, _np.array]) -> _Union[_tf.Tensor, _np.array]:
+def to_prediction(y_prob: any) -> any:
     """
     Determines if the probability is a multiclass or binary classification and then will
     return the prediction in either class or binary form.
 
     Args:
-        y_prob: the probabilities matrix either a 'tf.Tensor' or a 'np.array'
+        y_prob: the probabilities matrix either a 'list', 'tf.Tensor' or a 'np.array'
         dtype:(optional, only applicable for binary classification) parameter to change the dtype
 
     Return:
         A tensor or numpy array with the prediction.
     """
+    assert y_prob is not None, "y_prob is null"
+
     if is_multiclass_classification(y_prob=y_prob):
         y_prob = probability_to_class(y_prob=y_prob)
     elif is_binary_classification(y_prob=y_prob):

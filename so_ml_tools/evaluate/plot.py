@@ -181,7 +181,7 @@ def report_f1_score(y_true, y_pred=None, y_prob=None, class_names: list[str] = N
 
     y_true = _soml.util.label.to_prediction(y_prob=y_true)
     if y_pred is None and y_prob is not None:
-        y_pred = _soml.util.label.to_prediction(y_prob=y_pred)
+        y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
     elif y_pred is None and y_prob is None:
         raise "y_pred or y_prob argument should be provided."
 

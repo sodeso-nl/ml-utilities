@@ -29,12 +29,11 @@ def embeddings(folder: str, text_vectorizer, embedding_weights = None, embedding
         raise 'No embedding weights specified, either specify embedding_weights or embedding_layer or model and embedding_layer_name.'
 
     vocabulary = text_vectorizer.get_vocabulary()
-    embed_weights = embedding_weights.get_weights()[0]
 
     for index, word in enumerate(vocabulary):
         if index == 0:
             continue  # skip 0, it's padding.
-        vec = embed_weights[index]
+        vec = embedding_weights[index]
         out_v.write('\t'.join([str(x) for x in vec]) + "\n")
         out_m.write(word + "\n")
     out_v.close()

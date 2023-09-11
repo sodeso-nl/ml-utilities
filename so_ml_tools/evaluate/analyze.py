@@ -146,3 +146,33 @@ def quality_metrics_diff(metrics_1: _pd.DataFrame, metrics_2: _pd.DataFrame) -> 
     complete = _pd.concat([m1, m2, diff])
     complete.reset_index(drop=True, inplace=True)
     return complete
+
+
+def quality_metrics_combine(metrics: dict, sort_by: list[str] = None, ascending: bool | list[bool] | tuple[bool, ...] = True) -> _pd.DataFrame:
+    """
+    Combines all the given metrics into a single overview, call with a dictionary:
+
+        {
+            "baseline": baseline_results,
+            "model_1": model_1_results,
+            "model_2": model_2_results,
+            "model_3": model_3_results
+        }
+
+    Args:
+        metrics: a dictionary of quality metrics pd.DataFrame objects where the key is the name.
+        sort_by: column to sort by, if None specified then the default "accuracy" will be used.
+        ascending: a 'list' or 'tuple' or boolean value containing the sort order.
+
+    Returns:
+        A 'pd.DataFrame' containing all quality metrics combined.
+    """
+    if sort_by is None:
+        sort_by = ["accuracy"]
+
+    all_metrics_results = _pd.concat(metrics)
+    all_metrics_results.reset_index(inplace=True)
+    _soml.pd.dataframe.drop_columns(dataframe=all_metrics_results, column_names=['level_1'])
+    all_metrics_results.rename(columns={"level_0": "name"}, inplace=True)
+    all_metrics_results.sort_values(by=sort_by, inplace=True, ascending=ascending)
+    return all_metrics_results

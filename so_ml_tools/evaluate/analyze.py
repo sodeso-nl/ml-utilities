@@ -86,7 +86,7 @@ def determine_outliers_for_binary_classification(x, y_true, y_pred, target_colum
     return _pd.concat([positive_outliers_sorted, negative_outliers_sorted])
 
 
-def quality_metrics(y_true, y_pred=None, y_prob=None) -> dict:
+def quality_metrics(y_true, y_pred=None, y_prob=None) -> _pd.DataFrame:
     """
     calculates model accuracy, precision, recall and F1-Score
 
@@ -109,14 +109,40 @@ def quality_metrics(y_true, y_pred=None, y_prob=None) -> dict:
 
     # Calculate precision, recall and F1-score using "weighted" average,
     # weighted will also take the amount of samples for each in mind.
-    model_precission, model_recall, model_f1_score, support = \
+    model_precission, model_recall, model_f1_score = \
         _sklearn.metrics.precision_recall_fscore_support(y_true, y_pred, average="weighted")
     model_results = \
         {
             "accuracy": model_accuracy,
             "precision": model_precission,
             "recall": model_recall,
-            "f1-score": model_f1_score,
-            "support": support
+            "f1-score": model_f1_score
         }
-    return dict(sorted(model_results.items()))
+    return _pd.DataFrame(data=dict(sorted(model_results.items())), index=[0])
+
+
+def quality_metrics_diff(metrics_1: _pd.DataFrame, metrics_2: _pd.DataFrame) -> _pd.DataFrame:
+    """
+    Returns the difference between 'metrics_1' and 'metrics_2'.
+
+    Args:
+        metrics_1: the first set of metrics
+        metrics_2: the second set of metrics
+
+    Returns
+        A new 'pd.DataFrame' with the values of 'metrics_1' and 'metrics_2' and difference between these two.
+    """
+    c1 = {'metrics': 'metrics_1'}
+    c1.update(metrics_1.to_dict('records')[0])
+    m1 = _pd.DataFrame(data=c1, index=[0])
+
+    c2 = {'metrics': 'metrics_2'}
+    c2.update(metrics_2.to_dict('records')[0])
+    m2 = _pd.DataFrame(data=c2, index=[0])
+
+    diff = (m1.iloc[0][1:] - m2.iloc[0][1:]).to_frame().transpose()
+    diff.insert(loc=0, column='metrics', value='diff')
+
+    complete = _pd.concat([m1, m2, diff])
+    complete.reset_index(drop=True, inplace=True)
+    return complete

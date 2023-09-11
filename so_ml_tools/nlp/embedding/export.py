@@ -22,7 +22,7 @@ def embeddings(folder: str, text_vectorizer, embedding_weights = None, embedding
 
     if embedding_weights is None and embedding_layer is not None:
         embedding_weights = embedding_layer.get_weights()[0]
-    elif embedding_weights and embedding_layer is None and embedding_layer_name is not None and model is not None:
+    elif embedding_weights is None and embedding_layer_name is not None and model is not None:
         embedding_weights = model.get_layer(name=embedding_layer_name).get_weights()[0]
 
     if embedding_weights is None:

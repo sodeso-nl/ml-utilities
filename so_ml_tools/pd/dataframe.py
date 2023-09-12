@@ -1,23 +1,14 @@
 import pandas as _pd
 import numpy as _np
 
-
-import numpy as np
-import tensorflow as tf
-import tensorflow_datasets as tfds
-import pandas as pd
-
-from pandas.api.types import is_numeric_dtype
 from sklearn.preprocessing import OneHotEncoder
-
-from keras.utils import image_dataset_from_directory
 
 ########################################################################################################################
 # General
 ########################################################################################################################
 
 
-def one_hot_encode_column(*columns: list[np.ndarray]) -> (OneHotEncoder, list[np.ndarray]):
+def one_hot_encode_column(*columns: list[any]) -> (OneHotEncoder, list[any]):
     """
     One-Hot encodes all given columns using all values of all the provided columns.
 
@@ -44,7 +35,7 @@ def one_hot_encode_column(*columns: list[np.ndarray]) -> (OneHotEncoder, list[np
     # Preprocess the columns
     preprocessed_columns = []
     for column in columns:
-        if isinstance(column, pd.DataFrame) or isinstance(column, pd.Series):
+        if isinstance(column, _pd.DataFrame) or isinstance(column, _pd.Series):
             column = column.to_numpy()
 
         # Make sure the column is two-dimensional
@@ -54,7 +45,7 @@ def one_hot_encode_column(*columns: list[np.ndarray]) -> (OneHotEncoder, list[np
         preprocessed_columns.append(column)
 
     # Concatenate all columns and fit the encoder
-    encoder.fit(np.concatenate(preprocessed_columns))
+    encoder.fit(_np.concatenate(preprocessed_columns))
 
     return_values = []
     # Transform each list now individually

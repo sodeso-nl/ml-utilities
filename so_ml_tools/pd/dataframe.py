@@ -2,6 +2,69 @@ import pandas as _pd
 import numpy as _np
 
 
+import numpy as np
+import tensorflow as tf
+import tensorflow_datasets as tfds
+import pandas as pd
+
+from pandas.api.types import is_numeric_dtype
+from sklearn.preprocessing import OneHotEncoder
+
+from keras.utils import image_dataset_from_directory
+
+########################################################################################################################
+# General
+########################################################################################################################
+
+
+def one_hot_encode_column(*columns: list[np.ndarray]) -> (OneHotEncoder, list[np.ndarray]):
+    """
+    One-Hot encodes all given columns using all values of all the provided columns.
+
+    Example usage:
+
+    encoder, train_labels_one_hot, val_labels_one_hot, test_labels_one_hot = \
+    one_hot_encode_column(
+        train_df['target'],
+        val_df['target'],
+        test_df['target']
+    )
+
+    If you get the ValueError:
+
+    all the input arrays must have same number of dimensions, but the array at index 0 has 1 dimension(s) and the array at index 1 has 2 dimension(s)
+
+    Then that means one of the lists passed in has ha different shape then the others.
+
+    :param columns: one or more columns
+    :return: first value is the encoder, all other values are in same order as the columns but encoded
+    """
+    encoder = OneHotEncoder(sparse_output=False)
+
+    # Preprocess the columns
+    preprocessed_columns = []
+    for column in columns:
+        if isinstance(column, pd.DataFrame) or isinstance(column, pd.Series):
+            column = column.to_numpy()
+
+        # Make sure the column is two-dimensional
+        if column.ndim == 1:
+            column = column.reshape(-1, 1)
+
+        preprocessed_columns.append(column)
+
+    # Concatenate all columns and fit the encoder
+    encoder.fit(np.concatenate(preprocessed_columns))
+
+    return_values = []
+    # Transform each list now individually
+    for preprocessed_column in preprocessed_columns:
+        return_values.append(encoder.transform(preprocessed_column))
+
+    return_values.insert(0, encoder)
+    return return_values
+
+
 def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_np.float64,
                            inplace=True) -> _pd.DataFrame:
     """

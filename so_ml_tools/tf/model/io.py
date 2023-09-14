@@ -7,7 +7,7 @@ import keras as _keras
 import so_ml_tools as _soml
 
 
-def save_model(model: _tf.keras.Model, filepath="./models/model.h5", save_format="h5") -> None:
+def save_model(model: _tf.keras.Model, filepath: str ="./models/model", save_format: str ="tf") -> None:
     """
     This method will call the default model.save method.
 
@@ -18,7 +18,7 @@ def save_model(model: _tf.keras.Model, filepath="./models/model.h5", save_format
     model.save(filepath=filepath, save_format=save_format)
 
 
-def load_model(filepath="./models/model.h5", custom_objects=None) -> _keras.Model:
+def load_model(filepath="./models/model", custom_objects=None) -> _keras.Model:
     """
     This method will call the default load_model method.
 
@@ -37,7 +37,7 @@ def load_model(filepath="./models/model.h5", custom_objects=None) -> _keras.Mode
     return _tf.keras.models.load_model(filepath=filepath, custom_objects=custom_objects)
 
 
-def save_weights(model: _tf.keras.Model, filepath: str, save_format="h5") -> None:
+def save_weights(model: _tf.keras.Model, filepath: str = "./models/model", save_format: str ="tf") -> None:
     """
     Saves only the weights of the model (see model.save_weights )
 
@@ -51,7 +51,7 @@ def save_weights(model: _tf.keras.Model, filepath: str, save_format="h5") -> Non
     model.save_weights(filepath, save_format=save_format)
 
 
-def load_weights(model: _tf.keras.Model, filepath: str) -> None:
+def load_weights(model: _tf.keras.Model, filepath: str = "./models/model") -> None:
     """
     Loads the weights into the given model.
 

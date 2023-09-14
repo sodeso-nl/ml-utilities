@@ -15,6 +15,7 @@ def download_file(source='https://www.download.com/file.zip', filepath='./data/f
     """
     if not overwrite and _os.path.exists(filepath):
         print(f'Download of {source} skipped, file {filepath} exists.')
+        return
 
     path = _os.path.dirname(filepath)
     if path:
@@ -37,9 +38,11 @@ def extract_tgz(filepath='./data/file.tar.gz', folder='./data') -> None:
     """
     if folder is None:
         folder = _os.path.dirname(filepath)
-    tgz_file = _tarfile.open(filepath)
-    tgz_file.extractall(path=folder)
-    tgz_file.close()
+
+    print(f"Extraction of {filepath} started.")
+    with _tarfile.open(name=filepath) as tObject:
+        tObject.extractall(path=folder)
+
     print(f"Extraction of {filepath} completed.")
 
 
@@ -53,9 +56,12 @@ def extract_zip(filepath='./data/file.zip', folder='./data') -> None:
     """
     if folder is None:
         folder = _os.path.dirname(filepath)
-    zip_file = _zipfile.ZipFile(filepath)
-    zip_file.extractall(path=folder)
-    zip_file.close()
+
+    print(f"Extraction of {filepath} started.")
+    with _zipfile.ZipFile(file=filepath) as zObject:
+        zObject.extractall(path=folder)
+
+    print(f"Extraction of {filepath} completed.")
 
 
 def list_dir_summary(folder='./data') -> None:

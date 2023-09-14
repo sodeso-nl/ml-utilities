@@ -50,7 +50,7 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
     fig.colorbar(cax)
 
     # Set labels to be classes
-    if class_names:
+    if class_names is not None:
         labels = class_names
     else:
         labels = _np.arange(cm.shape[0])

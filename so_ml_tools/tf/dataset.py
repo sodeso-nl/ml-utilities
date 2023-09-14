@@ -2,6 +2,38 @@ import tensorflow as _tf
 import so_ml_tools as _soml
 
 
+def describe(dataset: _tf.data.Dataset) -> None:
+    """
+    Describes the input / output shapes and dtype's for the given `tf.data.Dataset`
+
+    Args:
+        dataset: a `tf.data.Dataset`
+    """
+    if isinstance(dataset.element_spec, tuple):
+        inputs = dataset.element_spec[0]
+        outputs = dataset.element_spec[1]
+
+        print(f"          | {'shape':<16} | dtype")
+        for i, input in enumerate(inputs):
+            print(f"Input  #{i} | {str(input.shape):<16} | {str(input.dtype.name)}")
+
+        if isinstance(outputs, _tf.TensorSpec):
+            print(f"Output    | {str(outputs.shape):<16} | {str(outputs.dtype.name)}")
+
+
+def batch_and_prefetch(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
+    """
+    Returns a dataset with batching enabled (size 32) and prefetching.
+
+    Args:
+        dataset: a `tf.data.Dataset`
+
+    Returns:
+        A `tf.data.Dataset` with batching and prefetching.
+    """
+    return dataset.batch(batch_size=32).prefetch(_tf.data.AUTOTUNE)
+
+
 def get_class_names_from_dataset_info(ds_info: dict):
     """
     Returns the labels from the dataset info object which is created from loading a

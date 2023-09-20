@@ -43,7 +43,7 @@ def batch_and_prefetch(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
         return dataset.prefetch(_tf.data.AUTOTUNE)
 
     if is_prefetched(dataset=dataset):
-        print('Dataset is already prefetched, only batch is added.')
+        print('Dataset is already prefetched, only batch is added, NOTE: adding batching after prefetch is not recommended')
         return dataset.batch(batch_size=32)
 
     return dataset.batch(batch_size=32).prefetch(_tf.data.AUTOTUNE)
@@ -125,6 +125,20 @@ def is_prefetched(dataset: _tf.data.Dataset) -> bool:
         input_dataset = input_dataset._input_dataset
 
     return dataset.__class__.__name__ == '_PrefetchDataset'
+
+
+def is_cached(dataset: _tf.data.Dataset) -> bool:
+    if not isinstance(dataset, _tf.data.Dataset):
+        raise TypeError('dataset is not a tf.data.Dataset')
+
+    if dataset.__class__.__name__ == 'CacheDataset':
+        return True
+
+    input_dataset = dataset._input_dataset
+    while not input_dataset.__class__.__name__ == 'CacheDataset' and hasattr(input_dataset, '_input_dataset'):
+        input_dataset = input_dataset._input_dataset
+
+    return dataset.__class__.__name__ == 'CacheDataset'
 
 
 def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)):

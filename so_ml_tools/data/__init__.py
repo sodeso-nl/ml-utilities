@@ -2,12 +2,14 @@ from . import (
     image,
     loader,
     normalize,
-    split
+    split,
+    plot
 )
 
 __all__ = [
     "image",
     "loader",
     "normalize",
-    "split"
+    "split",
+    "plot"
 ]

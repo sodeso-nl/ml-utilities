@@ -24,6 +24,7 @@ def download_file(source='https://www.download.com/file.zip', filepath='./data/f
         _os.path.join('./', filepath)
 
     # noinspection PyUnresolvedReferences
+    print(f'Download of {source} started.')
     _urllib.request.urlretrieve(source, filepath)
     print(f'Download of {source} completed.')
 

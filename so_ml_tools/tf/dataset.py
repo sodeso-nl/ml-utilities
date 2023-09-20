@@ -34,9 +34,17 @@ def batch_and_prefetch(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
+    if is_prefetched(dataset=dataset) and is_batched(dataset=dataset):
+        print('Dataset is already batched and prefetched, no changes made.')
+        return dataset
+
     if is_batched(dataset=dataset):
         print('Dataset is already batched, only prefetch is added.')
         return dataset.prefetch(_tf.data.AUTOTUNE)
+
+    if is_prefetched(dataset=dataset):
+        print('Dataset is already prefetched, only batch is added.')
+        return dataset.batch(batch_size=32)
 
     return dataset.batch(batch_size=32).prefetch(_tf.data.AUTOTUNE)
 
@@ -95,14 +103,28 @@ def is_batched(dataset: _tf.data.Dataset) -> bool:
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
-    if hasattr(dataset, '_batch_size'):
+    if dataset.__class__.__name__ == '_BatchDataset':
         return True
 
     input_dataset = dataset._input_dataset
-    while not hasattr(input_dataset, '_batch_size') and hasattr(input_dataset, '_input_dataset'):
+    while not input_dataset.__class__.__name__ == '_BatchDataset' and hasattr(input_dataset, '_input_dataset'):
         input_dataset = input_dataset._input_dataset
 
-    return hasattr(input_dataset, '_batch_size')
+    return dataset.__class__.__name__ == '_BatchDataset'
+
+
+def is_prefetched(dataset: _tf.data.Dataset) -> bool:
+    if not isinstance(dataset, _tf.data.Dataset):
+        raise TypeError('dataset is not a tf.data.Dataset')
+
+    if dataset.__class__.__name__ == '_PrefetchDataset':
+        return True
+
+    input_dataset = dataset._input_dataset
+    while not input_dataset.__class__.__name__ == '_PrefetchDataset' and hasattr(input_dataset, '_input_dataset'):
+        input_dataset = input_dataset._input_dataset
+
+    return dataset.__class__.__name__ == '_PrefetchDataset'
 
 
 def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)):

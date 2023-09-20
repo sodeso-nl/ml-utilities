@@ -27,7 +27,7 @@ def create_augmentation_layer(random_flip_h=True,
         steps.append(_keras.layers.RandomWidth(factor=.2))
 
     if random_zoom:
-        steps.append(_keras.layers.RandomZoom(factor=.2))
+        steps.append(_keras.layers.RandomZoom(height_factor=.2, width_factor=.2))
 
     if rescaling:
         steps.append(_keras.layers.Rescaling(factor=1 / 255.))

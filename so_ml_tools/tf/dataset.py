@@ -31,6 +31,13 @@ def batch_and_prefetch(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     Returns:
         A `tf.data.Dataset` with batching and prefetching.
     """
+    if not isinstance(dataset, _tf.data.Dataset):
+        raise TypeError('dataset is not a tf.data.Dataset')
+
+    if is_batched(dataset=dataset):
+        print('Dataset is already batched, only prefetch is added.')
+        return dataset.prefetch(_tf.data.AUTOTUNE)
+
     return dataset.batch(batch_size=32).prefetch(_tf.data.AUTOTUNE)
 
 
@@ -54,6 +61,9 @@ def get_class_names(dataset: _tf.data.Dataset):
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
+    if not hasattr(dataset, 'class_names'):
+        raise TypeError("dataset does not have a ´class_names´ attribute defined.")
+
     return dataset.class_names
 
 
@@ -65,20 +75,34 @@ def get_labels(dataset: _tf.data.Dataset):
     :return: the labels
     """
     if not isinstance(dataset, _tf.data.Dataset):
-      raise TypeError('dataset is not a tf.data.Dataset')
+        raise TypeError('dataset is not a tf.data.Dataset')
 
     input_dataset = dataset._input_dataset
     while not hasattr(input_dataset, '_batch_size') and hasattr(input_dataset, '_input_dataset'):
-      input_dataset = input_dataset._input_dataset
+        input_dataset = input_dataset._input_dataset
 
     if hasattr(input_dataset, '_batch_size'):
-      dataset = dataset.unbatch()
+        dataset = dataset.unbatch()
 
     y_labels = []
     for _, labels in dataset:
         y_labels.append(labels.numpy())
 
     return y_labels
+
+
+def is_batched(dataset: _tf.data.Dataset) -> bool:
+    if not isinstance(dataset, _tf.data.Dataset):
+        raise TypeError('dataset is not a tf.data.Dataset')
+
+    if hasattr(dataset, '_batch_size'):
+        return True
+
+    input_dataset = dataset._input_dataset
+    while not hasattr(input_dataset, '_batch_size') and hasattr(input_dataset, '_input_dataset'):
+        input_dataset = input_dataset._input_dataset
+
+    return hasattr(input_dataset, '_batch_size')
 
 
 def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)):

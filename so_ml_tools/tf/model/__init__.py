@@ -1,13 +1,17 @@
 from . import (
-    layer,
+    inspect,
     plot,
     predict,
-    io
+    io,
+    augment,
+    layer
 )
 
 __all__ = [
-    "layer",
-    "plot",
-    "predict",
-    "io"
+    'inspect',
+    'plot',
+    'predict',
+    'io',
+    'augment',
+    'layer'
 ]

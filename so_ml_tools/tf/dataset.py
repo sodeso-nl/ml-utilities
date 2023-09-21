@@ -36,21 +36,27 @@ def optimize_pipeline(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
+    # Add batching when possible.
     if is_batched(dataset=dataset):
         print('Dataset is already batched.')
         return dataset
     else:
+        print('Batching added to dataset.')
         dataset = dataset.batch(batch_size=32)
 
+    # Add caching when possible.
     if is_cached(dataset=dataset):
         print('Dataset is already cached.')
     else:
+        print('Caching added to dataset.')
         dataset = dataset.cache()
 
+    # Add prefetching when possible.
     if is_prefetched(dataset=dataset):
         print('Dataset is already prefetched.')
     else:
-        dataset = dataset.batch(batch_size=32)
+        print('Caching added to dataset.')
+        dataset = dataset.prefetch(_tf.data.AUTOTUNE)
 
     return dataset
 

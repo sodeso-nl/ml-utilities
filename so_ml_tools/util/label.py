@@ -24,7 +24,7 @@ def is_multiclass_classification(y_prob: any) -> bool:
     assert y_prob is not None, "y_prob is null"
 
     if isinstance(y_prob, list):
-        return len(y_prob) > 0 and isinstance(y_prob[0], list) and len(y_prob[0]) > 1  # [[0.60, 0.10, 0.30], [....]]
+        return len(y_prob) > 0 and isinstance(y_prob[0], (list | _np.ndarray)) and len(y_prob[0]) > 1  # [[0.60, 0.10, 0.30], [....]]
     elif _tf.is_tensor(y_prob):
         return y_prob.get_shape().ndims == 2 and y_prob.shape[1] > 1  # [[0.60, 0.10, 0.30], [....]]
     elif isinstance(y_prob, _np.ndarray):
@@ -54,7 +54,7 @@ def is_binary_classification(y_prob: any) -> bool:
     assert y_prob is not None, "y_prob is null"
 
     if isinstance(y_prob, list):
-        if len(y_prob) > 0 and isinstance(y_prob[0], list):
+        if len(y_prob) > 0 and isinstance(y_prob[0], (list | _np.ndarray)):
             if len(y_prob[0]) == 1: # [[1], [0], [1]]
                 if 0 <= _np.max(y_prob) <= 2:
                     return True
@@ -177,3 +177,13 @@ def to_prediction(y_prob: any) -> any:
         y_prob = probability_to_binary(y_prob=y_prob)
 
     return y_prob
+
+
+def is_one_hot(x):
+    """
+    Check if the given x is a one-hot encoded value.
+
+    Args:
+        x: the value to check
+    """
+    return (x.sum(axis=1)-_np.ones(x.shape[0])).sum() == 0

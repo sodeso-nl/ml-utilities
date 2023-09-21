@@ -2,7 +2,25 @@ import tensorflow as _tf
 import so_ml_tools as _soml
 
 
-def describe(dataset: _tf.data.Dataset) -> None:
+def describe_pipeline(dataset: _tf.data.Dataset):
+    """
+    Describes the different steps in the `tf.data.Dataset` pipeline.
+
+    :param dataset: the dataset.
+    """
+    if not isinstance(dataset, _tf.data.Dataset):
+        raise TypeError('dataset is not a tf.data.Dataset')
+
+    input_dataset = dataset
+    print(f"{input_dataset.__class__.__name__}", end="")
+
+    while hasattr(input_dataset, '_input_dataset'):
+        print(" -> ", end="")
+        input_dataset = input_dataset._input_dataset
+        print(f"{input_dataset.__class__.__name__}", end="")
+
+
+def describe_inputs_and_outputs(dataset: _tf.data.Dataset) -> None:
     """
     Describes the input / output shapes and dtype's for the given `tf.data.Dataset`
 
@@ -150,6 +168,17 @@ def is_cached(dataset: _tf.data.Dataset) -> bool:
         input_dataset = input_dataset._input_dataset
 
     return input_dataset.__class__.__name__ == 'CacheDataset'
+
+
+def is_shuffled(dataset: _tf.data.Dataset) -> bool:
+    if not isinstance(dataset, _tf.data.Dataset):
+        raise TypeError('dataset is not a tf.data.Dataset')
+
+    input_dataset = dataset
+    while not input_dataset.__class__.__name__ == '_ShuffleDataset' and hasattr(input_dataset, '_input_dataset'):
+        input_dataset = input_dataset._input_dataset
+
+    return input_dataset.__class__.__name__ == '_ShuffleDataset'
 
 
 def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)):

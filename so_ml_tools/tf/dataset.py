@@ -16,7 +16,7 @@ def describe(dataset: _tf.data.Dataset) -> None:
         print(f"          | {'shape':<16} | dtype")
         # In case of a single input
         if isinstance(inputs, _tf.TensorSpec):
-            print(f"Input    | {str(inputs.shape):<16} | {str(inputs.dtype.name)}")
+            print(f"Input     | {str(inputs.shape):<16} | {str(inputs.dtype.name)}")
         else:
             # In case of multiple concatenated datasets.
             for i, input in enumerate(inputs):

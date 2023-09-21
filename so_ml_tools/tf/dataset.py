@@ -13,17 +13,17 @@ def describe(dataset: _tf.data.Dataset) -> None:
         inputs = dataset.element_spec[0]
         outputs = dataset.element_spec[1]
 
-        print(f"          | {'shape':<16} | dtype")
+        print(f"          | {'dtype':<16} | shape")
         # In case of a single input
         if isinstance(inputs, _tf.TensorSpec):
-            print(f"Input     | {str(inputs.shape):<16} | {str(inputs.dtype.name)}")
+            print(f"Input     | {str(inputs.dtype.name):<16} | {str(inputs.shape)}")
         else:
             # In case of multiple concatenated datasets.
             for i, input in enumerate(inputs):
-                print(f"Input  #{i} | {str(input.shape):<16} | {str(input.dtype.name)}")
+                print(f"Input  #{i} | {str(input.dtype.name):<16} | {str(input.shape)}")
 
         if isinstance(outputs, _tf.TensorSpec):
-            print(f"Output    | {str(outputs.shape):<16} | {str(outputs.dtype.name)}")
+            print(f"Output    | {str(outputs.dtype.name):<16} | {str(outputs.shape)}")
 
 
 def optimize_pipeline(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
@@ -44,7 +44,6 @@ def optimize_pipeline(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     # Add batching when possible.
     if is_batched(dataset=dataset):
         print('Dataset is already batched.')
-        return dataset
     else:
         print('Batching added to dataset.')
         dataset = dataset.batch(batch_size=32)

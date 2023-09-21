@@ -59,7 +59,7 @@ def optimize_pipeline(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     if is_prefetched(dataset=dataset):
         print('Dataset is already prefetched.')
     else:
-        print('Caching added to dataset.')
+        print('Prefetching added to dataset.')
         dataset = dataset.prefetch(_tf.data.AUTOTUNE)
 
     return dataset
@@ -105,7 +105,7 @@ def get_labels(dataset: _tf.data.Dataset):
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
-    input_dataset = dataset._input_dataset
+    input_dataset = dataset
     while not hasattr(input_dataset, '_batch_size') and hasattr(input_dataset, '_input_dataset'):
         input_dataset = input_dataset._input_dataset
 
@@ -123,42 +123,33 @@ def is_batched(dataset: _tf.data.Dataset) -> bool:
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
-    if dataset.__class__.__name__ == '_BatchDataset':
-        return True
-
-    input_dataset = dataset._input_dataset
+    input_dataset = dataset
     while not input_dataset.__class__.__name__ == '_BatchDataset' and hasattr(input_dataset, '_input_dataset'):
         input_dataset = input_dataset._input_dataset
 
-    return dataset.__class__.__name__ == '_BatchDataset'
+    return input_dataset.__class__.__name__ == '_BatchDataset'
 
 
 def is_prefetched(dataset: _tf.data.Dataset) -> bool:
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
-    if dataset.__class__.__name__ == '_PrefetchDataset':
-        return True
-
-    input_dataset = dataset._input_dataset
+    input_dataset = dataset
     while not input_dataset.__class__.__name__ == '_PrefetchDataset' and hasattr(input_dataset, '_input_dataset'):
         input_dataset = input_dataset._input_dataset
 
-    return dataset.__class__.__name__ == '_PrefetchDataset'
+    return input_dataset.__class__.__name__ == '_PrefetchDataset'
 
 
 def is_cached(dataset: _tf.data.Dataset) -> bool:
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
-    if dataset.__class__.__name__ == 'CacheDataset':
-        return True
-
-    input_dataset = dataset._input_dataset
+    input_dataset = dataset
     while not input_dataset.__class__.__name__ == 'CacheDataset' and hasattr(input_dataset, '_input_dataset'):
         input_dataset = input_dataset._input_dataset
 
-    return dataset.__class__.__name__ == 'CacheDataset'
+    return input_dataset.__class__.__name__ == 'CacheDataset'
 
 
 def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)):

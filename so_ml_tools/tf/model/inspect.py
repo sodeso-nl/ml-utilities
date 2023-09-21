@@ -73,11 +73,18 @@ def list_model(model, recursive=True, include_trainable=True, include_non_traina
                             include_non_trainable=include_non_trainable)
     list_layers(layers=layers, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
 
+    total_params = sum([_tf.size(var).numpy() for var in model.variables])
+    trainable_params = sum([_tf.size(var).numpy() for var in model.trainable_variables])
+    non_trainable_params = total_params - trainable_params
+
+    print(f"\nTotal params: {total_params:,}")
+    print(f"Trainable params: {trainable_params:,}")
+    print(f"Non-trainable params: {non_trainable_params:,}")
+
 
 def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, include_non_trainable=True) -> None:
     layer_name_col_width = len(max(list(map(lambda l: l.name, layers)), key=len))
     layer_type_col_width = len(max(list(map(lambda l: type(l).__name__, layers)), key=len))
-    layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), layers)), key=len))
     layer_dtype_col_width = len(max(list(map(lambda l: str(l.dtype), layers)), key=len))
     layer_dtype_policy_col_width = len(max(list(map(lambda l: str(l.dtype_policy.name), layers)), key=len))
 
@@ -85,6 +92,7 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
         f"{'row':<5} | {'name (type)':<{layer_name_col_width + layer_type_col_width + 3}} | {'dtype':<{layer_dtype_col_width}} | {'policy':<{layer_dtype_policy_col_width}} | trainable | output shape")
     for layer_number, layer in enumerate(layers):
         if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable is False):
+            params = sum([_tf.size(var).numpy() for var in layer.trainable_variables])
             print(
                 f"{layer_number:<5} | {layer.name:<{layer_name_col_width}} ({type(layer).__name__:<{layer_type_col_width}}) | {str(layer.dtype):<{layer_dtype_col_width}} | {str(layer.dtype_policy.name):<{layer_dtype_policy_col_width}} | {str(layer.trainable):<9} | "
-                f"{str(layer.output_shape):<{layer_shape_col_width}}")
+                f"{str(layer.output_shape)}{params:,}")

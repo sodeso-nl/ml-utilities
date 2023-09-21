@@ -14,8 +14,13 @@ def describe(dataset: _tf.data.Dataset) -> None:
         outputs = dataset.element_spec[1]
 
         print(f"          | {'shape':<16} | dtype")
-        for i, input in enumerate(inputs):
-            print(f"Input  #{i} | {str(input.shape):<16} | {str(input.dtype.name)}")
+        # In case of a single input
+        if isinstance(inputs, _tf.TensorSpec):
+            print(f"Input    | {str(inputs.shape):<16} | {str(inputs.dtype.name)}")
+        else:
+            # In case of multiple concatenated datasets.
+            for i, input in enumerate(inputs):
+                print(f"Input  #{i} | {str(input.shape):<16} | {str(input.dtype.name)}")
 
         if isinstance(outputs, _tf.TensorSpec):
             print(f"Output    | {str(outputs.shape):<16} | {str(outputs.dtype.name)}")
@@ -81,7 +86,7 @@ def get_class_names(dataset: _tf.data.Dataset):
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
-    input_dataset = dataset._input_dataset
+    input_dataset = dataset
     while not hasattr(input_dataset, 'class_names') and hasattr(input_dataset, '_input_dataset'):
         input_dataset = input_dataset._input_dataset
 

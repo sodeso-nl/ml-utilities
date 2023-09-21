@@ -21,9 +21,11 @@ def describe(dataset: _tf.data.Dataset) -> None:
             print(f"Output    | {str(outputs.shape):<16} | {str(outputs.dtype.name)}")
 
 
-def batch_and_prefetch(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
+def optimize_pipeline(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     """
-    Returns a dataset with batching enabled (size 32) and prefetching.
+    Returns a dataset with (when possible), batching, caching and prefetch in that order, if any of the steps has
+    already been applied then it will skip this. For example, creating a dataset using load_image_dataset_from_directory
+    will already create a batching dataset, so this method will only add caching and prefetching.
 
     Args:
         dataset: a `tf.data.Dataset`
@@ -34,19 +36,23 @@ def batch_and_prefetch(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
-    if is_prefetched(dataset=dataset) and is_batched(dataset=dataset):
-        print('Dataset is already batched and prefetched, no changes made.')
-        return dataset
-
     if is_batched(dataset=dataset):
-        print('Dataset is already batched, only prefetch is added.')
-        return dataset.prefetch(_tf.data.AUTOTUNE)
+        print('Dataset is already batched.')
+        return dataset
+    else:
+        dataset = dataset.batch(batch_size=32)
+
+    if is_cached(dataset=dataset):
+        print('Dataset is already cached.')
+    else:
+        dataset = dataset.cache()
 
     if is_prefetched(dataset=dataset):
-        print('Dataset is already prefetched, only batch is added, NOTE: adding batching after prefetch is not recommended')
-        return dataset.batch(batch_size=32)
+        print('Dataset is already prefetched.')
+    else:
+        dataset = dataset.batch(batch_size=32)
 
-    return dataset.batch(batch_size=32).prefetch(_tf.data.AUTOTUNE)
+    return dataset
 
 
 def get_class_names_from_dataset_info(ds_info: dict):
@@ -73,10 +79,10 @@ def get_class_names(dataset: _tf.data.Dataset):
     while not hasattr(input_dataset, 'class_names') and hasattr(input_dataset, '_input_dataset'):
         input_dataset = input_dataset._input_dataset
 
-    if not hasattr(dataset, 'class_names'):
+    if not hasattr(input_dataset, 'class_names'):
         raise TypeError("dataset does not have a ´class_names´ attribute defined.")
 
-    return dataset.class_names
+    return input_dataset.class_names
 
 
 def get_labels(dataset: _tf.data.Dataset):

@@ -69,6 +69,10 @@ def get_class_names(dataset: _tf.data.Dataset):
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
+    input_dataset = dataset._input_dataset
+    while not hasattr(input_dataset, 'class_names') and hasattr(input_dataset, '_input_dataset'):
+        input_dataset = input_dataset._input_dataset
+
     if not hasattr(dataset, 'class_names'):
         raise TypeError("dataset does not have a ´class_names´ attribute defined.")
 

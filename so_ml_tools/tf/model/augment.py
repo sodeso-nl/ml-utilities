@@ -6,8 +6,7 @@ def create_augmentation_layer(random_flip_h=True,
                               random_rotate=True,
                               random_height=False,
                               random_width=False,
-                              random_zoom=True,
-                              rescaling=True) -> _keras.Sequential:
+                              random_zoom=True) -> _keras.Sequential:
     steps = []
     if random_flip_h or random_flip_v:
         if random_flip_h and random_flip_v:
@@ -28,8 +27,5 @@ def create_augmentation_layer(random_flip_h=True,
 
     if random_zoom:
         steps.append(_keras.layers.RandomZoom(.2))
-
-    if rescaling:
-        steps.append(_keras.layers.Rescaling(1/255.))
 
     return _keras.Sequential(steps, name='data_augmentation')

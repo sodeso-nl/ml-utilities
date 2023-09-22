@@ -44,11 +44,32 @@ def describe_inputs_and_outputs(dataset: _tf.data.Dataset) -> None:
             print(f"Output    | {str(outputs.dtype.name):<16} | {str(outputs.shape)}")
 
 
+def add_rescaling_mapping(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
+    """
+    Adds a rescale mapping to the dataset (0-255 -> 0-1)
+
+    Preferably do this before using `optimize_pipeline`
+
+    Args:
+        dataset: a `tf.data.Dataset`
+
+    Returns:
+        A `tf.data.Dataset` with rescaling.
+    """
+    return dataset.map(_rescale)
+
+
+def _rescale(x, y):
+    return x / 255., y
+
+
 def optimize_pipeline(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     """
     Returns a dataset with (when possible), batching, caching and prefetch in that order, if any of the steps has
     already been applied then it will skip this. For example, creating a dataset using load_image_dataset_from_directory
     will already create a batching dataset, so this method will only add caching and prefetching.
+
+    Preferably do this after using `add_rescaling_mapping`
 
     Args:
         dataset: a `tf.data.Dataset`

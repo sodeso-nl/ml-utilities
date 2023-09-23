@@ -53,14 +53,15 @@ def early_stopping_callback(monitor='val_loss',
                           start_from_epoch=start_from_epoch)
 
 
-def model_checkpoint_callback(experiment_name: str,
-                              dir_name='./checkpoints',
+def model_checkpoint_callback(dir_name='./checkpoints',
+                              experiment_name='my_base_model',
+                              file_name='/model-epoch-{{epoch:02d}}-{metric}-{{{metric}:.2f}}.hdf5',
                               metric='val_loss',
-                              save_weights_only=False,
-                              save_best_only=False,
+                              save_weights_only=True,
+                              save_best_only=True,
                               save_freq='epoch',
-                              verbose=1) -> _ModelCheckpoint:
-    log_dir = dir_name + '/' + experiment_name + f'/model-epoch-{{epoch:02d}}-{metric}-{{{metric}:.2f}}.hdf5'
+                              verbose=0) -> _ModelCheckpoint:
+    log_dir = dir_name + '/' + experiment_name + f'{eval(file_name)}'
     return _ModelCheckpoint(filepath=log_dir,
                             monitor=metric,
                             save_weights_only=save_weights_only,

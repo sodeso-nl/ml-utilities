@@ -7,14 +7,7 @@ from keras.callbacks import EarlyStopping as _EarlyStopping
 from keras.callbacks import ReduceLROnPlateau as _ReduceLROnPlateau
 
 import datetime
-
-__all__ = [
-    "reduce_lr_on_plateau_callback",
-    "early_stopping_callback",
-    "model_checkpoint_callback",
-    "learning_rate_scheduler_callback",
-    "tensorboard_callback"
-]
+import os
 
 
 def reduce_lr_on_plateau_callback(monitor="val_loss",
@@ -54,14 +47,14 @@ def early_stopping_callback(monitor='val_loss',
 
 
 def model_checkpoint_callback(dir_name='./checkpoints',
-                              experiment_name='my_base_model',
-                              file_name='/model-epoch-{{epoch:02d}}-{metric}-{{{metric}:.2f}}.hdf5',
+                              experiment_name='/experiment',
+                              file_name='/epoch-{{epoch:02d}}-{metric}-{{{metric}:.2f}}.hdf5',
                               metric='val_loss',
                               save_weights_only=True,
                               save_best_only=True,
                               save_freq='epoch',
-                              verbose=0) -> _ModelCheckpoint:
-    log_dir = dir_name + '/' + experiment_name + f'{eval(file_name)}'
+                              verbose=1) -> _ModelCheckpoint:
+    log_dir = os.path.join(dir_name, experiment_name, f'{eval(file_name)}')
     return _ModelCheckpoint(filepath=log_dir,
                             monitor=metric,
                             save_weights_only=save_weights_only,

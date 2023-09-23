@@ -66,7 +66,7 @@ def load_weights(model: _tf.keras.Model, filepath: str = "./models/model") -> No
     """
 
     # Collect all layers that are trainable
-    trainable_layer_names = _soml.tf.model.layer.collect_layer_names(model, recursive=True, include_trainable=True,
+    trainable_layer_names = _soml.tf.model.inspect.collect_layer_names(model, recursive=True, include_trainable=True,
                                                                      include_non_trainable=False)
 
     # Disable training completely

@@ -88,7 +88,6 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
     layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), layers)), key=len))
     layer_dtype_col_width = len(max(list(map(lambda l: str(l.dtype), layers)), key=len))
     layer_dtype_policy_col_width = len(max(list(map(lambda l: str(l.dtype_policy.name), layers)), key=len))
-    layer_variables_col_width = len(max(list(map(lambda l: str(l.variables), layers)), key=len))
 
     print(
         f"{'row':<5} | "
@@ -97,21 +96,26 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
         f"{'policy':<{layer_dtype_policy_col_width}} | "
         f"trainable | "
         f"{'output shape':<{layer_shape_col_width}} | "
-        f"{'Total Param #':<{layer_variables_col_width}} |"
-        f"{'Trainable Param #':<{layer_variables_col_width}} |"
-        f"{'Non-trainable Param #':<{layer_variables_col_width}}")
+        f"{'Total Param #'} | "
+        f"{'Trainable Param #'} | "
+        f"{'Non-trainable Param #'}")
     for layer_number, layer in enumerate(layers):
         if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable is False):
             total_params = sum([_tf.size(var).numpy() for var in layer.variables])
             trainaible_params = sum([_tf.size(var).numpy() for var in layer.trainable_variables])
             non_trainable_params = total_params - trainaible_params
+
+            total_params_s = f"{total_params:,}"
+            trainaible_params_s = f"{trainaible_params:,}"
+            non_trainable_params_s = f"{non_trainable_params:,}"
+
             print(
                 f"{layer_number:<5} | "
                 f"{layer.name:<{layer_name_col_width}} ({type(layer).__name__:<{layer_type_col_width}}) | "
                 f"{str(layer.dtype):<{layer_dtype_col_width}} | "
                 f"{str(layer.dtype_policy.name):<{layer_dtype_policy_col_width}} | "
                 f"{str(layer.trainable):<9} | "
-                f"{str(layer.output_shape):<{layer_shape_col_width}} |"
-                f"{str(total_params):<{layer_variables_col_width}} |"
-                f"{str(trainaible_params):<{layer_variables_col_width}} |"
-                f"{str(non_trainable_params):<{layer_variables_col_width}}")
+                f"{str(layer.output_shape):<{layer_shape_col_width}} | "
+                f"{total_params_s:<{len('Total Param #')}} | "
+                f"{trainaible_params_s:<{len('Trainable Param #')}} | "
+                f"{non_trainable_params_s:<{len('Non-trainable Param #')}}")

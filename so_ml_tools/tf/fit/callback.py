@@ -11,13 +11,13 @@ import os
 
 
 def reduce_lr_on_plateau_callback(monitor="val_loss",
-                                  factor=0.5,
+                                  factor=0.2,
                                   patience=4,
                                   verbose=1,
                                   mode="auto",
                                   min_delta=1e-4,
                                   cooldown=0,
-                                  min_lr=1e-6) -> _ReduceLROnPlateau:
+                                  min_lr=1e-7) -> _ReduceLROnPlateau:
     return _ReduceLROnPlateau(monitor=monitor,
                               factor=factor,
                               patience=patience,
@@ -53,7 +53,7 @@ def model_checkpoint_callback(dir_name='./checkpoints',
                               save_weights_only=True,
                               save_best_only=True,
                               save_freq='epoch',
-                              verbose=1) -> _ModelCheckpoint:
+                              verbose=0) -> _ModelCheckpoint:
     log_dir = os.path.join(dir_name, experiment_name, file_name)
     return _ModelCheckpoint(filepath=log_dir,
                             monitor=metric,

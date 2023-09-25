@@ -89,7 +89,7 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
     for layer_number, layer in enumerate(layers):
         if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable is False):
             total_params_s = trainaible_params_s = non_trainable_params_s = output_shape = 'unknown'
-            if len(layer._inbound_nodes) > 0:
+            if layer.built:
                 output_shape = layer.output_shape
 
                 total_params = sum([_tf.size(var).numpy() for var in layer.variables])

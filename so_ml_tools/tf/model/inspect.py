@@ -70,7 +70,8 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
 
     # Filter to have only called layers.
     called_layers = filter(lambda layer: len(layer._inbound_nodes) > 0, layers)
-    layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), called_layers)), key=len, default='output_shape'))
+    layer_shape_col_width = len(
+        max(list(map(lambda l: str(l.output_shape), called_layers)), key=len, default='output_shape'))
 
     layer_dtype_col_width = len(max(list(map(lambda l: str(l.dtype), layers)), key=len))
     layer_dtype_policy_col_width = len(max(list(map(lambda l: str(l.dtype_policy.name), layers)), key=len))
@@ -87,17 +88,17 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
         f"{'Non-trainable Param #'}")
     for layer_number, layer in enumerate(layers):
         if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable is False):
-            total_params = sum([_tf.size(var).numpy() for var in layer.variables])
-            trainaible_params = sum([_tf.size(var).numpy() for var in layer.trainable_variables])
-            non_trainable_params = total_params - trainaible_params
-
-            total_params_s = f"{total_params:,}"
-            trainaible_params_s = f"{trainaible_params:,}"
-            non_trainable_params_s = f"{non_trainable_params:,}"
-
-            output_shape = 'unknown'
+            total_params_s = trainaible_params_s = non_trainable_params_s = output_shape = 'unknown'
             if len(layer._inbound_nodes) > 0:
                 output_shape = layer.output_shape
+
+                total_params = sum([_tf.size(var).numpy() for var in layer.variables])
+                trainaible_params = sum([_tf.size(var).numpy() for var in layer.trainable_variables])
+                non_trainable_params = total_params - trainaible_params
+
+                total_params_s = f"{total_params:,}"
+                trainaible_params_s = f"{trainaible_params:,}"
+                non_trainable_params_s = f"{non_trainable_params:,}"
 
             print(
                 f"{layer_number:<5} | "

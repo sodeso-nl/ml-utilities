@@ -68,7 +68,8 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
     layer_name_col_width = len(max(list(map(lambda l: l.name, layers)), key=len))
     layer_type_col_width = len(max(list(map(lambda l: type(l).__name__, layers)), key=len))
 
-    called_layers = filter(lambda layer: not layer._inbound_nodes, layers)
+    # Filter to have only called layers.
+    called_layers = filter(lambda layer: len(layer._inbound_nodes) > 0, layers)
     layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), called_layers)), key=len))
 
     layer_dtype_col_width = len(max(list(map(lambda l: str(l.dtype), layers)), key=len))

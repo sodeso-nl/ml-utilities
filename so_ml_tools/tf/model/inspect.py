@@ -55,13 +55,14 @@ def list_model(model, recursive=True, include_trainable=True, include_non_traina
                             include_non_trainable=include_non_trainable)
     list_layers(layers=layers, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
 
-    total_params = sum([_tf.size(var).numpy() for var in model.variables])
-    trainable_params = sum([_tf.size(var).numpy() for var in model.trainable_variables])
-    non_trainable_params = total_params - trainable_params
+    if model.built:
+        total_params = sum([_tf.size(var).numpy() for var in model.variables])
+        trainable_params = sum([_tf.size(var).numpy() for var in model.trainable_variables])
+        non_trainable_params = total_params - trainable_params
 
-    print(f"\nTotal params: {total_params:,}")
-    print(f"Trainable params: {trainable_params:,}")
-    print(f"Non-trainable params: {non_trainable_params:,}")
+        print(f"\nTotal params: {total_params:,}")
+        print(f"Trainable params: {trainable_params:,}")
+        print(f"Non-trainable params: {non_trainable_params:,}")
 
 
 def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, include_non_trainable=True) -> None:

@@ -70,7 +70,7 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
 
     # Filter to have only called layers.
     called_layers = filter(lambda layer: len(layer._inbound_nodes) > 0, layers)
-    layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), called_layers)), key=len))
+    layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), called_layers)), key=len, default='output_shape'))
 
     layer_dtype_col_width = len(max(list(map(lambda l: str(l.dtype), layers)), key=len))
     layer_dtype_policy_col_width = len(max(list(map(lambda l: str(l.dtype_policy.name), layers)), key=len))
@@ -96,7 +96,7 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
             non_trainable_params_s = f"{non_trainable_params:,}"
 
             output_shape = 'unknown'
-            if not layer._inbound_nodes:
+            if len(layer._inbound_nodes) > 0:
                 output_shape = layer.output_shape
 
             print(

@@ -67,7 +67,10 @@ def list_model(model, recursive=True, include_trainable=True, include_non_traina
 def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, include_non_trainable=True) -> None:
     layer_name_col_width = len(max(list(map(lambda l: l.name, layers)), key=len))
     layer_type_col_width = len(max(list(map(lambda l: type(l).__name__, layers)), key=len))
-    layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), layers)), key=len))
+
+    called_layers = filter(lambda layer: not layer._inbound_nodes, layers)
+    layer_shape_col_width = len(max(list(map(lambda l: str(l.output_shape), called_layers)), key=len))
+
     layer_dtype_col_width = len(max(list(map(lambda l: str(l.dtype), layers)), key=len))
     layer_dtype_policy_col_width = len(max(list(map(lambda l: str(l.dtype_policy.name), layers)), key=len))
 
@@ -91,13 +94,17 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
             trainaible_params_s = f"{trainaible_params:,}"
             non_trainable_params_s = f"{non_trainable_params:,}"
 
+            output_shape = 'unknown'
+            if not layer._inbound_nodes:
+                output_shape = layer.output_shape
+
             print(
                 f"{layer_number:<5} | "
                 f"{layer.name:<{layer_name_col_width}} ({type(layer).__name__:<{layer_type_col_width}}) | "
                 f"{str(layer.dtype):<{layer_dtype_col_width}} | "
                 f"{str(layer.dtype_policy.name):<{layer_dtype_policy_col_width}} | "
                 f"{str(layer.trainable):<9} | "
-                f"{str(layer.output_shape):<{layer_shape_col_width}} | "
+                f"{str(output_shape):<{layer_shape_col_width}} | "
                 f"{total_params_s:<{len('Total Param #')}} | "
                 f"{trainaible_params_s:<{len('Trainable Param #')}} | "
                 f"{non_trainable_params_s:<{len('Non-trainable Param #')}}")

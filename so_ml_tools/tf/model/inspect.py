@@ -53,6 +53,9 @@ def collect_layer_names(model: [_tf.keras.Model | _tf.keras.Sequential], recursi
 def list_model(model: [_tf.keras.Model | _tf.keras.Sequential], recursive=True, include_trainable=True, include_non_trainable=True) -> None:
     layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable,
                             include_non_trainable=include_non_trainable)
+
+    assert len(layers) > 0, f"Model has no layers."
+
     list_layers(layers=layers, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
 
     total_params_s, trainable_params_s, non_trainable_params_s = calculate_parameters(object=model)
@@ -62,6 +65,8 @@ def list_model(model: [_tf.keras.Model | _tf.keras.Sequential], recursive=True, 
 
 
 def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, include_non_trainable=True) -> None:
+    assert len(layers) > 0, f"List of layers is empty."
+
     layer_name_col_width = len(max(list(map(lambda l: l.name, layers)), key=len))
     layer_type_col_width = len(max(list(map(lambda l: type(l).__name__, layers)), key=len))
 

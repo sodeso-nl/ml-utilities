@@ -20,16 +20,16 @@ def create_augmentation_layer(random_flip_h=True,
             steps.append(_keras.layers.RandomFlip('vertical'))
 
     if random_rotate:
-        steps.append(_keras.layers.RandomRotation(.2))
+        steps.append(_keras.layers.RandomRotation(.1))
 
     if random_height:
-        steps.append(_keras.layers.RandomHeight(.2))
+        steps.append(_keras.layers.RandomHeight(.1))
 
     if random_width:
-        steps.append(_keras.layers.RandomWidth(.2))
+        steps.append(_keras.layers.RandomWidth(.1))
 
     if random_zoom:
-        steps.append(_keras.layers.RandomZoom(.2))
+        steps.append(_keras.layers.RandomZoom(.1))
 
     if random_translation:
         steps.append(_keras.layers.RandomTranslation(height_factor=0.1, width_factor=0.1))

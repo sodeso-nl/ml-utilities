@@ -98,11 +98,13 @@ def quality_metrics(y_true, y_pred=None, y_prob=None) -> _pd.DataFrame:
     Returns:
         A 'dict' containing accuracy, precision, recall, f1 score and support
     """
+    y_true = _soml.util.label.to_prediction(y_prob=y_true)
+
     # If y_pred is not supplied but y_prob is then calculatwe y_pred
     if y_pred is None and y_prob is not None:
         y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
     elif y_pred is None and y_prob is None:
-        raise "y_pred or y_prob argument should be provided."
+        raise "Must specify 'y_pred' or 'y_prob'"
 
     # Calculate model accuracy
     model_accuracy = _sklearn.metrics.accuracy_score(y_true, y_pred) * 100

@@ -37,6 +37,8 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
     y_true = _soml.util.label.to_prediction(y_prob=y_true)
     if y_pred is None and y_prob is not None:
         y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
+    elif y_pred is None and y_prob is None:
+        raise "Must specify 'y_pred' or 'y_prob'"
 
     # Create the confusion matrix
     cm = _confusion_matrix(y_true, y_pred)

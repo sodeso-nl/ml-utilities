@@ -1,7 +1,7 @@
 import tensorflow as _tf
 
 
-def collect_layers(model: _tf.keras.Model, recursive=True, include_trainable=True, include_non_trainable=True) -> list:
+def collect_layers(model: [_tf.keras.Model | _tf.keras.Sequential], recursive=True, include_trainable=True, include_non_trainable=True) -> list:
     """
     Collects layers from the given model, if the model is functional then there might be sub-branches
     inside the model, for example:
@@ -43,27 +43,22 @@ def collect_layers(model: _tf.keras.Model, recursive=True, include_trainable=Tru
     return layers
 
 
-def collect_layer_names(model: _tf.keras.Model, recursive=True, include_trainable=True, include_non_trainable=True) -> \
+def collect_layer_names(model: [_tf.keras.Model | _tf.keras.Sequential], recursive=True, include_trainable=True, include_non_trainable=True) -> \
         list[str]:
     layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable,
                             include_non_trainable=include_non_trainable)
     return list(map(lambda layer: layer.name, layers))
 
 
-def list_model(model, recursive=True, include_trainable=True, include_non_trainable=True) -> None:
+def list_model(model: [_tf.keras.Model | _tf.keras.Sequential], recursive=True, include_trainable=True, include_non_trainable=True) -> None:
     layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable,
                             include_non_trainable=include_non_trainable)
     list_layers(layers=layers, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
 
-    total_params = trainable_params = non_trainable_params = -1
-    if model.built:
-        total_params = sum([_tf.size(var).numpy() for var in model.variables])
-        trainable_params = sum([_tf.size(var).numpy() for var in model.trainable_variables])
-        non_trainable_params = total_params - trainable_params
-
-    print(f"\nTotal params: {total_params:,}")
-    print(f"Trainable params: {trainable_params:,}")
-    print(f"Non-trainable params: {non_trainable_params:,}")
+    total_params_s = trainable_params_s = non_trainable_params_s = calculate_parameters(object=model)
+    print(f"\nTotal params: {total_params_s}")
+    print(f"Trainable params: {trainable_params_s}")
+    print(f"Non-trainable params: {non_trainable_params_s}")
 
 
 def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, include_non_trainable=True) -> None:
@@ -90,18 +85,8 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
         f"{'Non-trainable Param #'}")
     for layer_number, layer in enumerate(layers):
         if (include_trainable and layer.trainable) or (include_non_trainable and layer.trainable is False):
-            total_params_s = trainaible_params_s = non_trainable_params_s = output_shape = 'unknown'
-            if layer.built:
-                output_shape = layer.output_shape
-
-                total_params = sum([_tf.size(var).numpy() for var in layer.variables])
-                trainaible_params = sum([_tf.size(var).numpy() for var in layer.trainable_variables])
-                non_trainable_params = total_params - trainaible_params
-
-                total_params_s = f"{total_params:,}"
-                trainaible_params_s = f"{trainaible_params:,}"
-                non_trainable_params_s = f"{non_trainable_params:,}"
-
+            total_params_s = trainable_params_s = non_trainable_params_s = calculate_parameters(object=layer)
+            output_shape = 'unknown' if not layer.built else layer.output_shape
             print(
                 f"{layer_number:<5} | "
                 f"{layer.name:<{layer_name_col_width}} ({type(layer).__name__:<{layer_type_col_width}}) | "
@@ -110,5 +95,19 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
                 f"{str(layer.trainable):<9} | "
                 f"{str(output_shape):<{layer_shape_col_width}} | "
                 f"{total_params_s:<{len('Total Param #')}} | "
-                f"{trainaible_params_s:<{len('Trainable Param #')}} | "
+                f"{trainable_params_s:<{len('Trainable Param #')}} | "
                 f"{non_trainable_params_s:<{len('Non-trainable Param #')}}")
+
+
+def calculate_parameters(object: [_tf.keras.Model | _tf.keras.Sequential | _tf.keras.layers.Layer]) -> (str, str, str):
+    total_params_s = trainable_params_s = non_trainable_params_s = output_shape = 'unknown'
+    if object.built:
+        total_params = sum([_tf.size(var).numpy() for var in object.variables])
+        trainable_params = sum([_tf.size(var).numpy() for var in object.trainable_variables])
+        non_trainable_params = total_params - trainable_params
+
+        total_params_s = f"{total_params:,}"
+        trainable_params_s = f"{trainable_params:,}"
+        non_trainable_params_s = f"{non_trainable_params:,}"
+
+    return total_params_s, trainable_params_s, non_trainable_params_s

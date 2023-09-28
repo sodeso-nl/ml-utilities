@@ -17,3 +17,4 @@ def load_image_dataset_from_directory(directory: str,
                                                         shuffle=shuffle,
                                                         validation_split=validation_split
                                                         )
+

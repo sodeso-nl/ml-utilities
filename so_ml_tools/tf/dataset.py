@@ -65,58 +65,35 @@ def _rescale(x, y):
 
 def add_batching(dataset: _tf.data.Dataset, batch_size=32) -> _tf.data.Dataset:
     if is_batched(dataset=dataset):
-        print('Dataset is already batched.')
-        return dataset
-
-    print('Batching added to dataset.')
+        print('WARN: Dataset is already batched.')
     return dataset.batch(batch_size=batch_size)
 
 
 def add_caching(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     if is_cached(dataset=dataset):
-        print('Dataset is already cached.')
-        return dataset
-
-    print('Caching added to dataset.')
+        print('WARN: Dataset is already cached.')
     return dataset.cache()
 
 
-def add_shuffling(dataset: _tf.data.Dataset, buffer_size=1000) -> _tf.data.Dataset:
+def add_shuffling(dataset: _tf.data.Dataset, buffer_size=_tf.data.AUTOTUNE) -> _tf.data.Dataset:
     if is_shuffled(dataset=dataset):
-        print('Dataset is already shuffled.')
-        return dataset
+        print('WARN: Dataset is already shuffled.')
 
-    print('Shuffling added to dataset.')
+    if buffer_size == _tf.data.AUTOTUNE:
+        if is_batched(dataset=dataset):
+            batch_size = get_batch_size(dataset)
+            buffer_size = batch_size * 8
+        else:
+            buffer_size = 1000
+
+        print(f'Buffer size for shuffle has been set to {buffer_size}')
     return dataset.shuffle(buffer_size=buffer_size)
 
 
 def add_prefetching(dataset: _tf.data.Dataset, buffer_size=_tf.data.AUTOTUNE) -> _tf.data.Dataset:
     if is_prefetched(dataset=dataset):
-        print('Dataset is already prefetched.')
-        return dataset
-
-    print('Prefetching added to dataset.')
+        print('WARN: Dataset is already prefetched.')
     return dataset.prefetch(buffer_size=buffer_size)
-
-
-def optimize_pipeline(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
-    """
-    Returns a dataset with (when possible), batching, caching and prefetch in that order, if any of the steps has
-    already been applied then it will skip this. For example, creating a dataset using load_image_dataset_from_directory
-    will already create a batching dataset, so this method will only add caching and prefetching.
-
-    Preferably do this after using `add_rescaling_mapping`
-
-    Args:
-        dataset: a `tf.data.Dataset`
-
-    Returns:
-        A `tf.data.Dataset` with batching and prefetching.
-    """
-    if not isinstance(dataset, _tf.data.Dataset):
-        raise TypeError('dataset is not a tf.data.Dataset')
-
-    return add_prefetching(dataset=add_shuffling(dataset=add_caching(dataset=add_batching(dataset=dataset))))
 
 
 def get_class_names_from_dataset_info(ds_info: dict):
@@ -141,6 +118,7 @@ def get_class_names(dataset: _tf.data.Dataset):
 
     input_dataset = dataset
     while not hasattr(input_dataset, 'class_names') and hasattr(input_dataset, '_input_dataset'):
+        # noinspection PyProtectedMember
         input_dataset = input_dataset._input_dataset
 
     if not hasattr(input_dataset, 'class_names'):
@@ -161,6 +139,7 @@ def get_labels(dataset: _tf.data.Dataset):
 
     input_dataset = dataset
     while not hasattr(input_dataset, '_batch_size') and hasattr(input_dataset, '_input_dataset'):
+        # noinspection PyProtectedMember
         input_dataset = input_dataset._input_dataset
 
     if hasattr(input_dataset, '_batch_size'):
@@ -173,15 +152,31 @@ def get_labels(dataset: _tf.data.Dataset):
     return y_labels
 
 
-def is_batched(dataset: _tf.data.Dataset) -> bool:
+def get_batch_dataset(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
     input_dataset = dataset
     while not input_dataset.__class__.__name__ == '_BatchDataset' and hasattr(input_dataset, '_input_dataset'):
+        # noinspection PyProtectedMember
         input_dataset = input_dataset._input_dataset
 
-    return input_dataset.__class__.__name__ == '_BatchDataset'
+    if input_dataset.__class__.__name__ == '_BatchDataset':
+        return input_dataset
+
+
+def get_batch_size(dataset: _tf.data.Dataset) -> int:
+    batch_dataset = get_batch_dataset(dataset=dataset)
+    if not batch_dataset:
+        # noinspection PyUnresolvedReferences
+        # noinspection PyProtectedMember
+        return batch_dataset._batch_size
+
+    return -1
+
+
+def is_batched(dataset: _tf.data.Dataset) -> bool:
+    return not get_batch_dataset(dataset=dataset)
 
 
 def is_prefetched(dataset: _tf.data.Dataset) -> bool:
@@ -190,6 +185,7 @@ def is_prefetched(dataset: _tf.data.Dataset) -> bool:
 
     input_dataset = dataset
     while not input_dataset.__class__.__name__ == '_PrefetchDataset' and hasattr(input_dataset, '_input_dataset'):
+        # noinspection PyProtectedMember
         input_dataset = input_dataset._input_dataset
 
     return input_dataset.__class__.__name__ == '_PrefetchDataset'
@@ -201,6 +197,7 @@ def is_cached(dataset: _tf.data.Dataset) -> bool:
 
     input_dataset = dataset
     while not input_dataset.__class__.__name__ == 'CacheDataset' and hasattr(input_dataset, '_input_dataset'):
+        # noinspection PyProtectedMember
         input_dataset = input_dataset._input_dataset
 
     return input_dataset.__class__.__name__ == 'CacheDataset'
@@ -212,6 +209,7 @@ def is_shuffled(dataset: _tf.data.Dataset) -> bool:
 
     input_dataset = dataset
     while not input_dataset.__class__.__name__ == '_ShuffleDataset' and hasattr(input_dataset, '_input_dataset'):
+        # noinspection PyProtectedMember
         input_dataset = input_dataset._input_dataset
 
     return input_dataset.__class__.__name__ == '_ShuffleDataset'

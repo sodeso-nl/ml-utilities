@@ -55,7 +55,7 @@ def list_model(model, recursive=True, include_trainable=True, include_non_traina
                             include_non_trainable=include_non_trainable)
     list_layers(layers=layers, include_trainable=include_trainable, include_non_trainable=include_non_trainable)
 
-    total_params = trainable_params = non_trainable_params = 'Unknown'
+    total_params = trainable_params = non_trainable_params = -1
     if model.built:
         total_params = sum([_tf.size(var).numpy() for var in model.variables])
         trainable_params = sum([_tf.size(var).numpy() for var in model.trainable_variables])

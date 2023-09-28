@@ -14,20 +14,20 @@ from sklearn.metrics import classification_report as _classification_report
 def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = None, figsize=(15, 15), text_size=10,
                      norm=False, savefig=False) -> None:
     """
-      Plots a confusion matrix of the given data.
+   Plots a confusion matrix of the given data.
 
-      :param y_true: Array of truth labels (must be same shape as y_pred).
-      :param y_pred: Array of predictions (then y_prob is not necessary), must be same shape as y_true.
-      :param y_prob: Array of probabilities (then y_pred is not necessary), must be same shape as y_true.
-      :param class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
-      :param figsize: Size of output figure (default=(15, 15)).
-      :param text_size: Size of output figure text (default=10).
-      :param norm: normalize values or not (default=False).
-      :param savefig: save confusion matrix to file (default=False).
+    Args:
+      y_true: Array of truth labels (must be same shape as y_pred).
+      y_pred: Array of predictions (then y_prob is not necessary), must be same shape as y_true.
+      y_prob: Array of probabilities (then y_pred is not necessary), must be same shape as y_true.
+      class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
+      figsize: Size of output figure (default=(15, 15)).
+      text_size: Size of output figure text (default=10).
+      norm: normalize values or not (default=False).
+      savefig: save confusion matrix to file (default=False).
 
-      Plots the decision boundary created by a model predicting on X.
-      Inspired by the following two websites:
-      https://cs231n.github.io/neural-networks-case-study
+    Returns:
+        None
     """
 
     if isinstance(y_true, _tf.data.Dataset):
@@ -100,9 +100,13 @@ def decision_boundary(model: _tf.keras.Model, x, y) -> None:
     Inspired by the following two websites:
     https://cs231n.github.io/neural-networks-case-study
 
-    :param model: the sequence model.
-    :param x: array containing vectors with x/y coordinates
-    :param y: are the associated labels (0=blue, 1=red)
+    Args:
+        model: the sequence model.
+        x: array containing vectors with x/y coordinates
+        y: are the associated labels (0=blue, 1=red)
+
+    Returns:
+        None
     """
     # Define the axis boundaries of the plot and create a meshgrid.
     x_min, x_max = x[:, 0].min() - 0.1, x[:, 0].max() + 0.1
@@ -138,9 +142,14 @@ def decision_boundary(model: _tf.keras.Model, x, y) -> None:
 def y_pred_vs_y_true(y_true, y_pred, figsize=(10, 8)) -> None:
     """
     Shows a graph with the predicted values vs the truth labels.
-    :param y_true: the truth labels
-    :param y_pred: the predicted values
-    :param figsize: size of the graph
+
+    Args:
+        y_true: the truth labels
+        y_pred: the predicted values
+        figsize: size of the graph
+
+    Returns:
+        None
     """
     # Merge the two columns into a single new numpy array.
     m = _np.append(y_true.round(2), y_pred.round(2), axis=1)
@@ -220,21 +229,21 @@ def report_f1_score(y_true, y_pred=None, y_prob=None, class_names: list[str] = N
 
 def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8)):
     """
-        Creates a plot showing the confidence of the predictions, the plot will display the number of predictions vs
-        the confidence (how close was the prediction to the actual truth label). In a perfect world the
-        plot would be a straight vertical line on the right (all predictions are exactly 1 or 0 compared with their
-        truth label). Since this is never the case the more optimal plot would be a vertical line around 0 on the x-axis
-        with a small bend in the top left corner following a horizontal line around 100%.
+    Creates a plot showing the confidence of the predictions, the plot will display the number of predictions vs
+    the confidence (how close was the prediction to the actual truth label). In a perfect world the
+    plot would be a straight vertical line on the right (all predictions are exactly 1 or 0 compared with their
+    truth label). Since this is never the case the more optimal plot would be a vertical line around 0 on the x-axis
+    with a small bend in the top left corner following a horizontal line around 100%.
 
-        Args:
-            y_true: Array of truth labels, must be same shape as y_pred.
-            y_prob: Array of probabilities, must be same shape as y_true.
-            class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
-            figsize: Size of output figure (default=(10, 8)).
+    Args:
+        y_true: Array of truth labels, must be same shape as y_pred.
+        y_prob: Array of probabilities, must be same shape as y_true.
+        class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
+        figsize: Size of output figure (default=(10, 8)).
 
-        Returns:
-            None
-        """
+    Returns:
+        None
+    """
     _plt.figure(figsize=figsize)
 
     if _soml.util.label.is_multiclass_classification(y_prob=y_true):
@@ -299,18 +308,18 @@ def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8
 
 def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], figsize=(8, 4)):
     """
-        Creates a histogram showing the confidence of the predictions. The digest of this method is the same
-        as for the ´prediction_confidence´ method except that it displays the information as a histogram.
+    Creates a histogram showing the confidence of the predictions. The digest of this method is the same
+    as for the ´prediction_confidence´ method except that it displays the information as a histogram.
 
-        Args:
-            y_true: Array of truth labels, must be same shape as y_pred.
-            y_prob: Array of probabilities, must be same shape as y_true.
-            class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
-            figsize: Size of output figure (default=(10, 8)).
+    Args:
+        y_true: Array of truth labels, must be same shape as y_pred.
+        y_prob: Array of probabilities, must be same shape as y_true.
+        class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
+        figsize: Size of output figure (default=(10, 8)).
 
-        Returns:
-            None
-        """
+    Returns:
+        None
+    """
     bins = range(0, 110, 10)
 
     if _soml.util.label.is_multiclass_classification(y_prob=y_true):
@@ -383,5 +392,5 @@ def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], figs
 def __plot_histogram(class_names: list[str], axs, y, idx) -> None:
     class_name = str(idx) if class_names is None else class_names[idx]
     axs[idx].hist(y, log=True, bins=11, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.5,
-                label=class_name)
+                  label=class_name)
     axs[idx].set(title=class_name, xlabel='Confidence (%)', ylabel='Predictions')

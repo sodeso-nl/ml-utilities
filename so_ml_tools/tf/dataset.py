@@ -63,6 +63,42 @@ def _rescale(x, y):
     return x / 255., y
 
 
+def add_batching(dataset: _tf.data.Dataset, batch_size=32) -> _tf.data.Dataset:
+    if is_batched(dataset=dataset):
+        print('Dataset is already batched.')
+        return dataset
+
+    print('Batching added to dataset.')
+    return dataset.batch(batch_size=batch_size)
+
+
+def add_caching(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
+    if is_cached(dataset=dataset):
+        print('Dataset is already cached.')
+        return dataset
+
+    print('Caching added to dataset.')
+    return dataset.cache()
+
+
+def add_shuffling(dataset: _tf.data.Dataset, buffer_size=1000) -> _tf.data.Dataset:
+    if is_shuffled(dataset=dataset):
+        print('Dataset is already shuffled.')
+        return dataset
+
+    print('Shuffling added to dataset.')
+    return dataset.shuffle(buffer_size=buffer_size)
+
+
+def add_prefetching(dataset: _tf.data.Dataset, buffer_size=_tf.data.AUTOTUNE) -> _tf.data.Dataset:
+    if is_prefetched(dataset=dataset):
+        print('Dataset is already prefetched.')
+        return dataset
+
+    print('Prefetching added to dataset.')
+    return dataset.prefetch(buffer_size=buffer_size)
+
+
 def optimize_pipeline(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     """
     Returns a dataset with (when possible), batching, caching and prefetch in that order, if any of the steps has
@@ -80,28 +116,7 @@ def optimize_pipeline(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
-    # Add batching when possible.
-    if is_batched(dataset=dataset):
-        print('Dataset is already batched.')
-    else:
-        print('Batching added to dataset.')
-        dataset = dataset.batch(batch_size=32)
-
-    # Add caching when possible.
-    if is_cached(dataset=dataset):
-        print('Dataset is already cached.')
-    else:
-        print('Caching added to dataset.')
-        dataset = dataset.cache()
-
-    # Add prefetching when possible.
-    if is_prefetched(dataset=dataset):
-        print('Dataset is already prefetched.')
-    else:
-        print('Prefetching added to dataset.')
-        dataset = dataset.prefetch(_tf.data.AUTOTUNE)
-
-    return dataset
+    return add_prefetching(dataset=add_shuffling(dataset=add_caching(dataset=add_batching(dataset=dataset))))
 
 
 def get_class_names_from_dataset_info(ds_info: dict):

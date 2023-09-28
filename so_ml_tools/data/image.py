@@ -124,10 +124,14 @@ def show_single_image_from_nparray_or_tensor(image, title="", figsize=(10, 8), c
     """
     Shows images stored in a tensor / numpy array. The array should be a vector of images.
 
-    :param image: the image to plot
-    :param title: the title to display above the image
-    :param figsize: Size of output figure (default=(10, 8)).
-    :param cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
+    Args:
+        image: the image to plot
+        title: the title to display above the image
+        figsize: Size of output figure (default=(10, 8)).
+        cmap: is the collor map to use, use "gray" for gray scale images, use None for default.
+
+    Returns:
+        None
     """
     fig = _plt.figure(figsize=figsize)
     fig.patch.set_facecolor('gray')
@@ -140,10 +144,15 @@ def show_single_image_from_nparray_or_tensor(image, title="", figsize=(10, 8), c
 def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gray') -> None:
     """
     Shows a random image from the file system.
-    :param target_dir: The target directory, for example /food101/train
-    :param target_class: The target class name, for example /steak
-    :param shape: is the number of images in a grid to display
-    :param cmap: is the color map to use, use "gray" for gray scale images, use None for default.
+
+    Args:
+        target_dir: The target directory, for example /food101/train
+        target_class: The target class name, for example /steak
+        shape: is the number of images in a grid to display
+        cmap: is the color map to use, use "gray" for gray scale images, use None for default.
+
+    Returns:
+        None
     """
     try:
         target_folder = _os.path.join(target_dir, target_class)
@@ -166,6 +175,18 @@ def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gr
 
 
 def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)) -> None:
+    """
+    Displays a number of images based on the shape size, the shape size must be the same
+    as the batch size of the dataset. Default shape size is (4, 8) so the batch size
+    should be 32.
+
+    Args:
+        dataset: the dataset containing the images
+        shape: the shape size
+
+    Returns:
+        None
+    """
     assert isinstance(dataset, _tf.data.Dataset), f"The dataset supplied is not a tensorflow.data.Dataset."
 
     # Retrieve first batch, depending on the initalization of the dataset the batch size is default 32
@@ -179,8 +200,6 @@ def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)) -> None:
     assert shape[0] * shape[1] == len(x), f"Size of shape ({shape[0]}, {shape[1]}), with a total of " \
                                           f"{shape[0] * shape[1]} images, is not equal to the batch size of the dataset ({len(x)})."
 
-    if len(x) != shape[0] * shape[1]:
-        raise TypeError('dataset is not a Dataset')
-
-    show_images_from_nparray_or_tensor(x=x, y=y_true, class_names=dataset.class_names, shape=shape)
+    class_names = _soml.tf.dataset.get_class_names(dataset=dataset)
+    show_images_from_nparray_or_tensor(x=x, y=y_true, class_names=class_names, shape=shape)
     _plt.show()

@@ -7,7 +7,9 @@ def load_image_dataset_from_directory(directory: str,
                                       batch_size=32,
                                       class_names=None,
                                       color_mode='rgb',
-                                      shuffle=True, validation_split=None):
+                                      shuffle=True,
+                                      validation_split=None,
+                                      seed=None):
     return _tf.keras.utils.image_dataset_from_directory(directory=directory,
                                                         label_mode=label_mode,
                                                         image_size=image_size,
@@ -15,6 +17,7 @@ def load_image_dataset_from_directory(directory: str,
                                                         class_names=class_names,
                                                         color_mode=color_mode,
                                                         shuffle=shuffle,
-                                                        validation_split=validation_split
+                                                        validation_split=validation_split,
+                                                        seed=seed
                                                         )
 

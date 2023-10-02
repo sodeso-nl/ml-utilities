@@ -113,7 +113,10 @@ def drop_columns(dataframe: _pd.DataFrame, column_names: list[str]) -> None:
         column_names = [column_names]
 
     for c in column_names:
-        dataframe.drop(c, axis=1, inplace=True)
+        if c in dataframe:
+            dataframe.drop(c, axis=1, inplace=True)
+        else:
+            print(f"INFO: Column '{c}' does not exist in dataframe.")
 
 
 def describe(dataframe: _pd.DataFrame, column_names: list[str] = None, round=2):

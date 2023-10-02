@@ -77,16 +77,29 @@ def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_
     return result
 
 
-def delete_null_rows(dataframe: _pd.DataFrame, column_name: str, inplace=True) -> _pd.DataFrame:
+def delete_null_rows(dataframe: _pd.DataFrame, column_names: list[str], inplace=True) -> _pd.DataFrame:
     """
     Deletes all rows containing a null values inside the given column.
 
     :param dataframe: the pd.DatFrame
-    :param column_name: the column name
+    :param column_names: the names of the columns
     :param inplace: return a new instance of the DataFrame (False) or adjust the given DataFrame
     :return: see inplace
     """
-    return dataframe.drop(dataframe[dataframe[column_name].isnull()].index, inplace=inplace)
+    if not type(column_names) == list and column_names is not None:
+        column_names = [column_names]
+
+    work_df = dataframe
+    if not inplace:
+        work_df = dataframe.copy(deep=True)
+
+    for c in column_names:
+        if c in dataframe:
+            work_df.drop(work_df[dataframe[c].isnull()].index, inplace=inplace)
+        else:
+            print(f"INFO: Column '{c}' does not exist in dataframe.")
+
+    return work_df
 
 
 def delete_rows_not_numeric(dataframe: _pd.DataFrame, column_name: str, inplace=True) -> _pd.DataFrame:

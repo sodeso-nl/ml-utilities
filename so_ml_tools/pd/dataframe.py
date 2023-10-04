@@ -67,14 +67,14 @@ def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_
     :param inplace: return a new instance of the DataFrame or adjust the given DataFrame
     :return: see inplace
     """
-    result = dataframe
+    work_df = dataframe
     if not inplace:
-        result = dataframe.copy(deep=True)
+        work_df = dataframe.copy(deep=True)
 
     for column in columns:
-        result[column] = result[column].astype(dtype)
+        work_df[column] = work_df[column].astype(dtype)
 
-    return result
+    return work_df
 
 
 def delete_null_rows(dataframe: _pd.DataFrame, column_names: list[str], inplace=True) -> _pd.DataFrame:
@@ -95,9 +95,23 @@ def delete_null_rows(dataframe: _pd.DataFrame, column_names: list[str], inplace=
 
     for c in column_names:
         if c in dataframe:
-            work_df.drop(work_df[dataframe[c].isnull()].index, inplace=inplace)
+            work_df.drop(work_df[dataframe[c].isnull()].index, inplace=True)
         else:
-            print(f"INFO: Column '{c}' does not exist in dataframe.")
+            print(f"delete_null_rows: Column '{c}' does not exist in dataframe.")
+
+    return work_df
+
+
+def fill_nan_with_value(dataframe: _pd.DataFrame, column_values: dict, inplace=True) -> _pd.DataFrame:
+    work_df = dataframe
+    if not inplace:
+        work_df = dataframe.copy(deep=True)
+
+    for c, v in column_values:
+        if c in dataframe:
+            work_df[c].fillna(value=v, inplace=True)
+        else:
+            print(f"fill_nan_with_value: Column '{c}' does not exist in dataframe.")
 
     return work_df
 
@@ -129,7 +143,7 @@ def drop_columns(dataframe: _pd.DataFrame, column_names: list[str]) -> None:
         if c in dataframe:
             dataframe.drop(c, axis=1, inplace=True)
         else:
-            print(f"INFO: Column '{c}' does not exist in dataframe.")
+            print(f"drop_columns: Column '{c}' does not exist in dataframe.")
 
 
 def describe(dataframe: _pd.DataFrame, column_names: list[str] = None, round=2):

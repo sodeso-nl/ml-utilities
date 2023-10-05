@@ -116,6 +116,16 @@ def fill_nan_with_value(dataframe: _pd.DataFrame, column_values: dict, inplace=T
     return work_df
 
 
+def generate_code_ordinal_encoder(dataframe: _pd.DataFrame, column_names: list[str]) -> None:
+    for c in column_names:
+        if c in dataframe:
+            values = dataframe[c].value_counts()
+            categories = "', '".join(values)
+            print(f"sklearn.preprocessing.OrdinalEncoder(categories=[['{categories}']])")
+        else:
+            print(f"delete_null_rows: Column '{c}' does not exist in dataframe.")
+
+
 def delete_rows_not_numeric(dataframe: _pd.DataFrame, column_name: str, inplace=True) -> _pd.DataFrame:
     """
     Deletes all rows containing non-number values inside the given column.

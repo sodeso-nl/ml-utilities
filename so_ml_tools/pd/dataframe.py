@@ -107,7 +107,7 @@ def fill_nan_with_value(dataframe: _pd.DataFrame, column_values: dict, inplace=T
     if not inplace:
         work_df = dataframe.copy(deep=True)
 
-    for c, v in column_values:
+    for c, v in column_values.items():
         if c in dataframe:
             work_df[c].fillna(value=v, inplace=True)
         else:

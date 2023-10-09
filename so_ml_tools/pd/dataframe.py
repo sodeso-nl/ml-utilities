@@ -117,11 +117,15 @@ def fill_nan_with_value(dataframe: _pd.DataFrame, column_values: dict, inplace=T
 
 
 def generate_code_ordinal_encoder(dataframe: _pd.DataFrame, column_names: list[str]) -> None:
+    print(f"\n###################################################\nNOTE: The order still needs to be manualy adjusted.\n###################################################\n")
     for c in column_names:
         if c in dataframe:
-            values = dataframe[c].value_counts()
-            categories = "', '".join(values)
-            print(f"sklearn.preprocessing.OrdinalEncoder(categories=[['{categories}']])")
+            try:
+                values = dataframe[c].unique()
+                categories = "',\n    '".join(values)
+                print(f"{c}_encoder = sklearn.preprocessing.OrdinalEncoder(categories=[[\n    '{categories}'\n]])")
+            except TypeError as e:
+                print(f"Column {c} threw an exception {e}.")
         else:
             print(f"delete_null_rows: Column '{c}' does not exist in dataframe.")
 

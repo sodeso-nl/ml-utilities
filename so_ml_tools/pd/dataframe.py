@@ -102,6 +102,22 @@ def delete_null_rows(dataframe: _pd.DataFrame, column_names: list[str], inplace=
     return work_df
 
 
+def delete_rows_where_value_greater_then_z_max(dataframe: _pd.DataFrame, column_names: list[str], inplace=True) -> _pd.DataFrame:
+    work_df = dataframe
+    if not inplace:
+        work_df = dataframe.copy(deep=True)
+
+    for c in column_names:
+        if c in dataframe:
+            v = dataframe[c]
+            z_max = 3 * v.std() + v.mean()
+            work_df.drop(dataframe[dataframe[c] > z_max].index, inplace=True)
+        else:
+            print(f"delete_rows_where_value_greater_then_z_max: Column '{c}' does not exist in dataframe.")
+
+    return work_df
+
+
 def fill_nan_with_value(dataframe: _pd.DataFrame, column_values: dict, inplace=True) -> _pd.DataFrame:
     work_df = dataframe
     if not inplace:

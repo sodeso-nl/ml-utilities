@@ -92,7 +92,8 @@ def _plot_history_ends(histories: list[_tf.keras.callbacks.History], labels: lis
     :param labels: the labels for each history object for separating the epochs
     """
     for idx, history in enumerate(histories):
-        _plt.plot([min(history.epoch), min(history.epoch)], _plt.ylim(), label=f'{labels[idx]}')
+        _plt.axvline(min(history.epoch), label=f'{labels[idx]}')
+        # _plt.plot([min(history.epoch), min(history.epoch)], _plt.ylim(), label=f'{labels[idx]}')
 
 
 def _plot_history_graph_line(data, label, color, linestyle='solid') -> None:

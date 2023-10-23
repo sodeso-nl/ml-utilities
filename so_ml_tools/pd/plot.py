@@ -67,12 +67,12 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
             # Only show z_min when it is not before the graph starts.
             legend = False
             if z_max < v.max():
-                axs[n].axvline(z_max, label='Z-Max')
+                axs[n].axvline(z_max, label='Z-Max', color='#c46110')
                 legend = True
 
             # Only show z_min when it is not before the graph starts.
             if z_min > v.min():
-                axs[n].axvline(z_min, label='Z-Min')
+                axs[n].axvline(z_min, label='Z-Min', color='1cab0c')
                 legend = True
 
             if legend:

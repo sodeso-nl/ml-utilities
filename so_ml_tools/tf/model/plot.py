@@ -89,7 +89,7 @@ def _plot_history_ends(histories: list[_tf.keras.callbacks.History], labels: lis
     Internal method which will plot a vertical line showing where a histories last epoch is visible.
 
     :param histories: the history objects returned from fitting models.
-    :param labels: the labels for each history object for seperating the epochs
+    :param labels: the labels for each history object for separating the epochs
     """
     for idx, history in enumerate(histories):
         _plt.plot([min(history.epoch), min(history.epoch)], _plt.ylim(), label=f'{labels[idx]}')
@@ -97,7 +97,7 @@ def _plot_history_ends(histories: list[_tf.keras.callbacks.History], labels: lis
 
 def _plot_history_graph_line(data, label, color, linestyle='solid') -> None:
     """
-    Internal method which will plot the information from the fit histroy.
+    Internal method which will plot the information from the fit history.
 
     :param data: the data to plot
     :param label: the label associated with the data

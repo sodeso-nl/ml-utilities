@@ -77,16 +77,19 @@ def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_
     return work_df
 
 
-def delete_null_rows(dataframe: _pd.DataFrame, column_names: list[str], inplace=True) -> _pd.DataFrame:
+def delete_rows_where_columns_have_null_value(dataframe: _pd.DataFrame, column_names: list[str] = None, inplace=True) -> _pd.DataFrame:
     """
-    Deletes all rows containing a null values inside the given column.
+    Deletes all rows containing a null values inside the given column .
 
     :param dataframe: the pd.DatFrame
-    :param column_names: the names of the columns
+    :param column_names: the names of the columns to check, if None all columns will be checked.
     :param inplace: return a new instance of the DataFrame (False) or adjust the given DataFrame
     :return: see inplace
     """
-    if not type(column_names) == list and column_names is not None:
+    if column_names is None:
+        column_names = list(dataframe.columns)
+
+    if not type(column_names) is list and column_names is not None:
         column_names = [column_names]
 
     work_df = dataframe

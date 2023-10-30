@@ -18,46 +18,46 @@ def calculate_shap_values(explainer: _sh.Explainer, x, n_samples: [int | str] = 
     return explainer.shap_values(x, nsamples=n_samples)
 
 
-def waterfall_plot(explainer: _sh.Explainer, shap_values, feature_names: list[str], max_features: [str | int] = 'auto',
-              plot_example: int = None, plot_class: int = None):
+def waterfall_plot(explainer, shap_values: list[_np.array], feature_names: list[str], max_features: [str | int] = 'auto',
+                   display_entry: int = 0, display_class: int = 0):
     """
-    Plot the breakdown of the 
+    Plot the breakdown of the
 
     Args:
       explainer: the explainer object
       shap_values: calculated values, use shap_values[x] for single class.
       feature_names: a `list` containing the feature names.
-      max_features: maximum number of features to display ordered by most imported to least.
-      plot_class: (optional) the class to plot
+      max_features: default 'auto' to show the default amount, set to 'max' to show all
+      display_class: (optional) the class to plot
+      display_entry: (optional) the entry to display when multiple have been calculated
 
     Returns:
         None
     """
-    assert len(shap_values) > 1 and plot_class is not None, (f"shap_values contains multiple classes ({len(shap_values)}), "
-                                                         f"the force_plot can only plot a single class at a time, "
-                                                         f"please specify the class to plot.")
+    assert len(shap_values) > 1 and display_class is not None, (
+        f"shap_values contains multiple classes ({len(shap_values)}), "
+        f"the force_plot can only plot a single class at a time, "
+        f"please specify the class to plot.")
 
+    assert shap_values[0].ndim == 1 or (shap_values[0].ndim > 1 and display_entry is not None), \
+        (f"shap_values contains multiple examples ({len(shap_values[0])}), the waterfall_plot can only plot a single "
+         f"example at a time, please specify the plot_example.")
 
-    assert shap_values[0].ndim > 1 and plot_example is not None, (f"shap_values contains multiple examples ({len(shap_values[0])}), "
-                                                         f"the waterfall_plot can only plot a single example at a time, "
-                                                         f"please specify the plot_example.")
+    # Check if this is a multi-class shap value, if so pick a class.
+    shap_value_class = shap_values
+    if len(shap_values) > 1:
+        shap_value_class = shap_values[display_class]
 
-    if plot_class is None:
-        plot_class = 0
-
-    if plot_example is None:
-        plot_example = 1
-
-    shap_example = None
-    if shap_values[0].ndim > 1:
-        shap_example = shap_values[plot_example]
+    shap_example_within_class = shap_value_class
+    if shap_value_class.ndim > 1:
+        shap_example_within_class = shap_value_class[display_entry]
 
     explanation = _sh.Explanation(
-        values=shap_example[plot_class],  # Actual values of specific class
-        base_values=explainer.expected_value[plot_class],  # Mean value: E[f(x)] for specific class.
+        values=shap_example_within_class,  # Actual values of specific class
+        base_values=explainer.expected_value[display_class],  # Mean value: E[f(x)] for specific class.
         feature_names=feature_names)
 
-    if max_features == 'auto':
+    if max_features == 'max':
         max_features = len(feature_names)
 
     _sh.waterfall_plot(shap_values=explanation, max_display=max_features)
@@ -86,9 +86,11 @@ def summary_plot(shap_values: list[_np.array], class_names: list[str], feature_n
 
     # In case the shap_values were calculated for a single set of features we need to add an additional dimension.
     if shap_values[0].ndim == 1:
-        shap_values[0] = _np.expand_dims(shap_values[0], axis=0)
-        shap_values[1] = _np.expand_dims(shap_values[1], axis=0)
-        shap_values[2] = _np.expand_dims(shap_values[2], axis=0)
+        shap_values = [
+            _np.expand_dims(shap_values[0], axis=0),
+            _np.expand_dims(shap_values[1], axis=0),
+            _np.expand_dims(shap_values[2], axis=0)
+        ]
 
     if len(shap_values) > 1:
         plot_type = 'bar'

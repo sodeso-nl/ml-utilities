@@ -63,43 +63,47 @@ def summary_plot(shap_values: list[_np.array], class_names: list[str], feature_n
       class_names: a `list` containing the class names.
       feature_names: a `list` containing the feature names.
       plot_type: 'bar' for multiclass and single class, 'dot', 'violin' and  for single class.
-      display_entry: (optional) the entry to display when multiple have been calculated
-      display_class: (optional) the class to plot
 
     Returns:
         None
     """
     assert len(class_names) == len(
-        shap_values), (f"Number of class_names ({len(class_names)}) does not match the number of classes in shap_values "
-                       f"({shap_values[0].ndim})")
+        shap_values), f"Number of class_names ({len(class_names)}) does not match the number of classes in shap_values ({shap_values[0].ndim})"
     assert display_class is None or (
                 -1 < display_class < len(class_names)), f"Invalid display_class value {display_class}."
 
-    shap_values = _np.asarray(shap_values)
+    shap_values = _np.array(shap_values)
 
     # In case the shap_values were calculated for a single set of features we need to add an additional dimension.
     if shap_values[0].ndim == 1:
-        shap_values = list(map(lambda x: _np.expand_dims(x, axis=0), shap_values))
+        shap_values = _np.array(list(map(lambda x: _np.expand_dims(x, axis=0), shap_values)))
 
+    # Filter on a specific entry when applicable.
     if display_entry is not None:
-        shap_values = _np.expand_dims(_np.array(shap_values)[:, display_entry], axis=1)
+        shap_values = _np.expand_dims(shap_values[:, display_entry], axis=1)
 
-    # If we want to display a single class then we need to get that specific class name.
+    # Filter on a specific class when applicable.
     if display_class is not None:
         class_names = [class_names[display_class]]
-        shap_values = shap_values[display_class]
-
-    # If we have more then one class to display then force plot type bar.
-    if shap_values[0].ndim > 1:
-        plot_type = 'bar'
+        shap_values = _np.expand_dims(shap_values[display_class, :], axis=0)
 
     # Convert the numpy array back to a list with arrays as was the original data structure
     shap_values = list(map(lambda x: x, shap_values))
 
-    # Because of converting the structure back we could end up with a single set of features so we may need to add
-    # an additional dimension again.
-    if shap_values[0].ndim == 1:
-        shap_values = list(map(lambda x: _np.expand_dims(x, axis=0), shap_values))
+    # Old code that was used when dealing with single / multiple entries
+    # if shap_values[0].ndim == 1:
+    #     shap_values = list(map(lambda x: np.expand_dims(x, axis=0), shap_values))
+
+    # Do we display a single class
+    if len(shap_values) == 1:
+        if plot_type is None:
+            print("Using plot_type = 'dot', other options are 'violin' and 'bar'")
+            plot_type = 'dot'
+
+        shap_values = shap_values[0]
+    elif plot_type != 'bar':
+        print(f"{'Overriding' if plot_type != 'bar' else 'Using'} plot_type with 'bar' since we have multiple classes.")
+        plot_type = 'bar'
 
     _sh.summary_plot(shap_values=shap_values,
                      class_names=class_names,

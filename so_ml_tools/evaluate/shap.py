@@ -18,7 +18,7 @@ def calculate_shap_values(explainer: _sh.Explainer, x, n_samples: [int | str] = 
     return explainer.shap_values(x, nsamples=n_samples)
 
 
-def waterfall(explainer: _sh.Explainer, shap_values, feature_names: list[str], max_features: [str | int] = 'auto',
+def waterfall_plot(explainer: _sh.Explainer, shap_values, feature_names: list[str], max_features: [str | int] = 'auto',
               plot_class: int = None):
     """
     Plot the breakdown of the 

@@ -33,7 +33,7 @@ def waterfall_plot(explainer: _sh.Explainer, shap_values, feature_names: list[st
     Returns:
         None
     """
-    assert len(shap_values) > 1 and plot_class is None, (f"shap_values contains multiple classes ({len(shap_values)}), "
+    assert len(shap_values) > 1 and plot_class is not None, (f"shap_values contains multiple classes ({len(shap_values)}), "
                                                          f"the force_plot can only plot a single class at a time, "
                                                          f"please specify the class to plot.")
 
@@ -98,7 +98,7 @@ def force_plot(shap_values: list[_np.array], explainer: _sh.Explainer, feature_n
     Returns:
         None
     """
-    assert len(shap_values) > 1 and plot_class is None, (f"shap_values contains multiple classes ({len(shap_values)}), "
+    assert len(shap_values) > 1 and plot_class is not None, (f"shap_values contains multiple classes ({len(shap_values)}), "
                                                          f"the force_plot can only plot a single class at a time, "
                                                          f"please specify the class to plot.")
 

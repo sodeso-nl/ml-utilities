@@ -19,7 +19,7 @@ def calculate_shap_values(explainer: _sh.Explainer, x, n_samples: [int | str] = 
 
 
 def waterfall_plot(explainer: _sh.Explainer, shap_values, feature_names: list[str], max_features: [str | int] = 'auto',
-              plot_class: int = None):
+              plot_example: int = None, plot_class: int = None):
     """
     Plot the breakdown of the 
 
@@ -37,11 +37,23 @@ def waterfall_plot(explainer: _sh.Explainer, shap_values, feature_names: list[st
                                                          f"the force_plot can only plot a single class at a time, "
                                                          f"please specify the class to plot.")
 
+
+    assert shap_values[0].ndim > 1 and plot_example is not None, (f"shap_values contains multiple examples ({len(shap_values[0])}), "
+                                                         f"the waterfall_plot can only plot a single example at a time, "
+                                                         f"please specify the plot_example.")
+
     if plot_class is None:
         plot_class = 0
 
+    if plot_example is None:
+        plot_example = 1
+
+    shap_example = None
+    if shap_values[0].ndim > 1:
+        shap_example = shap_values[plot_example]
+
     explanation = _sh.Explanation(
-        values=shap_values[plot_class],  # Actual values of specific class
+        values=shap_example[plot_class],  # Actual values of specific class
         base_values=explainer.expected_value[plot_class],  # Mean value: E[f(x)] for specific class.
         feature_names=feature_names)
 
@@ -77,6 +89,9 @@ def summary_plot(shap_values: list[_np.array], class_names: list[str], feature_n
         shap_values[0] = _np.expand_dims(shap_values[0], axis=0)
         shap_values[1] = _np.expand_dims(shap_values[1], axis=0)
         shap_values[2] = _np.expand_dims(shap_values[2], axis=0)
+
+    if len(shap_values) > 1:
+        plot_type = 'bar'
 
     _sh.summary_plot(shap_values=shap_values,
                      class_names=class_names,

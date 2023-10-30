@@ -28,22 +28,12 @@ def waterfall_plot(explainer, shap_values: list[_np.array], feature_names: list[
       shap_values: calculated values, use shap_values[x] for single class.
       feature_names: a `list` containing the feature names.
       max_features: default 'auto' to show the default amount, set to 'max' to show all
-      display_class: (optional) the class to plot
       display_entry: (optional) the entry to display when multiple have been calculated
+      display_class: (optional) the class to plot
 
     Returns:
         None
     """
-    assert len(shap_values) > 1 and display_class is not None, (
-        f"shap_values contains multiple classes ({len(shap_values)}), "
-        f"the force_plot can only plot a single class at a time, "
-        f"please specify the class to plot.")
-
-    assert shap_values[0].ndim == 1 or (shap_values[0].ndim > 1 and display_entry is not None), \
-        (f"shap_values contains multiple examples ({len(shap_values[0])}), the waterfall_plot can only plot a single "
-         f"example at a time, please specify the plot_example.")
-
-    # Check if this is a multi-class shap value, if so pick a class.
     shap_value_class = shap_values
     if len(shap_values) > 1:
         shap_value_class = shap_values[display_class]
@@ -64,7 +54,7 @@ def waterfall_plot(explainer, shap_values: list[_np.array], feature_names: list[
 
 
 def summary_plot(shap_values: list[_np.array], class_names: list[str], feature_names: list[str],
-                 plot_type: str = 'auto') -> None:
+                 plot_type: str = 'dot', display_entry: int = None, display_class: int = None) -> None:
     """
     Summary plot for displaying feature for all entries.
 
@@ -73,36 +63,52 @@ def summary_plot(shap_values: list[_np.array], class_names: list[str], feature_n
       class_names: a `list` containing the class names.
       feature_names: a `list` containing the feature names.
       plot_type: 'bar' for multiclass and single class, 'dot', 'violin' and  for single class.
+      display_entry: (optional) the entry to display when multiple have been calculated
+      display_class: (optional) the class to plot
 
     Returns:
         None
     """
-    assert len(shap_values) > 1 and len(shap_values) == len(class_names), (f"Number of class_names {len(class_names)} "
-                                                                           f"does not match the number of classes "
-                                                                           f"present in shape_values {len(shap_values)}"
-                                                                           f", possible options:\n\nCheck if class_names"
-                                                                           f" is a list within list, if so use "
-                                                                           f"class_names[0].")
+    assert len(class_names) == len(
+        shap_values), (f"Number of class_names ({len(class_names)}) does not match the number of classes in shap_values "
+                       f"({shap_values[0].ndim})")
+    assert display_class is None or (
+                -1 < display_class < len(class_names)), f"Invalid display_class value {display_class}."
+
+    shap_values = _np.asarray(shap_values)
 
     # In case the shap_values were calculated for a single set of features we need to add an additional dimension.
     if shap_values[0].ndim == 1:
-        shap_values = [
-            _np.expand_dims(shap_values[0], axis=0),
-            _np.expand_dims(shap_values[1], axis=0),
-            _np.expand_dims(shap_values[2], axis=0)
-        ]
+        shap_values = list(map(lambda x: _np.expand_dims(x, axis=0), shap_values))
 
-    if len(shap_values) > 1:
+    if display_entry is not None:
+        shap_values = _np.expand_dims(_np.array(shap_values)[:, display_entry], axis=1)
+
+    # If we want to display a single class then we need to get that specific class name.
+    if display_class is not None:
+        class_names = [class_names[display_class]]
+        shap_values = shap_values[display_class]
+
+    # If we have more then one class to display then force plot type bar.
+    if shap_values[0].ndim > 1:
         plot_type = 'bar'
+
+    # Convert the numpy array back to a list with arrays as was the original data structure
+    shap_values = list(map(lambda x: x, shap_values))
+
+    # Because of converting the structure back we could end up with a single set of features so we may need to add
+    # an additional dimension again.
+    if shap_values[0].ndim == 1:
+        shap_values = list(map(lambda x: _np.expand_dims(x, axis=0), shap_values))
 
     _sh.summary_plot(shap_values=shap_values,
                      class_names=class_names,
                      feature_names=feature_names,
-                     plot_type=plot_type)
+                     plot_type=plot_type, show=True)
 
 
 def force_plot(shap_values: list[_np.array], explainer: _sh.Explainer, feature_names: list[str],
-               plot_class: int = None):
+               display_class: int = 0) -> None:
     """
     Force plot for displaying feature for a single class.
 
@@ -110,17 +116,13 @@ def force_plot(shap_values: list[_np.array], explainer: _sh.Explainer, feature_n
       shap_values: calculated values
       explainer: the explainer object
       feature_names: a `list` containing the feature names.
-      plot_class: (optional) the class to plot
+      display_class: (optional) the class to plot
 
     Returns:
         None
     """
-    assert len(shap_values) > 1 and plot_class is not None, (f"shap_values contains multiple classes ({len(shap_values)}), "
-                                                         f"the force_plot can only plot a single class at a time, "
-                                                         f"please specify the class to plot.")
+    if display_class is None:
+        display_class = 0
 
-    if plot_class is None:
-        plot_class = 0
-
-    _sh.force_plot(base_value=explainer.expected_value[plot_class], shap_values=shap_values[plot_class],
+    _sh.force_plot(base_value=explainer.expected_value[display_class], shap_values=shap_values[display_class],
                    features=feature_names)

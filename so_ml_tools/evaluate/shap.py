@@ -18,7 +18,7 @@ def calculate_shap_values(explainer: _sh.Explainer, x, n_samples: [int | str] = 
     return explainer.shap_values(x, nsamples=n_samples)
 
 
-def waterfall_plot(explainer, shap_values: list[_np.array], feature_names: list[str], max_features: [str | int] = 'auto',
+def waterfall_plot(explainer, shap_values: list[_np.array], feature_names: list[str], max_features: [str | int] = 'max',
                    display_entry: int = 0, display_class: int = 0):
     """
     Plot the breakdown of the
@@ -34,9 +34,10 @@ def waterfall_plot(explainer, shap_values: list[_np.array], feature_names: list[
     Returns:
         None
     """
-    shap_value_class = shap_values
-    if len(shap_values) > 1:
+    if len(shap_values) > 1:  # Multi-class
         shap_value_class = shap_values[display_class]
+    else:  # Single-class
+        shap_value_class = shap_values[0]
 
     shap_example_within_class = shap_value_class
     if shap_value_class.ndim > 1:

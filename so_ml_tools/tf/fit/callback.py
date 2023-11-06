@@ -66,7 +66,8 @@ def model_checkpoint_callback(dir_name='./checkpoints',
 def learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50) -> _LearningRateScheduler:
     """
     Creates a LearningRateScheduler which will be pre-configured with a division. The division
-    is calculated using find_learning_rate_division.
+    is calculated using find_learning_rate_division. At the start of every epoch a new learning rate
+    will be configured.
 
     :param learning_rate_start: initial starting learning rate
     :param epochs: number of epochs the model will train for

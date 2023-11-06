@@ -57,7 +57,7 @@ def one_hot_encode_column(*columns: list[any]) -> (OneHotEncoder, list[any]):
 
 
 def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_np.float64,
-                           inplace=True) -> _pd.DataFrame:
+                           inplace=True) -> _pd.DataFrame | None:
     """
     Converts the dtype of the given column to the specified dtype.
 
@@ -74,10 +74,14 @@ def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_
     for column in columns:
         work_df[column] = work_df[column].astype(dtype)
 
+    if inplace:
+        return None
+
     return work_df
 
 
-def delete_rows_where_columns_have_null_value(dataframe: _pd.DataFrame, column_names: list[str] = None, inplace=True) -> _pd.DataFrame:
+def delete_rows_where_columns_have_null_value(dataframe: _pd.DataFrame, column_names: list[str] = None, inplace=True) \
+        -> _pd.DataFrame | None:
     """
     Deletes all rows containing a null values inside the given column .
 
@@ -102,10 +106,39 @@ def delete_rows_where_columns_have_null_value(dataframe: _pd.DataFrame, column_n
         else:
             print(f"delete_null_rows: Column '{c}' does not exist in dataframe.")
 
+    if inplace:
+        return None
+
     return work_df
 
 
-def delete_rows_where_value_greater_then_z_max(dataframe: _pd.DataFrame, column_names: list[str], inplace=True) -> _pd.DataFrame:
+def delete_rows_where_value_equal_to(dataframe: _pd.DataFrame, column_name: str, value: object, inplace=True) \
+        -> _pd.DataFrame | None:
+    """
+    Deletes all rows where the specified column has the specified value.
+
+    :param dataframe: the pd.DatFrame
+    :param column_name: the names of the column to check
+    :param value: the value to compare with
+    :param inplace: return a new instance of the DataFrame (False) or adjust the given DataFrame
+    :return: see inplace
+    """
+    work_df = dataframe
+    if not inplace:
+        work_df = dataframe.copy(deep=True)
+
+    if column_name in dataframe:
+        work_df.drop(dataframe[dataframe[column_name] == value].index, inplace=True)
+    else:
+        print(f"delete_rows_where_value_equal_to: Column '{column_name}' does not exist in dataframe.")
+
+    if inplace:
+        return None
+
+    return work_df
+
+
+def delete_rows_where_value_greater_then_z_max(dataframe: _pd.DataFrame, column_names: list[str], inplace=True) -> _pd.DataFrame | None:
     work_df = dataframe
     if not inplace:
         work_df = dataframe.copy(deep=True)
@@ -118,10 +151,13 @@ def delete_rows_where_value_greater_then_z_max(dataframe: _pd.DataFrame, column_
         else:
             print(f"delete_rows_where_value_greater_then_z_max: Column '{c}' does not exist in dataframe.")
 
+    if inplace:
+        return None
+
     return work_df
 
 
-def fill_nan_with_value(dataframe: _pd.DataFrame, column_values: dict, inplace=True) -> _pd.DataFrame:
+def fill_nan_with_value(dataframe: _pd.DataFrame, column_values: dict, inplace=True) -> _pd.DataFrame | None:
     work_df = dataframe
     if not inplace:
         work_df = dataframe.copy(deep=True)
@@ -132,11 +168,34 @@ def fill_nan_with_value(dataframe: _pd.DataFrame, column_values: dict, inplace=T
         else:
             print(f"fill_nan_with_value: Column '{c}' does not exist in dataframe.")
 
+    if inplace:
+        return None
+
+    return work_df
+
+
+def fill_nan_with_mean(dataframe: _pd.DataFrame, column_names: list[str], inplace = True) -> _pd.DataFrame | None:
+    work_df = dataframe
+    if not inplace:
+        work_df = dataframe.copy(deep=True)
+
+    for c in column_names:
+        if c in dataframe:
+            c_mean = work_df[c].mean()
+            work_df[c].fillna(value=c_mean, inplace=True)
+        else:
+            print(f"fill_nan_with_mean: Column '{c}' does not exist in dataframe.")
+
+    if inplace:
+        return None
+
     return work_df
 
 
 def generate_code_ordinal_encoder(dataframe: _pd.DataFrame, column_names: list[str]) -> None:
-    print(f"\n###################################################\nNOTE: The order still needs to be manualy adjusted.\n###################################################\n")
+    print(f"\n###################################################\n"
+          f"NOTE: The order still needs to be manualy adjusted.\n"
+          f"###################################################\n")
     for c in column_names:
         if c in dataframe:
             try:
@@ -146,7 +205,23 @@ def generate_code_ordinal_encoder(dataframe: _pd.DataFrame, column_names: list[s
             except TypeError as e:
                 print(f"Column {c} threw an exception {e}.")
         else:
-            print(f"delete_null_rows: Column '{c}' does not exist in dataframe.")
+            print(f"generate_code_ordinal_encoder: Column '{c}' does not exist in dataframe.")
+
+
+def generate_one_hot_encoder(dataframe: _pd.DataFrame, column_names: list[str]) -> None:
+    print(f"\n###################################################\n"
+          f"NOTE: The order still needs to be manualy adjusted.\n"
+          f"###################################################\n")
+    for c in column_names:
+        if c in dataframe:
+            try:
+                values = dataframe[c].unique()
+                categories = "',\n    '".join(values)
+                print(f"{c}_encoder = sklearn.preprocessing.OneHotEncoder(categories=[[\n    '{categories}'\n]])")
+            except TypeError as e:
+                print(f"Column {c} threw an exception {e}.")
+        else:
+            print(f"generate_one_hot_encoder: Column '{c}' does not exist in dataframe.")
 
 
 def delete_rows_not_numeric(dataframe: _pd.DataFrame, column_name: str, inplace=True) -> _pd.DataFrame:

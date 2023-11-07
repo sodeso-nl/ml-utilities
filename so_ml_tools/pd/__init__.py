@@ -1,9 +1,11 @@
 from . import (
     dataframe,
-    plot
+    plot,
+    report
 )
 
 __all__ = [
     "dataframe",
-    "plot"
+    "plot",
+    "report"
 ]

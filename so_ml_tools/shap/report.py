@@ -2,10 +2,16 @@ import shap as _sh
 import numpy as _np
 import tensorflow as _tf
 
-# https://towardsdatascience.com/explain-any-models-with-the-shap-values-use-the-kernelexplainer-79de9464897a
 
+def create_kernel_explainer(model: [_tf.keras.Model | _tf.keras.Sequential], x: _np.array, sample_size=None) \
+        -> _sh.Explainer:
+    """
+    Args:
+        model:
+        x:
+        sample_size:
 
-def create_kernel_explainer(model: [_tf.keras.Model | _tf.keras.Sequential], x, sample_size=None) -> _sh.Explainer:
+    """
     x_sample = x
     if sample_size is not None:
         x_sample = x[:sample_size, :]
@@ -13,7 +19,13 @@ def create_kernel_explainer(model: [_tf.keras.Model | _tf.keras.Sequential], x, 
     return _sh.KernelExplainer(model, x_sample)
 
 
-def calculate_shap_values(explainer: _sh.Explainer, x, n_samples: [int | str] = "auto"):
+def calculate_shap_values(explainer: _sh.Explainer, x: _np.array, n_samples: [int | str] = "auto"):
+    """
+    Args:
+        explainer:
+        x:
+        n_samples:
+    """
     print(f"Calculating shap values for {len(x)} entries.")
     return explainer.shap_values(x, nsamples=n_samples)
 
@@ -69,13 +81,14 @@ def summary_plot(shap_values: list[_np.array], class_names: list[str], feature_n
         None
     """
     assert len(class_names) == len(
-        shap_values), f"Number of class_names ({len(class_names)}) does not match the number of classes in shap_values ({shap_values[0].ndim})"
+        shap_values), (f"Number of class_names ({len(class_names)}) does not match the number of "
+                       f"classes in shap_values ({shap_values[0].ndim})")
     assert display_class is None or (
                 -1 < display_class < len(class_names)), f"Invalid display_class value {display_class}."
 
     shap_values = _np.array(shap_values)
 
-    # In case the shap_values were calculated for a single set of features we need to add an additional dimension.
+    # In case the shap_values were calculated for a single set of features we need to add another dimension.
     if shap_values[0].ndim == 1:
         shap_values = _np.array(list(map(lambda x: _np.expand_dims(x, axis=0), shap_values)))
 
@@ -113,7 +126,7 @@ def summary_plot(shap_values: list[_np.array], class_names: list[str], feature_n
 
 
 def force_plot(shap_values: list[_np.array], explainer: _sh.Explainer, feature_names: list[str],
-               display_class: int = 0) -> None:
+               display_class: int = 0) -> object:
     """
     Force plot for displaying feature for a single class.
 
@@ -129,5 +142,5 @@ def force_plot(shap_values: list[_np.array], explainer: _sh.Explainer, feature_n
     if display_class is None:
         display_class = 0
 
-    _sh.force_plot(base_value=explainer.expected_value[display_class], shap_values=shap_values[display_class],
+    return _sh.force_plot(base_value=explainer.expected_value[display_class], shap_values=shap_values[display_class],
                    features=feature_names)

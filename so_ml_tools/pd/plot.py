@@ -1,10 +1,5 @@
 import matplotlib.pyplot as _plt
 import pandas as _pd
-from ydata_profiling import ProfileReport as _pr
-
-
-def heatmap_correlation(dataframe: _pd.DataFrame):
-    _pr(df=dataframe)
 
 
 def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = None, log=False,

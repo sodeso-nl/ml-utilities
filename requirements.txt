@@ -6,3 +6,4 @@ tensorflow==2.13
 scipy==1.11.2
 shap==0.42.1
 ydata_profiling==4.6.1
+seaborn==0.13.0

@@ -3,6 +3,7 @@ import numpy as _np
 
 from sklearn.preprocessing import OneHotEncoder
 
+
 ########################################################################################################################
 # General
 ########################################################################################################################
@@ -138,7 +139,8 @@ def delete_rows_where_value_equal_to(dataframe: _pd.DataFrame, column_name: str,
     return work_df
 
 
-def delete_rows_where_value_greater_then_z_max(dataframe: _pd.DataFrame, column_names: list[str], inplace=True) -> _pd.DataFrame | None:
+def delete_rows_where_value_greater_then_z_max(dataframe: _pd.DataFrame, column_names: list[str],
+                                               inplace=True) -> _pd.DataFrame | None:
     work_df = dataframe
     if not inplace:
         work_df = dataframe.copy(deep=True)
@@ -174,7 +176,17 @@ def fill_nan_with_value(dataframe: _pd.DataFrame, column_values: dict, inplace=T
     return work_df
 
 
-def fill_nan_with_mean(dataframe: _pd.DataFrame, column_names: list[str], inplace = True) -> _pd.DataFrame | None:
+def fill_nan_with_global_mean(dataframe: _pd.DataFrame, column_names: list[str], inplace=True) \
+        -> _pd.DataFrame | None:
+    """
+        Fill in missing values based on a global mean value which is calculated on all non `NaN` values in the same
+        column.
+
+        Args:
+            dataframe: the pd.DatFrame
+            column_names: list of column names with `NaN` values.
+            inplace: update the given dataframe or return a new dataframe.
+    """
     work_df = dataframe
     if not inplace:
         work_df = dataframe.copy(deep=True)
@@ -185,6 +197,46 @@ def fill_nan_with_mean(dataframe: _pd.DataFrame, column_names: list[str], inplac
             work_df[c].fillna(value=c_mean, inplace=True)
         else:
             print(f"fill_nan_with_mean: Column '{c}' does not exist in dataframe.")
+
+    if inplace:
+        return None
+
+    return work_df
+
+
+def fill_nan_with_mean_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+                                  fill_remainder_with_global_mean=True, inplace=True) -> _pd.DataFrame | None:
+    """
+    Fill in missing values based on a mean value which is calculated on all data having a similar value in
+    another column. For example, fill in BMI values based on other BMI values that have the same age.
+
+    If any NaN values are left over then these can be filled in by setting the `fill_remainder_with_global_mean` to
+    True (default: True).
+
+    Args:
+        dataframe: the pd.DatFrame
+        column_name: name of the column with the `NaN` values.
+        group_by_column_name: name of the column to use as the group by column to calculate the mean value of column_name.
+        fill_remainder_with_global_mean: fill any remaining `NaN` values with the global mean.
+        inplace: update the given dataframe or return a new dataframe.
+    """
+    work_df = dataframe
+    if not inplace:
+        work_df = dataframe.copy(deep=True)
+
+    assert column_name in dataframe, f"fill_nan_with_mean: Column '{column_name}' does not exist in dataframe."
+    assert group_by_column_name in dataframe, (f"fill_nan_with_mean: Column '{group_by_column_name}' "
+                                               f"does not exist in dataframe.")
+
+    mean_by_group = work_df.groupby(group_by_column_name)[column_name].transform('mean')
+
+    # Use a list comprehension to fill in missing value values with the mean value of the corresponding group value.
+    work_df[column_name] = [mean_value if _pd.isna(value) else value for value, mean_value in
+                            zip(work_df[column_name], mean_by_group)]
+
+    # If any other values are still NaN then check if we need to fill these in a default manner.
+    if fill_remainder_with_global_mean:
+        work_df = fill_nan_with_global_mean(dataframe=work_df, column_names=[column_name], inplace=inplace)
 
     if inplace:
         return None

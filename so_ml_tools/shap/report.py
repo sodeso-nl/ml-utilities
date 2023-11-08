@@ -4,7 +4,7 @@ import numpy as _np
 import tensorflow as _tf
 
 
-def create_kernel_explainer(model: [_tf.keras.Model | _tf.keras.Sequential], x: _np.array | _pd.DataFrame, sample_size=None) \
+def create_kernel_explainer(model: [_tf.keras.Model | _tf.keras.Sequential], x: [_np.array | _pd.DataFrame], sample_size=None) \
         -> _sh.Explainer:
     """
     Args:

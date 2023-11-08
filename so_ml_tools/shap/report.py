@@ -1,16 +1,19 @@
 import shap as _sh
+import pandas as _pd
 import numpy as _np
 import tensorflow as _tf
 
 
-def create_kernel_explainer(model: [_tf.keras.Model | _tf.keras.Sequential], x: _np.array, sample_size=None) \
+def create_kernel_explainer(model: [_tf.keras.Model | _tf.keras.Sequential], x: _np.array | _pd.DataFrame, sample_size=None) \
         -> _sh.Explainer:
     """
     Args:
-        model:
-        x:
-        sample_size:
+        model: keras model
+        x: training dataset, either a numpy array or a pandas dataframe.
+        sample_size:  sample size
 
+    Returns:
+        The explainer object.
     """
     x_sample = x
     if sample_size is not None:

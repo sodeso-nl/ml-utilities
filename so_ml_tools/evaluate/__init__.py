@@ -1,11 +1,9 @@
 from . import (
     analyze,
-    plot,
-    shap
+    plot
 )
 
 __all__ = [
     "analyze",
-    "plot",
-    "shap"
+    "plot"
 ]

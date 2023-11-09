@@ -159,14 +159,21 @@ def delete_rows_where_value_greater_then_z_max(dataframe: _pd.DataFrame, column_
     return work_df
 
 
-def fill_nan_with_value(dataframe: _pd.DataFrame, column_values: dict, inplace=True) -> _pd.DataFrame | None:
+def fill_nan_with_value(dataframe: _pd.DataFrame, column_names: list[str], value, inplace=True, add_indicator=False) \
+        -> _pd.DataFrame | None:
     work_df = dataframe
     if not inplace:
         work_df = dataframe.copy(deep=True)
 
-    for c, v in column_values.items():
+    if not type(column_names) == list and column_names is not None:
+        column_names = [column_names]
+
+    for c in column_names:
         if c in dataframe:
-            work_df[c].fillna(value=v, inplace=True)
+            if work_df[c].isna().any():
+                if add_indicator:
+                    work_df[c + '_nan'] = work_df[c].isna().astype(int)
+                work_df[c].fillna(value=value, inplace=True)
         else:
             print(f"fill_nan_with_value: Column '{c}' does not exist in dataframe.")
 
@@ -176,16 +183,194 @@ def fill_nan_with_value(dataframe: _pd.DataFrame, column_values: dict, inplace=T
     return work_df
 
 
-def fill_nan_with_global_mean(dataframe: _pd.DataFrame, column_names: list[str], inplace=True) \
+def fill_nan_with_previous_value(dataframe: _pd.DataFrame, column_names: list[str], inplace=True, add_indicator=False) \
         -> _pd.DataFrame | None:
     """
-        Fill in missing values based on a global mean value which is calculated on all non `NaN` values in the same
+        Fill in missing values based on the previous value.
+
+        Args:
+            dataframe: the pd.DatFrame
+            column_names: list of column names with `NaN` values.
+            inplace: update the given dataframe or return a new dataframe.
+            add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    work_df = dataframe
+    if not inplace:
+        work_df = dataframe.copy(deep=True)
+
+    if not type(column_names) == list and column_names is not None:
+        column_names = [column_names]
+
+    for c in column_names:
+        if c in dataframe:
+            if add_indicator:
+                work_df[c + '_nan'] = work_df[c].isna().astype(int)
+            work_df[c].fillna(method='ffill', inplace=True)
+        else:
+            print(f"fill_nan_with_previous_value: Column '{c}' does not exist in dataframe.")
+
+    if inplace:
+        return None
+
+    return work_df
+
+
+def fill_nan_with_next_value(dataframe: _pd.DataFrame, column_names: list[str], inplace=True, add_indicator=False) \
+        -> _pd.DataFrame | None:
+    """
+        Fill in missing values based on the next value.
+
+        Args:
+            dataframe: the pd.DatFrame
+            column_names: list of column names with `NaN` values.
+            inplace: update the given dataframe or return a new dataframe.
+            add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    work_df = dataframe
+    if not inplace:
+        work_df = dataframe.copy(deep=True)
+
+    if not type(column_names) == list and column_names is not None:
+        column_names = [column_names]
+
+    for c in column_names:
+        if c in dataframe:
+            if add_indicator:
+                work_df[c + '_nan'] = work_df[c].isna().astype(int)
+            work_df[c].fillna(method='bfill', inplace=True)
+        else:
+            print(f"fill_nan_with_next_value: Column '{c}' does not exist in dataframe.")
+
+    if inplace:
+        return None
+
+    return work_df
+
+
+def fill_nan_with_global_mode(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
+                              add_indicator=False) -> _pd.DataFrame | None:
+    """
+        Fill in missing values based on the mode (most often) value which is calculated on all non `NaN` values
+        in the same column.
+
+        Args:
+            dataframe: the pd.DatFrame
+            column_names: list of column names with `NaN` values.
+            inplace: update the given dataframe or return a new dataframe.
+            add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_global_func(dataframe=dataframe, column_names=column_names, agg_func='mode', inplace=inplace,
+                                     add_indicator=add_indicator)
+
+
+def fill_nan_with_global_kurt(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
+                              add_indicator=False) -> _pd.DataFrame | None:
+    """
+        Fill in missing values based on kurt value which is calculated on all non `NaN` values in the same
         column.
 
         Args:
             dataframe: the pd.DatFrame
             column_names: list of column names with `NaN` values.
             inplace: update the given dataframe or return a new dataframe.
+            add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_global_func(dataframe=dataframe, column_names=column_names, agg_func='kurt', inplace=inplace,
+                                     add_indicator=add_indicator)
+
+
+def fill_nan_with_global_skew(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
+                              add_indicator=False) -> _pd.DataFrame | None:
+    """
+        Fill in missing values based on skew value which is calculated on all non `NaN` values in the same
+        column.
+
+        Args:
+            dataframe: the pd.DatFrame
+            column_names: list of column names with `NaN` values.
+            inplace: update the given dataframe or return a new dataframe.
+            add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_global_func(dataframe=dataframe, column_names=column_names, agg_func='kurt', inplace=inplace,
+                                     add_indicator=add_indicator)
+
+
+def fill_nan_with_global_median(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
+                                add_indicator=False) -> _pd.DataFrame | None:
+    """
+        Fill in missing values based on median value which is calculated on all non `NaN` values in the same
+        column.
+
+        Args:
+            dataframe: the pd.DatFrame
+            column_names: list of column names with `NaN` values.
+            inplace: update the given dataframe or return a new dataframe.
+            add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_global_func(dataframe=dataframe, column_names=column_names, agg_func='median', inplace=inplace,
+                                     add_indicator=add_indicator)
+
+
+def fill_nan_with_global_mean(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
+                              add_indicator=False) -> _pd.DataFrame | None:
+    """
+        Fill in missing values based on mean value which is calculated on all non `NaN` values in the same
+        column.
+
+        Args:
+            dataframe: the pd.DatFrame
+            column_names: list of column names with `NaN` values.
+            inplace: update the given dataframe or return a new dataframe.
+            add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_global_func(dataframe=dataframe, column_names=column_names, agg_func='mean', inplace=inplace,
+                                     add_indicator=add_indicator)
+
+
+def fill_nan_with_global_max(dataframe: _pd.DataFrame, column_names: list[str], inplace=True, add_indicator=False) \
+        -> _pd.DataFrame | None:
+    """
+        Fill in missing values based on max value which is calculated on all non `NaN` values in the same
+        column.
+
+        Args:
+            dataframe: the pd.DatFrame
+            column_names: list of column names with `NaN` values.
+            inplace: update the given dataframe or return a new dataframe.
+            add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_global_func(dataframe=dataframe, column_names=column_names, agg_func='max', inplace=inplace,
+                                     add_indicator=add_indicator)
+
+
+def fill_nan_with_global_min(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
+                             add_indicator=False) -> _pd.DataFrame | None:
+    """
+        Fill in missing values based on min value which is calculated on all non `NaN` values in the same
+        column.
+
+        Args:
+            dataframe: the pd.DatFrame
+            column_names: list of column names with `NaN` values.
+            inplace: update the given dataframe or return a new dataframe.
+            add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_global_func(dataframe=dataframe, column_names=column_names, agg_func='min', inplace=inplace,
+                                     add_indicator=add_indicator)
+
+
+def fill_nan_with_global_func(dataframe: _pd.DataFrame, column_names: list[str], agg_func: str, inplace=True,
+                              add_indicator=False) -> _pd.DataFrame | None:
+    """
+        Fill in missing values based on a func value which is calculated on all non `NaN` values in the same
+        column.
+
+        Args:
+            dataframe: the pd.DatFrame
+            column_names: list of column names with `NaN` values.
+            agg_func: type of function to use: 'mean', 'min', 'max', 'median', 'skew' or 'kurt'
+            inplace: update the given dataframe or return a new dataframe.
+            add_indicator: add an indicator column indicating with a boolean value if the value was NaN
     """
     work_df = dataframe
     if not inplace:
@@ -193,8 +378,11 @@ def fill_nan_with_global_mean(dataframe: _pd.DataFrame, column_names: list[str],
 
     for c in column_names:
         if c in dataframe:
-            c_mean = work_df[c].mean()
-            work_df[c].fillna(value=c_mean, inplace=True)
+            if add_indicator:
+                work_df[c + '_nan'] = work_df[c].isna().astype(int)
+
+            c_value = work_df[c].apply(agg_func)
+            work_df[c].fillna(value=c_value, inplace=True)
         else:
             print(f"fill_nan_with_mean: Column '{c}' does not exist in dataframe.")
 
@@ -204,39 +392,227 @@ def fill_nan_with_global_mean(dataframe: _pd.DataFrame, column_names: list[str],
     return work_df
 
 
-def fill_nan_with_mean_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
-                                  fill_remainder_with_global_mean=True, inplace=True) -> _pd.DataFrame | None:
+def fill_nan_with_mode_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+                                  remainder_agg_func='mode', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
     """
-    Fill in missing values based on a mean value which is calculated on all data having a similar value in
-    another column. For example, fill in BMI values based on other BMI values that have the same age.
+    Fill in missing values based on the mode value (most often) which is calculated on all data having a similar value
+    in another column. For example, fill in BMI values based on other BMI values that have the same age.
 
-    If any NaN values are left over then these can be filled in by setting the `fill_remainder_with_global_mean` to
-    True (default: True).
+    If any NaN values are left over then these can be filled in by setting the `fill_remainder_with_global_func` the
+    appropriate function.
+
+    Alternatively you can use the soml.sklearn.SimpleGroupByImputer when you want to do this in a ColumnTransformer.
 
     Args:
         dataframe: the pd.DatFrame
         column_name: name of the column with the `NaN` values.
-        group_by_column_name: name of the column to use as the group by column to calculate the mean value of column_name.
-        fill_remainder_with_global_mean: fill any remaining `NaN` values with the global mean.
+        group_by_column_name: name of the column to use as the group by column to calculate the mode
+            value of column_name.
+        remainder_agg_func: fill any remaining `NaN` values with the global function.
         inplace: update the given dataframe or return a new dataframe.
+        add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+                                         group_by_column_name=group_by_column_name, agg_func='mode',
+                                         remainder_agg_func=remainder_agg_func,
+                                         inplace=inplace, add_indicator=add_indicator)
+
+
+def fill_nan_with_kurt_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+                                  remainder_agg_func='kurt', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+    """
+    Fill in missing values based on the kurt value which is calculated on all data having a similar value in
+    another column. For example, fill in BMI values based on other BMI values that have the same age.
+
+    If any NaN values are left over then these can be filled in by setting the `fill_remainder_with_global_func` the
+    appropriate function.
+
+    Alternatively you can use the soml.sklearn.SimpleGroupByImputer when you want to do this in a ColumnTransformer.
+
+    Args:
+        dataframe: the pd.DatFrame
+        column_name: name of the column with the `NaN` values.
+        group_by_column_name: name of the column to use as the group by column to calculate the kurt
+            value of column_name.
+        remainder_agg_func: fill any remaining `NaN` values with the global function.
+        inplace: update the given dataframe or return a new dataframe.
+        add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+                                         group_by_column_name=group_by_column_name, agg_func='kurt',
+                                         remainder_agg_func=remainder_agg_func,
+                                         inplace=inplace, add_indicator=add_indicator)
+
+
+def fill_nan_with_skew_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+                                  remainder_agg_func='skew', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+    """
+    Fill in missing values based on the skew value which is calculated on all data having a similar value in
+    another column. For example, fill in BMI values based on other BMI values that have the same age.
+
+    If any NaN values are left over then these can be filled in by setting the `fill_remainder_with_global_func` the
+    appropriate function.
+
+    Alternatively you can use the soml.sklearn.SimpleGroupByImputer when you want to do this in a ColumnTransformer.
+
+    Args:
+        dataframe: the pd.DatFrame
+        column_name: name of the column with the `NaN` values.
+        group_by_column_name: name of the column to use as the group by column to calculate the skew
+            value of column_name.
+        remainder_agg_func: fill any remaining `NaN` values with the global function.
+        inplace: update the given dataframe or return a new dataframe.
+        add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+                                         group_by_column_name=group_by_column_name, agg_func='skew',
+                                         remainder_agg_func=remainder_agg_func,
+                                         inplace=inplace, add_indicator=add_indicator)
+
+
+def fill_nan_with_median_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+                                    remainder_agg_func='median', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+    """
+    Fill in missing values based on the median value which is calculated on all data having a similar value in
+    another column. For example, fill in BMI values based on other BMI values that have the same age.
+
+    If any NaN values are left over then these can be filled in by setting the `fill_remainder_with_global_func` the
+    appropriate function.
+
+    Alternatively you can use the soml.sklearn.SimpleGroupByImputer when you want to do this in a ColumnTransformer.
+
+    Args:
+        dataframe: the pd.DatFrame
+        column_name: name of the column with the `NaN` values.
+        group_by_column_name: name of the column to use as the group by column to calculate the median
+            value of column_name.
+        remainder_agg_func: fill any remaining `NaN` values with the global function.
+        inplace: update the given dataframe or return a new dataframe.
+        add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+                                         group_by_column_name=group_by_column_name, agg_func='median',
+                                         remainder_agg_func=remainder_agg_func,
+                                         inplace=inplace, add_indicator=add_indicator)
+
+
+def fill_nan_with_mean_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+                                  remainder_agg_func='mean', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+    """
+    Fill in missing values based on the mean value which is calculated on all data having a similar value in
+    another column. For example, fill in BMI values based on other BMI values that have the same age.
+
+    If any NaN values are left over then these can be filled in by setting the `fill_remainder_with_global_func` the
+    appropriate function.
+
+    Alternatively you can use the soml.sklearn.SimpleGroupByImputer when you want to do this in a ColumnTransformer.
+
+    Args:
+        dataframe: the pd.DatFrame
+        column_name: name of the column with the `NaN` values.
+        group_by_column_name: name of the column to use as the group by column to calculate the mean
+            value of column_name.
+        remainder_agg_func: fill any remaining `NaN` values with the global function.
+        inplace: update the given dataframe or return a new dataframe.
+        add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+                                         group_by_column_name=group_by_column_name, agg_func='mean',
+                                         remainder_agg_func=remainder_agg_func,
+                                         inplace=inplace, add_indicator=add_indicator)
+
+
+def fill_nan_with_max_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+                                 remainder_agg_func='max', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+    """
+    Fill in missing values based on the max value which is calculated on all data having a similar value in
+    another column. For example, fill in BMI values based on other BMI values that have the same age.
+
+    If any NaN values are left over then these can be filled in by setting the `fill_remainder_with_global_func` the
+    appropriate function.
+
+    Alternatively you can use the soml.sklearn.SimpleGroupByImputer when you want to do this in a ColumnTransformer.
+
+    Args:
+        dataframe: the pd.DatFrame
+        column_name: name of the column with the `NaN` values.
+        group_by_column_name: name of the column to use as the group by column to calculate the max
+            value of column_name.
+        remainder_agg_func: fill any remaining `NaN` values with the global function.
+        inplace: update the given dataframe or return a new dataframe.
+        add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+                                         group_by_column_name=group_by_column_name, agg_func='max',
+                                         remainder_agg_func=remainder_agg_func,
+                                         inplace=inplace, add_indicator=add_indicator)
+
+
+def fill_nan_with_min_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+                                 remainder_agg_func='min', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+    """
+    Fill in missing values based on the min value which is calculated on all data having a similar value in
+    another column. For example, fill in BMI values based on other BMI values that have the same age.
+
+    If any NaN values are left over then these can be filled in by setting the `fill_remainder_with_global_func` the
+    appropriate function.
+
+    Alternatively you can use the soml.sklearn.SimpleGroupByImputer when you want to do this in a ColumnTransformer.
+
+    Args:
+        dataframe: the pd.DatFrame
+        column_name: name of the column with the `NaN` values.
+        group_by_column_name: name of the column to use as the group by column to calculate the min
+            value of column_name.
+        remainder_agg_func: fill any remaining `NaN` values with the global function.
+        inplace: update the given dataframe or return a new dataframe.
+        add_indicator: add an indicator column indicating with a boolean value if the value was NaN
+    """
+    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+                                         group_by_column_name=group_by_column_name, agg_func='min',
+                                         remainder_agg_func=remainder_agg_func,
+                                         inplace=inplace, add_indicator=add_indicator)
+
+
+def fill_nan_with_func_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str, agg_func: str,
+                                  remainder_agg_func=None, inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+    """
+    Fill in missing values based on a function  which is calculated on all data having a similar value in
+    another column. For example, fill in BMI values based on other BMI values that have the same age.
+
+    If any NaN values are left over then these can be filled in by setting the `fill_remainder_with_global_func` the
+    appropriate function.
+
+    Alternatively you can use the soml.sklearn.SimpleGroupByImputer when you want to do this in a ColumnTransformer.
+
+    Args:
+        dataframe: the pd.DatFrame
+        column_name: name of the column with the `NaN` values.
+        group_by_column_name: name of the column to use as the group by column to calculate the function
+            value of column_name.
+        agg_func: type of function to use: 'mean', 'min', 'max', 'median', 'mode', 'skew' or 'kurt'
+        remainder_agg_func: fill any remaining `NaN` values with the global function.
+        inplace: update the given dataframe or return a new dataframe.
+        add_indicator: add an indicator column indicating with a boolean value if the value was NaN
     """
     work_df = dataframe
     if not inplace:
         work_df = dataframe.copy(deep=True)
 
-    assert column_name in dataframe, f"fill_nan_with_mean: Column '{column_name}' does not exist in dataframe."
-    assert group_by_column_name in dataframe, (f"fill_nan_with_mean: Column '{group_by_column_name}' "
+    assert column_name in dataframe, f"fill_nan_with_func_grouped_by: Column '{column_name}' does not exist in dataframe."
+    assert group_by_column_name in dataframe, (f"fill_nan_with_func_grouped_by: Column '{group_by_column_name}' "
                                                f"does not exist in dataframe.")
 
-    mean_by_group = work_df.groupby(group_by_column_name)[column_name].transform('mean')
+    if add_indicator:
+        work_df[column_name + '_nan'] = work_df[column_name].isna().astype(int)
 
-    # Use a list comprehension to fill in missing value values with the mean value of the corresponding group value.
-    work_df[column_name] = [mean_value if _pd.isna(value) else value for value, mean_value in
-                            zip(work_df[column_name], mean_by_group)]
+    mean_by_group = work_df.groupby(group_by_column_name)[column_name].agg(agg_func)
+    work_df[column_name].fillna(work_df[group_by_column_name].map(mean_by_group), inplace=True)
 
     # If any other values are still NaN then check if we need to fill these in a default manner.
-    if fill_remainder_with_global_mean:
-        work_df = fill_nan_with_global_mean(dataframe=work_df, column_names=[column_name], inplace=inplace)
+    if remainder_agg_func:
+        c_value = work_df[column_name].apply(remainder_agg_func)
+        work_df[column_name].fillna(value=c_value, inplace=True)
 
     if inplace:
         return None

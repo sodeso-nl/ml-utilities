@@ -7,6 +7,7 @@ import so_ml_tools as _soml
 
 class Test(TestCase):
     def test_is_multiclass_classification_true(self):
+        _soml.sklearn.FillForwardImputer.FillForwardImputer
         y_prob = [[0.98, 0.2], [0.4, 0.6]]
         self.assertTrue(_soml.util.label.is_multiclass_classification(y_prob=y_prob))
         self.assertTrue(_soml.util.label.is_multiclass_classification(y_prob=np.array(y_prob)))

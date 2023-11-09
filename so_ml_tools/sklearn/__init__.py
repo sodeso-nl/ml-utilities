@@ -1,13 +1,9 @@
 from . import (
-    BooleanEncoder,
-    FillBackwardImputer,
-    FillForwardImputer,
-    SimpleGroupByImputer
+    encoder,
+    imputer
 )
 
 __all__ = [
-    "BooleanEncoder",
-    "FillBackwardImputer",
-    "FillForwardImputer",
-    "SimpleGroupByImputer"
+    "encoder",
+    "imputer",
 ]

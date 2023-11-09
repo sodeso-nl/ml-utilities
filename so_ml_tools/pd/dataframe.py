@@ -159,6 +159,9 @@ def delete_rows_where_value_greater_then_z_max(dataframe: _pd.DataFrame, column_
     return work_df
 
 
+
+
+
 def fill_nan_with_value(dataframe: _pd.DataFrame, column_names: list[str], value, inplace=True, add_indicator=False) \
         -> _pd.DataFrame | None:
     work_df = dataframe

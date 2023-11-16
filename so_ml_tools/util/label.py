@@ -22,12 +22,17 @@ def is_multiclass_classification(y_prob: any) -> bool:
     """
     assert y_prob is not None, "y_prob is null"
 
+    if isinstance(y_prob, _pd.DataFrame):
+        y_prob = y_prob.to_numpy()
+    elif isinstance(y_prob, _pd.Series):
+        y_prob = _np.expand_dims(y_prob.to_numpy(), axis=-1)
+
     if isinstance(y_prob, list):
         return len(y_prob) > 0 and isinstance(y_prob[0], (list | _np.ndarray)) and len(y_prob[0]) > 1
     elif _tf.is_tensor(y_prob):
         return y_prob.get_shape().ndims == 2 and y_prob.shape[1] > 1
-    elif isinstance(y_prob, _pd.DataFrame):
-        return y_prob.ndims == 2 and y_prob.shape[1] > 1
+    # elif isinstance(y_prob, _pd.DataFrame):
+    #     return y_prob.ndims == 2 and y_prob.shape[1] > 1
     elif isinstance(y_prob, _np.ndarray):
         return y_prob.ndim == 2 and y_prob.shape[1] > 1
 
@@ -54,6 +59,11 @@ def is_binary_classification(y_prob: any) -> bool:
     """
     assert y_prob is not None, "y_prob is null"
 
+    if isinstance(y_prob, _pd.DataFrame):
+        y_prob = y_prob.to_numpy()
+    elif isinstance(y_prob, _pd.Series):
+        y_prob = _np.expand_dims(y_prob.to_numpy(), axis=-1)
+
     if isinstance(y_prob, list):
         if len(y_prob) > 0 and isinstance(y_prob[0], (list | _np.ndarray)):
             if len(y_prob[0]) == 1: # [[1], [0], [1]]
@@ -71,13 +81,13 @@ def is_binary_classification(y_prob: any) -> bool:
             return True
 
         return False
-    elif isinstance(y_prob, _pd.DataFrame):
-        if y_prob.ndims == 2 and y_prob.shape[1] == 1 and 0 <= y_prob.max() <= 2:  # [[1], [0], [1]]
-            return True
-        elif y_prob.ndims == 1 and 0 <= y_prob.max() <= 2:  # [0, 1, 1, 0, 1]
-            return True
-
-        return False
+    # elif isinstance(y_prob, _pd.DataFrame):
+    #     if y_prob.ndims == 2 and y_prob.shape[1] == 1 and 0 <= y_prob.max() <= 2:  # [[1], [0], [1]]
+    #         return True
+    #     elif y_prob.ndims == 1 and 0 <= y_prob.max() <= 2:  # [0, 1, 1, 0, 1]
+    #         return True
+    #
+    #     return False
     elif isinstance(y_prob, _np.ndarray):
         if y_prob.ndim == 2 and y_prob.shape[1] == 1 and 0 <= _np.max(y_prob) <= 2:  # [[1], [0], [1]]
             return True

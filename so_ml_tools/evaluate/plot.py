@@ -32,7 +32,7 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
 
     if isinstance(y_true, _tf.data.Dataset):
         raise TypeError('y_true is a dataset, please get the labels from the dataset using '
-                        '\'y_labels = ml.tf.dataset.get_labels(dataset=dataset)\'')
+                        '\'y_labels = soml.tf.dataset.get_labels(dataset=dataset)\'')
 
     y_true = _soml.util.label.to_prediction(y_prob=y_true)
     if y_pred is None and y_prob is not None:

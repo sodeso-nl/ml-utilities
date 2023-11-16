@@ -1,7 +1,6 @@
 import numpy as _np
+import pandas as _pd
 import tensorflow as _tf
-
-from typing import Union as _Union
 
 
 def is_multiclass_classification(y_prob: any) -> bool:
@@ -24,13 +23,15 @@ def is_multiclass_classification(y_prob: any) -> bool:
     assert y_prob is not None, "y_prob is null"
 
     if isinstance(y_prob, list):
-        return len(y_prob) > 0 and isinstance(y_prob[0], (list | _np.ndarray)) and len(y_prob[0]) > 1  # [[0.60, 0.10, 0.30], [....]]
+        return len(y_prob) > 0 and isinstance(y_prob[0], (list | _np.ndarray)) and len(y_prob[0]) > 1
     elif _tf.is_tensor(y_prob):
-        return y_prob.get_shape().ndims == 2 and y_prob.shape[1] > 1  # [[0.60, 0.10, 0.30], [....]]
+        return y_prob.get_shape().ndims == 2 and y_prob.shape[1] > 1
+    elif isinstance(y_prob, _pd.DataFrame):
+        return y_prob.ndims == 2 and y_prob.shape[1] > 1
     elif isinstance(y_prob, _np.ndarray):
-        return y_prob.ndim == 2 and y_prob.shape[1] > 1  # [[0.60, 0.10, 0.30], [....]]
+        return y_prob.ndim == 2 and y_prob.shape[1] > 1
 
-    raise TypeError('y should be of type tf.Tensor or np.array.')
+    raise TypeError('y should be of type tf.Tensor, np.array or pd.DataFrame.')
 
 
 def is_binary_classification(y_prob: any) -> bool:
@@ -70,6 +71,13 @@ def is_binary_classification(y_prob: any) -> bool:
             return True
 
         return False
+    elif isinstance(y_prob, _pd.DataFrame):
+        if y_prob.ndims == 2 and y_prob.shape[1] == 1 and 0 <= y_prob.max() <= 2:  # [[1], [0], [1]]
+            return True
+        elif y_prob.ndims == 1 and 0 <= y_prob.max() <= 2:  # [0, 1, 1, 0, 1]
+            return True
+
+        return False
     elif isinstance(y_prob, _np.ndarray):
         if y_prob.ndim == 2 and y_prob.shape[1] == 1 and 0 <= _np.max(y_prob) <= 2:  # [[1], [0], [1]]
             return True
@@ -78,7 +86,7 @@ def is_binary_classification(y_prob: any) -> bool:
 
         return False
 
-    raise TypeError('y_prob should be of type list, tf.Tensor or np.array.')
+    raise TypeError('y_prob should be of type tf.Tensor, np.array or pd.DataFrame.')
 
 
 def probability_to_class(y_prob: any) -> any:
@@ -109,10 +117,12 @@ def probability_to_class(y_prob: any) -> any:
         return list(_np.argmax(y_prob, axis=1))
     elif _tf.is_tensor(y_prob):
         return _tf.argmax(y_prob, axis=1)
+    elif isinstance(y_prob, _pd.DataFrame):
+        return y_prob.arg.idxmax(axis=1)
     elif isinstance(y_prob, _np.ndarray):
         return _np.argmax(y_prob, axis=1)
 
-    raise TypeError('y_prob should be of type list, tf.Tensor or np.array.')
+    raise TypeError('y_prob should be of type tf.Tensor, np.array or pd.DataFrame.')
 
 
 def probability_to_binary(y_prob: any) -> any:
@@ -135,7 +145,6 @@ def probability_to_binary(y_prob: any) -> any:
 
     Args:
         y_prob: the probabilities matrix either a 'list', 'tf.Tensor' or a 'np.array'
-        dtype: (optional) the destination type.
 
     Returns:
         Binarized prediction labels
@@ -150,11 +159,14 @@ def probability_to_binary(y_prob: any) -> any:
     if _tf.is_tensor(y_prob):
         y1 = _tf.round(y_prob)
         return _tf.cast(y1, dtype=_tf.int8)
+    elif isinstance(y_prob, _pd.DataFrame):
+        y1 = y_prob.round(decimals=0)
+        return y1.astype(_np.int64)
     elif isinstance(y_prob, _np.ndarray):
         y1 = _np.round(a=y_prob, decimals=0)
-        return y1.astype(int)
+        return y1.astype(_np.int64)
 
-    raise TypeError('y_prob should be of type list, tf.Tensor or np.array.')
+    raise TypeError('y_prob should be of type tf.Tensor, np.array or pd.DataFrame.')
 
 
 def to_prediction(y_prob: any) -> any:
@@ -164,7 +176,6 @@ def to_prediction(y_prob: any) -> any:
 
     Args:
         y_prob: the probabilities matrix either a 'list', 'tf.Tensor' or a 'np.array'
-        dtype:(optional, only applicable for binary classification) parameter to change the dtype
 
     Return:
         A tensor or numpy array with the prediction.

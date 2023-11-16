@@ -24,7 +24,8 @@ def one_hot_encode_column(*columns: list[any]) -> (OneHotEncoder, list[any]):
 
     If you get the ValueError:
 
-    all the input arrays must have same number of dimensions, but the array at index 0 has 1 dimension(s) and the array at index 1 has 2 dimension(s)
+    all the input arrays must have same number of dimensions, but the array at index 0 has 1 dimension(s) and the
+    array at index 1 has 2 dimension(s)
 
     Then that means one of the lists passed in has ha different shape then the others.
 
@@ -55,6 +56,15 @@ def one_hot_encode_column(*columns: list[any]) -> (OneHotEncoder, list[any]):
 
     return_values.insert(0, encoder)
     return return_values
+
+
+def colunm_as_dataframe(dataframe: _pd.DataFrame, column: str, drop_after: False) -> _pd.DataFrame:
+    column = dataframe[[column]]
+
+    if drop_after:
+        drop_columns(dataframe=dataframe, column_names=[column])
+
+    return column
 
 
 def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_np.float64,

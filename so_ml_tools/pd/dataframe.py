@@ -700,7 +700,7 @@ def describe(dataframe: _pd.DataFrame, column_names: list[str] = None, round=2):
     for c in columns:
         v = dataframe[c]
 
-        _mean = _std = _min = _q25 = _q50 = _q75 = _max = z_min = z_max = _np.NAN
+        _mean = _std = _min = _q25 = _q50 = _q75 = _max = z_score_negative = z_score_positive = _np.NAN
         if _pd.api.types.is_numeric_dtype(v):
             _mean = v.mean()
             _std = v.std()
@@ -711,17 +711,17 @@ def describe(dataframe: _pd.DataFrame, column_names: list[str] = None, round=2):
             _max = v.max()
 
             # Calculate lower value when Z-Score = -3
-            z_min = -3 * _std + _mean
+            z_score_negative = -3 * _std + _mean
 
             # Calculate upper value when Z-Score = 3
-            z_max = 3 * _std + _mean
+            z_score_positive = 3 * _std + _mean
 
         data.append([
-            v.name, v.dtype, v.count(), v.isna().sum(), v.nunique(), _mean, _std, z_min, z_max, _min, _q25,
+            v.name, v.dtype, v.count(), v.isna().sum(), v.nunique(), _mean, _std, z_score_negative, z_score_positive, _min, _q25,
             _q50, _q75, _max
         ])
 
     print(f"Total number of rows: {len(dataframe)}")
     return _pd.DataFrame(
-        columns=["Column", "DType", "NotNull", "Null", "Unique", "Mean", "Std", "Z-Min", "Z-Max", "Min", "25%", "50%",
+        columns=["Column", "DType", "NotNull", "Null", "Unique", "Mean", "Std", "-3σ", "3σ", "Min", "25%", "50%",
                  "75%", "Max"], data=data).round(round)

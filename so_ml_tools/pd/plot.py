@@ -1,6 +1,7 @@
 import matplotlib.pyplot as _plt
+import matplotlib as _mpl
 import pandas as _pd
-
+import numpy as _np
 
 def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = None, log=False,
                                   min_nunique: int = 3, max_nunique: int = 50, figsize: tuple = None, cols=3,
@@ -56,27 +57,29 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
         nunique = v.nunique()
 
         if _pd.api.types.is_numeric_dtype(v) and min_nunique < nunique:
-
-            z_min = -3 * v.std() + v.mean()
-            z_max = 3 * v.std() + v.mean()
-
             # Make sure we do not get more then 50 bins.
             nunique = 50 if nunique > 50 else nunique
             v.hist(ax=axs[n], bins=nunique + 1, log=log, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1)
 
-            # Only show z_min when it is not before the graph starts.
-            legend = False
-            if z_max < v.max():
-                axs[n].axvline(z_max, label='Z-Max', color='#c46110')
-                legend = True
 
-            # Only show z_min when it is not before the graph starts.
-            if z_min > v.min():
-                axs[n].axvline(z_min, label='Z-Min', color='#1cab0c')
-                legend = True
+            color = iter(["black", "darkred", "red", "lightred", 'lightgreen', 'green', 'darkgreen'])
+            axs[n].axvline(v.mean(), label=f'Mean', color=next(color), linestyle='dashed')
 
-            if legend:
-                axs[n].legend()
+            z_score_min = [-1 * v.std() + v.mean(), -2 * v.std() + v.mean(), -3 * v.std() + v.mean()]
+            for idx, value in enumerate(z_score_min):
+                # Only show when it is not before the graph starts.
+                c = next(color)
+                if value > v.min():
+                    axs[n].axvline(value, label=f'(-{idx+1}σ)', color=c, linestyle='dashed')
+
+            z_score_max = [1 * v.std() + v.mean(), 2 * v.std() + v.mean(), 3 * v.std() + v.mean()]
+            for idx, value in enumerate(z_score_max):
+                # Only show when it is not after the graph starts.
+                c = next(color)
+                if value < v.max():
+                    axs[n].axvline(value, label=f'({idx+1}σ)', color=c, linestyle='dashed')
+
+            axs[n].legend()
         elif _pd.api.types.is_object_dtype(v) and min_nunique < nunique <= max_nunique:
             v.hist(ax=axs[n], bins=range(nunique + 1), log=log, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1, width = .5)
         else:
@@ -92,6 +95,7 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
 
         # Remove unnecessary white space on the left/right side of the graph.
         axs[n].margins(x=0)
+        axs[n].grid(axis='x')
         n += 1
 
     for i in range(n, rows*cols):

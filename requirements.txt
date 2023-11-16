@@ -2,7 +2,7 @@ matplotlib==3.7.2
 pandas==2.0.3
 numpy==1.24.3
 scikit-learn==1.3.0
-tensorflow==2.14
+tensorflow[and-cuda]==2.14
 scipy==1.11.2
 shap==0.42.1
 ydata_profiling==4.6.1

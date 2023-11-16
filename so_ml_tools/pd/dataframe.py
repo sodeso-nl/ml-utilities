@@ -58,11 +58,11 @@ def one_hot_encode_column(*columns: list[any]) -> (OneHotEncoder, list[any]):
     return return_values
 
 
-def colunm_as_dataframe(dataframe: _pd.DataFrame, column: str, drop_after: False) -> _pd.DataFrame:
-    column = dataframe[[column]]
+def column_as_dataframe(dataframe: _pd.DataFrame, column_name: str, drop_after: False) -> _pd.DataFrame:
+    column = dataframe[[column_name]]
 
     if drop_after:
-        drop_columns(dataframe=dataframe, column_names=[column])
+        drop_columns(dataframe=dataframe, column_names=[column_name])
 
     return column
 

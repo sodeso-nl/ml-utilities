@@ -60,7 +60,7 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
     # label the axes
     ax.set(title="Confusion matrix",
            xlabel="predicted label",
-           ylabel="True label",
+           ylabel="Actual label",
            xticks=_np.arange(n_classes),
            yticks=_np.arange(n_classes),
            xticklabels=labels,

@@ -10,9 +10,21 @@ from scipy.interpolate import interp1d as _interp1d
 from sklearn.metrics import confusion_matrix as _confusion_matrix
 from sklearn.metrics import classification_report as _classification_report
 
+import itertools as _itertools
+
+import matplotlib.pyplot as _plt
+import numpy as _np
+import tensorflow as _tf
+import so_ml_tools as _soml
+
+from scipy.interpolate import interp1d as _interp1d
+
+from sklearn.metrics import confusion_matrix as _confusion_matrix
+from sklearn.metrics import classification_report as _classification_report
+
 
 def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = None, figsize=(15, 15), text_size=10,
-                     norm=False, savefig=False) -> None:
+                     norm=False, savefig=False, label_color='black') -> None:
     """
    Plots a confusion matrix of the given data.
 
@@ -47,9 +59,16 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
 
     fig, ax = _plt.subplots(figsize=figsize)
 
+    # Set background to transparent.
+    fig.patch.set_alpha(0.0)
+
     # noinspection PyUnresolvedReferences
+    # Color bar on the right side.
     cax = ax.matshow(cm, cmap=_plt.cm.Blues)
-    fig.colorbar(cax)
+    cb = fig.colorbar(cax)
+    cb.set_label('', color=label_color)
+    cb.ax.yaxis.set_tick_params(color=label_color)
+    _plt.setp(_plt.getp(cb.ax.axes, 'yticklabels'), color=label_color)
 
     # Set labels to be classes
     if class_names is not None:
@@ -66,6 +85,10 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
            xticklabels=labels,
            yticklabels=labels)
 
+    ax.xaxis.label.set_color(label_color)
+    ax.yaxis.label.set_color(label_color)
+    ax.title.set_color(label_color)
+
     # Set x-axis labels to bottom
     ax.xaxis.set_label_position("bottom")
     ax.xaxis.tick_bottom()
@@ -73,8 +96,8 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
     # Adjust label size
     ax.title.set_size(text_size)
 
-    _plt.xticks(rotation=70, fontsize=text_size)
-    _plt.yticks(fontsize=text_size)
+    _plt.xticks(rotation=70, fontsize=text_size, color=label_color)
+    _plt.yticks(fontsize=text_size, color=label_color)
 
     # Set treshold for different colors
     threshold = (cm.max() + cm.min()) / 2.

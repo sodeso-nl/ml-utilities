@@ -2,6 +2,7 @@ import itertools as _itertools
 
 import matplotlib.pyplot as _plt
 import numpy as _np
+import sklearn as _sk
 import tensorflow as _tf
 import so_ml_tools as _soml
 
@@ -10,17 +11,42 @@ from scipy.interpolate import interp1d as _interp1d
 from sklearn.metrics import confusion_matrix as _confusion_matrix
 from sklearn.metrics import classification_report as _classification_report
 
-import itertools as _itertools
 
-import matplotlib.pyplot as _plt
-import numpy as _np
-import tensorflow as _tf
-import so_ml_tools as _soml
+def roc_curve(y_true, y_pred=None, y_prob=None, figsize=(5, 5), label_color='black'):
+    if isinstance(y_true, _tf.data.Dataset):
+        raise TypeError('y_true is a dataset, please get the labels from the dataset using '
+                        '\'y_labels = soml.tf.dataset.get_labels(dataset=dataset)\'')
 
-from scipy.interpolate import interp1d as _interp1d
+    y_true = _soml.util.label.to_prediction(y_prob=y_true)
 
-from sklearn.metrics import confusion_matrix as _confusion_matrix
-from sklearn.metrics import classification_report as _classification_report
+    if y_pred is None and y_prob is not None:
+        y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
+    elif y_pred is None and y_prob is None:
+        raise "Must specify 'y_pred' or 'y_prob'"
+
+    precision, recall, thresholds = _sk.metrics.precision_recall_curve(y_true=y_true, probas_pred=y_prob)
+    auc = _sk.metrics.auc(recall, precision)
+
+    fig, ax = _plt.subplots(figsize=figsize)
+    fig.patch.set_alpha(0.0)  # Transparant background
+
+    ax.plot(recall, precision)
+    ax.plot([0, 1], [0, 1], transform=ax.transAxes)
+
+    ax.set(title=f'ROC-Curve (AUC: {auc})',
+           xlabel="False Positive Rate",
+           ylabel="True Positive Rate")
+
+    ax.xaxis.label.set_color(label_color)  # Set color of x-axis label
+    ax.tick_params(axis='x', colors=label_color)  # Set color of x-axis ticks.
+
+    ax.yaxis.label.set_color(label_color)  # Set color of y-axis label
+    ax.tick_params(axis='y', colors=label_color)  # Set color of y-axis ticks.
+    ax.title.set_color(label_color)  # Set color of title
+
+    _plt.xticks(rotation=70)
+
+    _plt.show()
 
 
 def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = None, figsize=(15, 15), text_size=10,
@@ -37,6 +63,7 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
       text_size: Size of output figure text (default=10).
       norm: normalize values or not (default=False).
       savefig: save confusion matrix to file (default=False).
+      label_color: color of all the labels outside the graphs itself
 
     Returns:
         None
@@ -85,9 +112,11 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
            xticklabels=labels,
            yticklabels=labels)
 
-    ax.xaxis.label.set_color(label_color)
-    ax.yaxis.label.set_color(label_color)
-    ax.title.set_color(label_color)
+    ax.xaxis.label.set_color(label_color) # Set color of x-axis label
+    ax.tick_params(axis='x', colors=label_color) # Set color of x-axis ticks.
+    ax.yaxis.label.set_color(label_color)  # Set color of y-axis label
+    ax.tick_params(axis='y', colors=label_color)  # Set color of y-axis ticks.
+    ax.title.set_color(label_color) # Set color of title
 
     # Set x-axis labels to bottom
     ax.xaxis.set_label_position("bottom")
@@ -96,8 +125,8 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
     # Adjust label size
     ax.title.set_size(text_size)
 
-    _plt.xticks(rotation=70, fontsize=text_size, color=label_color)
-    _plt.yticks(fontsize=text_size, color=label_color)
+    _plt.xticks(rotation=70, fontsize=text_size)
+    _plt.yticks(fontsize=text_size)
 
     # Set treshold for different colors
     threshold = (cm.max() + cm.min()) / 2.

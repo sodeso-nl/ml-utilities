@@ -97,7 +97,7 @@ def is_binary_classification(y_prob: any) -> bool:
 
         return False
 
-    raise TypeError('y_prob should be of type tf.Tensor, np.array or pd.DataFrame.')
+    raise TypeError('y_prob should be of type tf.Tensor, np.array, list or pd.DataFrame, pd.Series.')
 
 
 def probability_to_class(y_prob: any) -> any:
@@ -133,7 +133,7 @@ def probability_to_class(y_prob: any) -> any:
     elif isinstance(y_prob, _np.ndarray):
         return _np.argmax(y_prob, axis=1)
 
-    raise TypeError('y_prob should be of type tf.Tensor, np.array or pd.DataFrame.')
+    raise TypeError('y_prob should be of type tf.Tensor, np.array, list or pd.DataFrame.')
 
 
 def probability_to_binary(y_prob: any) -> any:
@@ -155,13 +155,13 @@ def probability_to_binary(y_prob: any) -> any:
     ]
 
     Args:
-        y_prob: the probabilities matrix either a 'list', 'tf.Tensor' or a 'np.array'
+        y_prob: the probabilities matrix either a 'list', 'tf.Tensor', 'pd.DataFrame' or a 'np.array'
 
     Returns:
         Binarized prediction labels
 
     Raises:
-        TypeError: If `y_prob` is neither a 'list', 'tf.Tensor' or 'np.array'.
+        TypeError: If `y_prob` is neither a 'list', 'tf.Tensor', 'pd.DataFrame' or an 'np.array'
     """
     assert y_prob is not None, "y_prob is null"
 
@@ -177,7 +177,29 @@ def probability_to_binary(y_prob: any) -> any:
         y1 = _np.round(a=y_prob, decimals=0)
         return y1.astype(_np.int64)
 
-    raise TypeError('y_prob should be of type tf.Tensor, np.array or pd.DataFrame.')
+    raise TypeError('y_prob should be of type tf.Tensor, np.array, list or pd.DataFrame.')
+
+
+def to_prediction_custom_threshold(y_prob: any, custom_threshold: float = 0.5) -> any:
+    """
+    Does the same as the to_prediction method except that it allows for a custom threshold, by default
+    the to_prediction method will use the standard rounding function, meaning a threshold of 0.5, using this
+    method you can define your own threshold.
+
+    Args:
+        y_prob: the probabilities matrix either a 'list' or an 'np.array'
+        custom_threshold: threshold value for when the result is either a 0 or a 1 ( >= threshold)
+
+    Raises:
+        TypeError: If `y_prob` is neither a 'list' nor 'np.array'
+    """
+    if is_binary_classification(y_prob=y_prob):
+        if isinstance(y_prob, list):
+            return [[1.0] if y[0] >= custom_threshold else [0.0] for y in y_prob]
+        elif isinstance(y_prob, _np.ndarray):
+            return _np.where(y_prob > custom_threshold, 1, 0)
+
+    raise TypeError('y_prob should be of type np.array or list.')
 
 
 def to_prediction(y_prob: any) -> any:

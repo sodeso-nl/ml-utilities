@@ -62,7 +62,7 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
             v.hist(ax=axs[n], bins=nunique + 1, log=log, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1)
 
 
-            color = iter(["black", "darkred", "red", "lightred", 'lightgreen', 'green', 'darkgreen'])
+            color = iter(["black", "darkred", "red", "orangered", 'limegreen', 'green', 'darkgreen'])
             axs[n].axvline(v.mean(), label=f'Mean', color=next(color), linestyle='dashed')
 
             z_score_min = [-1 * v.std() + v.mean(), -2 * v.std() + v.mean(), -3 * v.std() + v.mean()]

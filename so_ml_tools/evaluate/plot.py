@@ -1,3 +1,5 @@
+from sklearn.metrics import confusion_matrix as _confusion_matrix
+
 import itertools as _itertools
 
 import matplotlib.pyplot as _plt
@@ -12,28 +14,34 @@ from sklearn.metrics import confusion_matrix as _confusion_matrix
 from sklearn.metrics import classification_report as _classification_report
 
 
-def roc_curve(y_true, y_pred=None, y_prob=None, figsize=(5, 5), label_color='black'):
+def roc_curve(y_true, y_prob=None, figsize=(5, 5), label_color='black'):
     if isinstance(y_true, _tf.data.Dataset):
         raise TypeError('y_true is a dataset, please get the labels from the dataset using '
                         '\'y_labels = soml.tf.dataset.get_labels(dataset=dataset)\'')
 
     y_true = _soml.util.label.to_prediction(y_prob=y_true)
 
-    if y_pred is None and y_prob is not None:
-        y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
-    elif y_pred is None and y_prob is None:
-        raise "Must specify 'y_pred' or 'y_prob'"
+    precision_fpr, recall_tpr, thresholds = _sk.metrics.roc_curve(y_true=y_true, y_score=y_prob)
 
-    precision, recall, thresholds = _sk.metrics.precision_recall_curve(y_true=y_true, probas_pred=y_prob)
-    auc = _sk.metrics.auc(recall, precision)
+    # Calculate Area Under Curve
+    auc = _sk.metrics.auc(precision_fpr, recall_tpr)
+
+    # Calculate optimal threshold value:
+    optimal_idx = _np.argmax(recall_tpr - precision_fpr)
+    optimal_threshold = thresholds[optimal_idx]
 
     fig, ax = _plt.subplots(figsize=figsize)
     fig.patch.set_alpha(0.0)  # Transparant background
 
-    ax.plot(recall, precision)
-    ax.plot([0, 1], [0, 1], transform=ax.transAxes)
+    ax.plot(precision_fpr, recall_tpr)
+    ax.plot([0, 1], [0, 1], transform=ax.transAxes, linestyle='dashed')  # Draw diagonal line
+    ax.plot(precision_fpr[optimal_idx], recall_tpr[optimal_idx],
+            marker="o",
+            markersize=5,
+            markeredgecolor="red",
+            markerfacecolor="red")  # Draw dot for optimal threshold
 
-    ax.set(title=f'ROC-Curve (AUC: {auc})',
+    ax.set(title=f'ROC-Curve \nArea Under Curve (AUC): {round(auc * 100)}%\nOptimal Threshold: {optimal_threshold}',
            xlabel="False Positive Rate",
            ylabel="True Positive Rate")
 

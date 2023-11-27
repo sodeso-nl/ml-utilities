@@ -15,6 +15,19 @@ from sklearn.metrics import classification_report as _classification_report
 
 
 def roc_curve(y_true, y_prob=None, figsize=(5, 5), label_color='black'):
+    """
+    Plots the ROC curve for the given values. Also calculates the ROC-AUC value and the
+    optimal threshold. The optimal threshold is also returned as a value.
+
+    Args:
+        y_true: Array of truth labels (must be same shape as y_pred).
+        y_prob: Array of probabilities (then y_pred is not necessary), must be same shape as y_true.
+        figsize: Size of output figure (default=(15, 15)).
+        label_color: label color of ticks, titles, x/y axis values / labels.
+
+    Returns:
+        The optimal threshold value
+    """
     if isinstance(y_true, _tf.data.Dataset):
         raise TypeError('y_true is a dataset, please get the labels from the dataset using '
                         '\'y_labels = soml.tf.dataset.get_labels(dataset=dataset)\'')
@@ -56,6 +69,8 @@ def roc_curve(y_true, y_prob=None, figsize=(5, 5), label_color='black'):
 
     _plt.show()
 
+    return optimal_threshold
+
 
 def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = None, figsize=(15, 15), text_size=10,
                      norm=False, savefig=False, label_color='black') -> None:
@@ -71,7 +86,7 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
       text_size: Size of output figure text (default=10).
       norm: normalize values or not (default=False).
       savefig: save confusion matrix to file (default=False).
-      label_color: color of all the labels outside the graphs itself
+        label_color: label color of ticks, titles, x/y axis values / labels.
 
     Returns:
         None

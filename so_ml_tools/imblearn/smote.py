@@ -24,7 +24,7 @@ def resample(dataframe: _pd.DataFrame, label_column: str, sampling_strategy: str
     y = dataframe[[label_column]]
     X = dataframe.drop(label_column, axis=1, inplace=False)
     x_s, y_s = resample_xy(X=X, y=y, sampling_strategy=sampling_strategy)
-    return _pd.concat([x_s, y], axis=1)
+    return _pd.concat([x_s, y_s], axis=1)
 
 
 def resample_xy(X: _pd.DataFrame, y: _pd.DataFrame, sampling_strategy: str) -> (_pd.DataFrame, _pd.DataFrame):

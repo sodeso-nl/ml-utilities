@@ -6,7 +6,8 @@ from . import (
     util,
     evaluate,
     shap,
-    sklearn
+    sklearn,
+    imblearn
 )
 
 # We follow Semantic Versioning (https://semver.org/spec/v2.0.0.html)
@@ -29,5 +30,6 @@ __all__ = [
     "util",
     "evaluate",
     "sklearn",
+    "imblearn",
     "__version__"
 ]

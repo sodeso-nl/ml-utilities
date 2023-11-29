@@ -8,6 +8,61 @@ from sklearn.preprocessing import OneHotEncoder
 # General
 ########################################################################################################################
 
+def simple_undersample(dataframe: _pd.DataFrame, label_column, value_to_undersample, undersample_to):
+    """
+    Undersample a class (label_column) with a value (value_to_undersample) to the number of entries (undersample_to)
+
+    For example:
+
+    undersample(dataframe: training_data, column_name='stroke', value_to_undersample=0, undersample_to=2000)
+
+    Args:
+        dataframe: the pd.DataFrame
+        label_column: the column to match on
+        value_to_undersample: the value within the `column` to match on for under-sampling.
+        undersample_to: number of entries that need to exist after the under-sampling.
+
+    Returns:
+        A new dataframe with the data.
+    """
+    print('A better solution for under-sampling / over-sampling is to use the soml.imblearn.smote package.')
+    unique = dataframe[label_column].unique()
+
+    sections = {}
+    for v in unique:
+        sections[v] = dataframe[dataframe[label_column] == v]
+
+    sections[value_to_undersample] = sections[value_to_undersample].sample(undersample_to)
+    return _pd.concat(sections.values(), axis=0)
+
+
+def simple_oversample(dataframe: _pd.DataFrame, label_column, value_to_oversample, oversample_to):
+    """
+    oversample a class (label_column) with a value (value_to_oversample) to the number of entries (oversample_to)
+
+    For example:
+
+    oversample(dataframe: training_data, column_name='stroke', value_to_oversample=1, oversample_to=2000)
+
+    Args:
+        dataframe: the pd.DataFrame
+        label_column: the column to match on
+        value_to_oversample: the value within the `column` to match on for over sampling.
+        oversample_to: number of entries that need to exist after the over sampling.
+
+    Returns:
+        A new dataframe with the data.
+    """
+    print('A better solution for under-sampling / over-sampling is to use the soml.imblearn.smote package.')
+    unique = dataframe[label_column].unique()
+
+    sections = {}
+    for v in unique:
+        sections[v] = dataframe[dataframe[label_column] == v]
+
+    sections[value_to_oversample] = sections[value_to_oversample].sample(oversample_to, replace=True)
+    return _pd.concat(sections.values(), axis=0)
+
 
 def one_hot_encode_column(*columns: list[any]) -> (OneHotEncoder, list[any]):
     """

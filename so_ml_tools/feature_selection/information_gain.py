@@ -1,10 +1,11 @@
 import matplotlib.pyplot as _plt
-import sklearn as _sk
 import pandas as _pd
+
+from sklearn.feature_selection import mutual_info_classif as _mutual_info_classif
 
 
 def calculate(X: _pd.DataFrame, y: _pd.DataFrame) -> _pd.DataFrame:
-    mutual_info = _sk.feature_selection.mutual_info_classif(X=X, y=y.values.ravel())
+    mutual_info = _mutual_info_classif(X=X, y=y.values.ravel())
     return _pd.DataFrame(mutual_info, index=X.columns, columns=['IG']).sort_values(by='IG', ascending=False)
 
 

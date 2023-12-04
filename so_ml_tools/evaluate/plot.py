@@ -34,21 +34,22 @@ def roc_curve(y_true, y_prob=None, figsize=(5, 5), label_color='black'):
 
     y_true = _soml.util.label.to_prediction(y_prob=y_true)
 
-    precision_fpr, recall_tpr, thresholds = _sk.metrics.roc_curve(y_true=y_true, y_score=y_prob)
+    precision_fpr, sensitivity_tpr, thresholds = _sk.metrics.roc_curve(y_true=y_true, y_score=y_prob)
 
     # Calculate Area Under Curve
-    auc = _sk.metrics.auc(precision_fpr, recall_tpr)
+    auc = _sk.metrics.auc(precision_fpr, sensitivity_tpr)
 
     # Calculate optimal threshold value:
-    optimal_idx = _np.argmax(recall_tpr - precision_fpr)
+    youden_index = sensitivity_tpr - precision_fpr
+    optimal_idx = _np.argmax(youden_index)
     optimal_threshold = thresholds[optimal_idx]
 
     fig, ax = _plt.subplots(figsize=figsize)
     fig.patch.set_alpha(0.0)  # Transparant background
 
-    ax.plot(precision_fpr, recall_tpr)
+    ax.plot(precision_fpr, sensitivity_tpr)
     ax.plot([0, 1], [0, 1], transform=ax.transAxes, linestyle='dashed')  # Draw diagonal line
-    ax.plot(precision_fpr[optimal_idx], recall_tpr[optimal_idx],
+    ax.plot(precision_fpr[optimal_idx], sensitivity_tpr[optimal_idx],
             marker="o",
             markersize=5,
             markeredgecolor="red",

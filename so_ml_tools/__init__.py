@@ -7,6 +7,7 @@ from . import (
     evaluate,
     shap,
     sklearn,
+    feature_selection,
     imblearn
 )
 
@@ -30,6 +31,7 @@ __all__ = [
     "util",
     "evaluate",
     "sklearn",
+    "feature_selection",
     "imblearn",
     "__version__"
 ]

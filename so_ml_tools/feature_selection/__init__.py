@@ -1,7 +1,7 @@
 from . import (
-    information_gain
+    select_k_best
 )
 
 __all__ = [
-    "information_gain"
+    "select_k_best"
 ]

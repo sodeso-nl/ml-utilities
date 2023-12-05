@@ -1,6 +1,6 @@
 import pandas as _pd
 import numpy as _np
-import matplotlib as _plt
+import matplotlib.pyplot as _plt
 
 from sklearn.feature_selection import SelectKBest as _SelectKBest
 from sklearn.feature_selection import mutual_info_classif as _mutual_info_classif

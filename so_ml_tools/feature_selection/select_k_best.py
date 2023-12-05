@@ -50,7 +50,7 @@ def _plot(scores: _pd.DataFrame, label_color):
     fig.patch.set_alpha(0.0)  # Transparant background
 
     y_pos = range(len(scores))
-    scores = ax.barh(y_pos, scores.values.ravel(), align='center')
+    ax_scores = ax.barh(y_pos, scores.values.ravel(), align='center')
     ax.set_yticks(y_pos)
     ax.set_yticklabels(scores.index.values)
 
@@ -58,7 +58,7 @@ def _plot(scores: _pd.DataFrame, label_color):
     ax.set_xlabel('Importance Score')
     ax.set_ylabel('Feature')
     ax.set_title('Feature Importance Scores')
-    ax.bar_label(scores, fmt='%.2f')
+    ax.bar_label(ax_scores, fmt='%.2f')
 
     ax.xaxis.label.set_color(label_color)  # Set color of x-axis label
     ax.tick_params(axis='x', colors=label_color)  # Set color of x-axis ticks.

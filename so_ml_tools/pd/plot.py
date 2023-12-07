@@ -4,7 +4,7 @@ import pandas as _pd
 import numpy as _np
 
 def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = None, log=False,
-                                  min_nunique: int = 3, max_nunique: int = 50, figsize: tuple = None, cols=3,
+                                  min_nunique: int = 0, max_nunique: int = 50, figsize: tuple = None, cols=3,
                                   verbose=1):
     """
     Plots a histogram for each of the numeric columns in the DataFrame.
@@ -60,7 +60,6 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
             # Make sure we do not get more then 50 bins.
             nunique = 50 if nunique > 50 else nunique
             v.hist(ax=axs[n], bins=nunique + 1, log=log, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1)
-
 
             color = iter(["black", "darkred", "red", "orangered", 'limegreen', 'green', 'darkgreen'])
             axs[n].axvline(v.mean(), label=f'Mean', color=next(color), linestyle='dashed')

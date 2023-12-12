@@ -1,7 +1,36 @@
 import matplotlib.pyplot as _plt
-import matplotlib as _mpl
+import seaborn as _sns
 import pandas as _pd
-import numpy as _np
+
+
+def count_categories(dataframe: _pd.DataFrame, label_column: str = None, column_names: list[str] = None, cols=3, figsize: tuple = None):
+    if column_names is None:
+        column_names = dataframe.select_dtypes(exclude='number').columns.tolist()
+
+    rows = max(int(len(column_names) / cols), 1)
+    cols = min(cols, len(column_names))
+    rows += 1 if rows * cols < len(column_names) else 0
+
+    # If figsize is not specified then calculate the fig-size
+    if figsize is None:
+        figsize = (17, rows * 4)
+
+    fig, axs = _plt.subplots(nrows=rows, ncols=cols, figsize=figsize)
+
+    # If we have more then one column then flatten the axis so we can loop through them,
+    # if we have only one column then create list containing the axis so we can still loop through it.
+    if len(column_names) > 1:
+        axs = axs.flatten()
+    else:
+        axs = [axs]
+
+    n = 0
+    for column_name in column_names:
+        _sns.countplot(ax=axs[n], data=dataframe, x=column_name, hue=label_column)
+        n += 1
+
+    _plt.show()
+
 
 def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = None, log=False,
                                   min_nunique: int = 0, max_nunique: int = 50, figsize: tuple = None, cols=3,
@@ -10,7 +39,8 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
     Plots a histogram for each of the numeric columns in the DataFrame.
 
     :param dataframe: the pandas dataframe
-    :param column_names: columns which exist within the DataFrame if none specified all columns will be processed
+    :param column_names: columns which exist within the DataFrame if none specified all columns that are numeric
+        will be processed
     :param log: set to True to enable logarithmic scaling
     :param min_nunique: minimum number of unique values present, if lower then this then no graph will be displayed (since it is basically boolean)
     :param max_nunique: maximum number of unique values present, only applicable to object column types since these cannot be binned
@@ -79,8 +109,6 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
                     axs[n].axvline(value, label=f'({idx+1}σ)', color=c, linestyle='dashed')
 
             axs[n].legend()
-        elif _pd.api.types.is_object_dtype(v) and min_nunique < nunique <= max_nunique:
-            v.hist(ax=axs[n], bins=range(nunique + 1), log=log, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1, width = .5)
         else:
             if verbose:
                 print(f"Column '{v.name}' is not visualized, the number of nunique values ({nunique}) either exceeds {max_nunique} or is lower then {min_nunique}.")

@@ -204,23 +204,25 @@ def delete_rows_where_value_equal_to(dataframe: _pd.DataFrame, column_name: str,
     return work_df
 
 
-def delete_rows_where_value_smaller_then_3_stddev(
-        dataframe: _pd.DataFrame,
-        column_names: list[str],
-        inplace=True) -> _pd.DataFrame | None:
+def delete_rows_where_value_smaller_then(dataframe: _pd.DataFrame, column_name: str, value: object, inplace=True) \
+        -> _pd.DataFrame | None:
+    """
+    Deletes all rows where the specified column has the specified value.
+
+    :param dataframe: the pd.DatFrame
+    :param column_name: the names of the column to check
+    :param value: the value to compare with
+    :param inplace: return a new instance of the DataFrame (False) or adjust the given DataFrame
+    :return: see inplace
+    """
     work_df = dataframe
     if not inplace:
         work_df = dataframe.copy(deep=True)
 
-    for c in column_names:
-        if c in dataframe:
-            v = dataframe[c]
-            z_max = -3 * v.std() + v.mean()
-            indexes = dataframe[dataframe[c] < z_max].index
-            work_df.drop(indexes, inplace=True)
-            print(f'Deleting {len(indexes)} rows ({c} < {z_max:.2f})')
-        else:
-            print(f"delete_rows_where_value_greater_then_z_max: Column '{c}' does not exist in dataframe.")
+    if column_name in dataframe:
+        work_df.drop(dataframe[dataframe[column_name] < value].index, inplace=True)
+    else:
+        print(f"delete_rows_where_value_equal_to: Column '{column_name}' does not exist in dataframe.")
 
     if inplace:
         return None
@@ -228,23 +230,25 @@ def delete_rows_where_value_smaller_then_3_stddev(
     return work_df
 
 
-def delete_rows_where_value_greater_then_3_stddev(
-        dataframe: _pd.DataFrame,
-        column_names: list[str],
-        inplace=True) -> _pd.DataFrame | None:
+def delete_rows_where_value_larger_then(dataframe: _pd.DataFrame, column_name: str, value: object, inplace=True) \
+        -> _pd.DataFrame | None:
+    """
+    Deletes all rows where the specified column has the specified value.
+
+    :param dataframe: the pd.DatFrame
+    :param column_name: the names of the column to check
+    :param value: the value to compare with
+    :param inplace: return a new instance of the DataFrame (False) or adjust the given DataFrame
+    :return: see inplace
+    """
     work_df = dataframe
     if not inplace:
         work_df = dataframe.copy(deep=True)
 
-    for c in column_names:
-        if c in dataframe:
-            v = dataframe[c]
-            z_max = 3 * v.std() + v.mean()
-            indexes = dataframe[dataframe[c] > z_max].index
-            work_df.drop(indexes, inplace=True)
-            print(f'Deleting {len(indexes)} rows ({c} > {z_max:.2f})')
-        else:
-            print(f"delete_rows_where_value_greater_then_z_max: Column '{c}' does not exist in dataframe.")
+    if column_name in dataframe:
+        work_df.drop(dataframe[dataframe[column_name] > value].index, inplace=True)
+    else:
+        print(f"delete_rows_where_value_equal_to: Column '{column_name}' does not exist in dataframe.")
 
     if inplace:
         return None
@@ -258,7 +262,7 @@ def fill_nan_with_value(dataframe: _pd.DataFrame, column_names: list[str], value
     if not inplace:
         work_df = dataframe.copy(deep=True)
 
-    if not type(column_names) == list and column_names is not None:
+    if type(column_names) is not list and column_names is not None:
         column_names = [column_names]
 
     for c in column_names:
@@ -291,7 +295,7 @@ def fill_nan_with_previous_value(dataframe: _pd.DataFrame, column_names: list[st
     if not inplace:
         work_df = dataframe.copy(deep=True)
 
-    if not type(column_names) == list and column_names is not None:
+    if type(column_names) is not list and column_names is not None:
         column_names = [column_names]
 
     for c in column_names:
@@ -323,7 +327,7 @@ def fill_nan_with_next_value(dataframe: _pd.DataFrame, column_names: list[str], 
     if not inplace:
         work_df = dataframe.copy(deep=True)
 
-    if not type(column_names) == list and column_names is not None:
+    if type(column_names) is not list and column_names is not None:
         column_names = [column_names]
 
     for c in column_names:
@@ -485,7 +489,7 @@ def fill_nan_with_global_func(dataframe: _pd.DataFrame, column_names: list[str],
     return work_df
 
 
-def fill_nan_with_mode_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+def ffill_nan_with_groupby_mode(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
                                   remainder_agg_func='mode', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
     """
     Fill in missing values based on the mode value (most often) which is calculated on all data having a similar value
@@ -505,13 +509,13 @@ def fill_nan_with_mode_grouped_by(dataframe: _pd.DataFrame, column_name: str, gr
         inplace: update the given dataframe or return a new dataframe.
         add_indicator: add an indicator column indicating with a boolean value if the value was NaN
     """
-    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+    return fill_nan_with_groupby_func(dataframe=dataframe, column_name=column_name,
                                          group_by_column_name=group_by_column_name, agg_func='mode',
                                          remainder_agg_func=remainder_agg_func,
                                          inplace=inplace, add_indicator=add_indicator)
 
 
-def fill_nan_with_kurt_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+def fill_nan_with_groupby_kurt(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
                                   remainder_agg_func='kurt', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
     """
     Fill in missing values based on the kurt value which is calculated on all data having a similar value in
@@ -531,13 +535,13 @@ def fill_nan_with_kurt_grouped_by(dataframe: _pd.DataFrame, column_name: str, gr
         inplace: update the given dataframe or return a new dataframe.
         add_indicator: add an indicator column indicating with a boolean value if the value was NaN
     """
-    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+    return fill_nan_with_groupby_func(dataframe=dataframe, column_name=column_name,
                                          group_by_column_name=group_by_column_name, agg_func='kurt',
                                          remainder_agg_func=remainder_agg_func,
                                          inplace=inplace, add_indicator=add_indicator)
 
 
-def fill_nan_with_skew_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+def fill_nan_with_groupby_skew(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
                                   remainder_agg_func='skew', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
     """
     Fill in missing values based on the skew value which is calculated on all data having a similar value in
@@ -557,13 +561,13 @@ def fill_nan_with_skew_grouped_by(dataframe: _pd.DataFrame, column_name: str, gr
         inplace: update the given dataframe or return a new dataframe.
         add_indicator: add an indicator column indicating with a boolean value if the value was NaN
     """
-    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+    return fill_nan_with_groupby_func(dataframe=dataframe, column_name=column_name,
                                          group_by_column_name=group_by_column_name, agg_func='skew',
                                          remainder_agg_func=remainder_agg_func,
                                          inplace=inplace, add_indicator=add_indicator)
 
 
-def fill_nan_with_median_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+def fill_nan_with_groupby_median(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
                                     remainder_agg_func='median', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
     """
     Fill in missing values based on the median value which is calculated on all data having a similar value in
@@ -583,13 +587,13 @@ def fill_nan_with_median_grouped_by(dataframe: _pd.DataFrame, column_name: str, 
         inplace: update the given dataframe or return a new dataframe.
         add_indicator: add an indicator column indicating with a boolean value if the value was NaN
     """
-    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+    return fill_nan_with_groupby_func(dataframe=dataframe, column_name=column_name,
                                          group_by_column_name=group_by_column_name, agg_func='median',
                                          remainder_agg_func=remainder_agg_func,
                                          inplace=inplace, add_indicator=add_indicator)
 
 
-def fill_nan_with_mean_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+def fill_nan_with_groupby_mean(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
                                   remainder_agg_func='mean', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
     """
     Fill in missing values based on the mean value which is calculated on all data having a similar value in
@@ -609,13 +613,13 @@ def fill_nan_with_mean_grouped_by(dataframe: _pd.DataFrame, column_name: str, gr
         inplace: update the given dataframe or return a new dataframe.
         add_indicator: add an indicator column indicating with a boolean value if the value was NaN
     """
-    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+    return fill_nan_with_groupby_func(dataframe=dataframe, column_name=column_name,
                                          group_by_column_name=group_by_column_name, agg_func='mean',
                                          remainder_agg_func=remainder_agg_func,
                                          inplace=inplace, add_indicator=add_indicator)
 
 
-def fill_nan_with_max_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+def fill_nan_with_grouped_max(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
                                  remainder_agg_func='max', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
     """
     Fill in missing values based on the max value which is calculated on all data having a similar value in
@@ -635,13 +639,13 @@ def fill_nan_with_max_grouped_by(dataframe: _pd.DataFrame, column_name: str, gro
         inplace: update the given dataframe or return a new dataframe.
         add_indicator: add an indicator column indicating with a boolean value if the value was NaN
     """
-    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+    return fill_nan_with_groupby_func(dataframe=dataframe, column_name=column_name,
                                          group_by_column_name=group_by_column_name, agg_func='max',
                                          remainder_agg_func=remainder_agg_func,
                                          inplace=inplace, add_indicator=add_indicator)
 
 
-def fill_nan_with_min_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+def fill_nan_with_groupby_min(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
                                  remainder_agg_func='min', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
     """
     Fill in missing values based on the min value which is calculated on all data having a similar value in
@@ -661,13 +665,13 @@ def fill_nan_with_min_grouped_by(dataframe: _pd.DataFrame, column_name: str, gro
         inplace: update the given dataframe or return a new dataframe.
         add_indicator: add an indicator column indicating with a boolean value if the value was NaN
     """
-    return fill_nan_with_func_grouped_by(dataframe=dataframe, column_name=column_name,
+    return fill_nan_with_groupby_func(dataframe=dataframe, column_name=column_name,
                                          group_by_column_name=group_by_column_name, agg_func='min',
                                          remainder_agg_func=remainder_agg_func,
                                          inplace=inplace, add_indicator=add_indicator)
 
 
-def fill_nan_with_func_grouped_by(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str, agg_func: str,
+def fill_nan_with_groupby_func(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str, agg_func: str,
                                   remainder_agg_func=None, inplace=True, add_indicator=False) -> _pd.DataFrame | None:
     """
     Fill in missing values based on a function  which is calculated on all data having a similar value in
@@ -790,7 +794,7 @@ def describe(dataframe: _pd.DataFrame, column_names: list[str] = None, round=2):
     for c in columns:
         v = dataframe[c]
 
-        _mean = _std = _min = _q25 = _q50 = _q75 = _max = z_score_negative = z_score_positive = _np.NAN
+        _mean = _std = _min = _q25 = _q50 = _q75 = _max = z_score_negative = z_score_positive = _irq = _irq_lower = _irq_upper = _np.NAN
         if _pd.api.types.is_numeric_dtype(v):
             _mean = v.mean()
             _std = v.std()
@@ -806,12 +810,54 @@ def describe(dataframe: _pd.DataFrame, column_names: list[str] = None, round=2):
             # Calculate upper value when Z-Score = 3
             z_score_positive = 3 * _std + _mean
 
+            # Calculate Interquartile Range (IRQ) and lower / upper bounds
+            _irq = _q75 - _q25
+            _irq_lower = _q25 - (1.5 * _irq)
+            _irq_upper = _q75 + (1.5 * _irq)
+
         data.append([
-            v.name, v.dtype, v.count(), v.isna().sum(), v.nunique(), _mean, _std, z_score_negative, z_score_positive, _min, _q25,
-            _q50, _q75, _max
+            v.name, v.dtype, v.count(), v.isna().sum(), v.nunique(), _mean, _std, z_score_negative, z_score_positive,
+            _min, _q25,
+            _q50, _q75, _max, _irq_lower, _irq, _irq_upper
         ])
 
-    print(f"Total number of rows: {len(dataframe)}")
-    return _pd.DataFrame(
-        columns=["Column", "DType", "NotNull", "Null", "Unique", "Mean", "Std", "-3σ", "3σ", "Min", "25%", "50%",
-                 "75%", "Max"], data=data).round(round)
+    data = _pd.DataFrame(
+        columns=['Column', 'DType', 'NotNull', 'Null', 'Unique', 'Mean', 'Std', '-3σ', '3σ', 'Min', '25%', '50%',
+                 '75%', 'Max', 'IRQ-L', 'IRQ', 'IRQ-U'], data=data)
+
+    def highlight_columns(col):
+        if col.name == '-3σ' or col.name == 'IRQ-L':
+            css = []
+
+            for idx, val in enumerate(col):
+
+                if data['Unique'][idx] > 2 and val > data['Min'][idx]:
+                    style = 'color: blue'
+                elif _pd.isnull(val):
+                    style = 'color: lightgrey'
+                else:
+                    style = ''
+
+                css.append(style)
+
+            return css;
+        elif col.name == '3σ' or col.name == 'IRQ-U':
+            css = []
+
+            for idx, val in enumerate(col):
+                if data['Unique'][idx] > 3 and val < data['Max'][idx]:
+                    style = 'color: blue'
+                elif _pd.isnull(val):
+                    style = 'color: lightgrey'
+                else:
+                    style = ''
+
+                css.append(style)
+
+            return css;
+        elif col.name == 'Null':
+            return ['color: red' if val > 0 else '' for val in col]
+
+        return ['color: lightgrey' if _pd.isnull(val) else '' for val in col]
+
+    return data.style.apply(highlight_columns).format(precision=round)

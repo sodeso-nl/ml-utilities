@@ -33,8 +33,8 @@ def count_categories(dataframe: _pd.DataFrame, label_column: str = None, column_
 
 
 def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = None, log=False,
-                                  min_nunique: int = 0, max_nunique: int = 50, figsize: tuple = None, cols=3,
-                                  verbose=1):
+                          min_nunique: int = 0, max_nunique: int = 50, dist='zscore', figsize: tuple = None, cols=3,
+                          verbose=1, label_color='black'):
     """
     Plots a histogram for each of the numeric columns in the DataFrame.
 
@@ -44,9 +44,11 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
     :param log: set to True to enable logarithmic scaling
     :param min_nunique: minimum number of unique values present, if lower then this then no graph will be displayed (since it is basically boolean)
     :param max_nunique: maximum number of unique values present, only applicable to object column types since these cannot be binned
+    :param dist: which distribution metric should be displayed, either 'zscore' or 'irq'
     :param figsize: size of the plot, if None specified then one is calculated
     :param cols: number of plots on the horizontal axis
     :param verbose: display messages when columns are not visualized
+    :param label_color: label color of ticks, titles, x/y axis values / labels.
     """
     # assert column_names is not None, "column_names cannot be None"
 
@@ -80,6 +82,7 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
 
     # Horizontal / vertical padding between the histograms.
     fig.tight_layout(h_pad=10, w_pad=5)
+    fig.patch.set_alpha(0.0)  # Transparant background
 
     n = 0
     for c in columns:
@@ -92,21 +95,32 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
             v.hist(ax=axs[n], bins=nunique + 1, log=log, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1)
 
             color = iter(["black", "darkred", "red", "orangered", 'limegreen', 'green', 'darkgreen'])
-            axs[n].axvline(v.mean(), label=f'Mean', color=next(color), linestyle='dashed')
+            axs[n].axvline(v.mean(), label=f'Mean', color=next(color), linestyle='dotted')
 
-            z_score_min = [-1 * v.std() + v.mean(), -2 * v.std() + v.mean(), -3 * v.std() + v.mean()]
-            for idx, value in enumerate(z_score_min):
-                # Only show when it is not before the graph starts.
-                c = next(color)
-                if value > v.min():
-                    axs[n].axvline(value, label=f'(-{idx+1}σ)', color=c, linestyle='dashed')
+            if dist == 'zscore':
+                z_score_min = [-1 * v.std() + v.mean(), -2 * v.std() + v.mean(), -3 * v.std() + v.mean()]
+                for idx, value in enumerate(z_score_min):
+                    # Only show when it is not before the graph starts.
+                    c = next(color)
+                    if value > v.min():
+                        axs[n].axvline(value, label=f'-{idx+1}σ', color=c, linestyle='dashed')
 
-            z_score_max = [1 * v.std() + v.mean(), 2 * v.std() + v.mean(), 3 * v.std() + v.mean()]
-            for idx, value in enumerate(z_score_max):
-                # Only show when it is not after the graph starts.
-                c = next(color)
-                if value < v.max():
-                    axs[n].axvline(value, label=f'({idx+1}σ)', color=c, linestyle='dashed')
+                z_score_max = [1 * v.std() + v.mean(), 2 * v.std() + v.mean(), 3 * v.std() + v.mean()]
+                for idx, value in enumerate(z_score_max):
+                    # Only show when it is not after the graph starts.
+                    c = next(color)
+                    if value < v.max():
+                        axs[n].axvline(value, label=f'{idx+1}σ', color=c, linestyle='dashed')
+            elif dist == 'irq':
+                q1 = v.quantile(q=.25)
+                q3 = v.quantile(q=.75)
+                irq = (q3 - q1)
+                irql = q1 - 0.5 * irq
+                irqu = q3 + 0.5 * irq
+                axs[n].axvline(irql, label=f'IRQ-L', color='red', linestyle='solid')
+                axs[n].axvline(q1, label=f'Q1', color='red', linestyle='dashed')
+                axs[n].axvline(irqu, label=f'IRQ-U', color='green', linestyle='solid')
+                axs[n].axvline(q3, label=f'Q3', color='green', linestyle='dashed')
 
             axs[n].legend()
         else:
@@ -123,6 +137,14 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
         # Remove unnecessary white space on the left/right side of the graph.
         axs[n].margins(x=0)
         axs[n].grid(axis='x')
+
+        axs[n].xaxis.label.set_color(label_color)  # Set color of x-axis label
+        axs[n].tick_params(axis='x', colors=label_color)  # Set color of x-axis ticks.
+
+        axs[n].yaxis.label.set_color(label_color)  # Set color of y-axis label
+        axs[n].tick_params(axis='y', colors=label_color)  # Set color of y-axis ticks.
+        axs[n].title.set_color(label_color)  # Set color of title
+
         n += 1
 
     for i in range(n, rows*cols):

@@ -33,7 +33,7 @@ def count_categories(dataframe: _pd.DataFrame, label_column: str = None, column_
 
 
 def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = None, log=False,
-                          min_nunique: int = 0, max_nunique: int = 50, dist='zscore', figsize: tuple = None, cols=3,
+                          min_nunique: int = 0, max_nunique: int = 50, figsize: tuple = None, cols=1,
                           verbose=1, label_color='black'):
     """
     Plots a histogram for each of the numeric columns in the DataFrame.
@@ -44,7 +44,6 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
     :param log: set to True to enable logarithmic scaling
     :param min_nunique: minimum number of unique values present, if lower then this then no graph will be displayed (since it is basically boolean)
     :param max_nunique: maximum number of unique values present, only applicable to object column types since these cannot be binned
-    :param dist: which distribution metric should be displayed, either 'zscore' or 'irq'
     :param figsize: size of the plot, if None specified then one is calculated
     :param cols: number of plots on the horizontal axis
     :param verbose: display messages when columns are not visualized
@@ -92,43 +91,70 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
         if _pd.api.types.is_numeric_dtype(v) and min_nunique < nunique:
             # Make sure we do not get more then 50 bins.
             nunique = 50 if nunique > 50 else nunique
-            v.hist(ax=axs[n], bins=nunique + 1, log=log, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.1)
+            bins = 'auto'
+            if nunique < 3:
+                bins = 2
+            _sns.histplot(data=v, kde=bins == 'auto', stat='count', bins=bins, ax=axs[n])
 
-            color = iter(["black", "darkred", "red", "orangered", 'limegreen', 'green', 'darkgreen'])
-            axs[n].axvline(v.mean(), label=f'Mean', color=next(color), linestyle='dotted')
+            if nunique > 3:
+                # Display the mean
+                axs[n].text(v.mean(), axs[n].get_ylim()[1] + 10, 'Mean', rotation='vertical', ha='center', va='bottom')
 
-            if dist == 'zscore':
-                z_score_min = [-1 * v.std() + v.mean(), -2 * v.std() + v.mean(), -3 * v.std() + v.mean()]
+                axs[n].axvline(v.mean(), label=f'Mean ({v.mean():.2f})', color='black', linestyle='dotted')
+
+                # Display the Z-Score
+                color = iter(["red", "red", "red", 'red', 'red', 'red'])
+                z_score_min = [-3 * v.std() + v.mean(), -2 * v.std() + v.mean(), -1 * v.std() + v.mean()]
                 for idx, value in enumerate(z_score_min):
                     # Only show when it is not before the graph starts.
                     c = next(color)
                     if value > v.min():
-                        axs[n].axvline(value, label=f'-{idx+1}σ', color=c, linestyle='dashed')
+                        axs[n].text(value, axs[n].get_ylim()[1] + 10, f'-{3 - idx}σ', rotation='vertical', ha='center',
+                                    va='bottom')
+                        axs[n].axvline(value, label=f'-{3 - idx}σ ({value:.2f})', color=c, linestyle='dotted')
 
                 z_score_max = [1 * v.std() + v.mean(), 2 * v.std() + v.mean(), 3 * v.std() + v.mean()]
                 for idx, value in enumerate(z_score_max):
                     # Only show when it is not after the graph starts.
                     c = next(color)
                     if value < v.max():
-                        axs[n].axvline(value, label=f'{idx+1}σ', color=c, linestyle='dashed')
-            elif dist == 'irq':
+                        axs[n].text(value, axs[n].get_ylim()[1] + 10, f'{idx + 1}σ', rotation='vertical', ha='center',
+                                    va='bottom')
+                        axs[n].axvline(value, label=f'{idx + 1}σ ({value:.2f})', color=c, linestyle='dotted')
+
+                # Display the IREQ and lower / upper bounds.
                 q1 = v.quantile(q=.25)
                 q3 = v.quantile(q=.75)
                 irq = (q3 - q1)
-                irql = q1 - 0.5 * irq
-                irqu = q3 + 0.5 * irq
-                axs[n].axvline(irql, label=f'IRQ-L', color='red', linestyle='solid')
-                axs[n].axvline(q1, label=f'Q1', color='red', linestyle='dashed')
-                axs[n].axvline(irqu, label=f'IRQ-U', color='green', linestyle='solid')
-                axs[n].axvline(q3, label=f'Q3', color='green', linestyle='dashed')
+                irql = q1 - (1.5 * irq)
+                irqu = q3 + (1.5 * irq)
 
-            axs[n].legend()
+                if axs[n].get_xlim()[1] > irql > axs[n].get_xlim()[0]:
+                    axs[n].text(irql, axs[n].get_ylim()[1] + 10, 'IRQ-L', rotation='vertical', ha='center', va='bottom')
+                    axs[n].axvline(irql, label=f'IRQ-L ({irql:.2f})', color='green', linestyle='dotted')
+
+                if axs[n].get_xlim()[1] > q1 > axs[n].get_xlim()[0]:
+                    axs[n].text(q1, axs[n].get_ylim()[1] + 10, 'Q1', rotation='vertical', ha='center', va='bottom')
+                    axs[n].axvline(q1, label=f'Q1 ({q1:.2f})', color='green', linestyle='dotted')
+
+                if axs[n].get_xlim()[1] > q1 > axs[n].get_xlim()[0]:
+                    axs[n].text(q3, axs[n].get_ylim()[1] + 10, 'Q3', rotation='vertical', ha='center', va='bottom')
+                    axs[n].axvline(q3, label=f'Q3 ({q3:.2f})', color='green', linestyle='dotted')
+
+                if axs[n].get_xlim()[1] > irqu > axs[n].get_xlim()[0]:
+                    axs[n].text(irqu, axs[n].get_ylim()[1] + 10, 'IRQ-U', rotation='vertical', ha='center', va='bottom')
+                    axs[n].axvline(irqu, label=f'IRQ-U ({irqu:.2f})', color='green', linestyle='dotted')
+
+                axs[n].legend()
+            # sns.despine(ax=axs[n])
+            # sns.despine(ax=axs[n], left=True)
+            axs[n].grid(False)
+
         else:
             if verbose:
-                print(f"Column '{v.name}' is not visualized, the number of nunique values ({nunique}) either exceeds {max_nunique} or is lower then {min_nunique}.")
+                print(
+                    f"Column '{v.name}' is not visualized, the number of nunique values ({nunique}) either exceeds {max_nunique} or is lower then {min_nunique} or the values are not numeric.")
             continue
-
-        axs[n].set(title=v.name)
 
         # Only rotate the x labels
         for tick in axs[n].get_xticklabels():
@@ -136,7 +162,7 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
 
         # Remove unnecessary white space on the left/right side of the graph.
         axs[n].margins(x=0)
-        axs[n].grid(axis='x')
+        axs[n].grid(axis='y')
 
         axs[n].xaxis.label.set_color(label_color)  # Set color of x-axis label
         axs[n].tick_params(axis='x', colors=label_color)  # Set color of x-axis ticks.
@@ -147,7 +173,7 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
 
         n += 1
 
-    for i in range(n, rows*cols):
+    for i in range(n, rows * cols):
         fig.delaxes(axs[i])
 
     _plt.show()

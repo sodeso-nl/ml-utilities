@@ -1,7 +1,7 @@
 from sklearn import model_selection as _model_selection
 
 
-def split_train_test_data(*arrays, test_size=.2, train_size=.8, random_state=42, shuffle=True):
+def split_train_test_data(*arrays, test_size=.2, train_size=.8, random_state=42, shuffle=True, stratify=None):
     """
     Usage:
 
@@ -15,4 +15,5 @@ def split_train_test_data(*arrays, test_size=.2, train_size=.8, random_state=42,
                                                     test_size=test_size,
                                                     train_size=train_size,
                                                     random_state=random_state,
-                                                    shuffle=shuffle)
+                                                    shuffle=shuffle,
+                                                    stratify=stratify)

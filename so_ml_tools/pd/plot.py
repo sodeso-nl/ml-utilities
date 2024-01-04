@@ -177,3 +177,19 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
         fig.delaxes(axs[i])
 
     _plt.show()
+
+def correlation(dataframe: _pd.DataFrame, numeric_only=False, figsize: tuple = (12, 12), label_color='black'):
+    fig, ax = _plt.subplots(figsize=figsize)
+    fig.patch.set_alpha(0.0)  # Transparant background
+
+    _sns.heatmap(data=dataframe.corr(numeric_only=numeric_only).round(2), vmin=-1, vmax=1, annot=True, cmap='coolwarm',
+                 ax=ax)
+
+    ax.xaxis.label.set_color(label_color)  # Set color of x-axis label
+    ax.tick_params(axis='x', colors=label_color)  # Set color of x-axis ticks.
+
+    ax.yaxis.label.set_color(label_color)  # Set color of y-axis label
+    ax.tick_params(axis='y', colors=label_color)  # Set color of y-axis ticks.
+    ax.title.set_color(label_color)  # Set color of title
+    ax.set_title('Correlation')
+    _plt.show()

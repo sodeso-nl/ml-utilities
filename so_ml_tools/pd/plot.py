@@ -2,9 +2,38 @@ import matplotlib.pyplot as _plt
 import seaborn as _sns
 import pandas as _pd
 import numpy as _np
+import scipy as _sp
 
 
-def count_categories(dataframe: _pd.DataFrame, label_column: str = None, column_names: list[str] = None, cols=3, figsize: tuple = None):
+def count_categories(dataframe: _pd.DataFrame, label_column: str = None, column_names: list[str] = None, cols=3,
+                     figsize: tuple = None):
+    """
+    Create count plots for categorical columns in a DataFrame, optionally segmented by a label column.
+
+    Parameters:
+    - dataframe (pd.DataFrame): The input DataFrame.
+    - label_column (str): The column used for segmentation (optional). If provided, each count plot will be segmented by the unique values in this column.
+    - column_names (List[str]): List of column names to create count plots for. If not provided, all non-numeric columns in the DataFrame will be used.
+    - cols (int): Number of columns in the grid layout for count plots.
+    - figsize (Tuple[int, int]): Size of the entire figure (width, height). If not provided, the figure size is calculated based on the number of rows and a default height.
+
+    Returns:
+    - None
+
+    Example:
+    ```python
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    # Sample DataFrame
+    data = {'Category': ['A', 'B', 'A', 'C', 'B', 'C'], 'Label': [1, 0, 1, 1, 0, 1]}
+    df = pd.DataFrame(data)
+
+    # Create count plots for categorical columns
+    count_categories(dataframe=df, label_column='Label', cols=2)
+    ```
+    """
     if column_names is None:
         column_names = dataframe.select_dtypes(exclude='number').columns.tolist()
 
@@ -95,7 +124,7 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
             bins = 'auto'
             if nunique < 3:
                 bins = 2
-            _sns.histplot(data=v, kde=bins == 'auto', stat='count', bins=bins, ax=axs[n])
+            _sns.histplot(data=v, kde=bins == 'auto', stat='count', bins=bins, ax=axs[n], kde_kws={'bw_adjust': .15})
 
             if nunique > 3:
                 # Display the mean
@@ -147,10 +176,7 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
                     axs[n].axvline(irqu, label=f'IRQ-U ({irqu:.2f})', color='green', linestyle='dotted')
 
                 axs[n].legend()
-            # sns.despine(ax=axs[n])
-            # sns.despine(ax=axs[n], left=True)
             axs[n].grid(False)
-
         else:
             if verbose:
                 print(
@@ -180,22 +206,20 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
     _plt.show()
 
 
-def correlation(dataframe: _pd.DataFrame, numeric_only=False, figsize: tuple = (12, 12), label_color='black'):
+def correlation(dataframe: _pd.DataFrame, numeric_only=False, method: str = 'pearson', figsize: tuple = (12, 12),
+                label_color='black') -> None:
     """
     Create a correlation heatmap for the given DataFrame.
 
     Parameters:
     - dataframe (pd.DataFrame): The input DataFrame.
     - numeric_only (bool): Whether to include only numeric columns.
+    - method (str): The method to use for the correlation heatmap (pearson, spearman or kendall)
     - figsize (tuple): Size of the figure.
     - label_color (str): Color of axis labels and title.
-    - cmap (str): Colormap for the heatmap.
-    - vmin (float): Minimum value for color scale.
-    - vmax (float): Maximum value for color scale.
-    - annot (bool): Whether to annotate the cells with correlation values.
 
     Returns:
-    - fig, ax: Matplotlib figure and axes objects.
+    - None
     """
     # Validate input parameters
     if not isinstance(dataframe, _pd.DataFrame):
@@ -204,8 +228,11 @@ def correlation(dataframe: _pd.DataFrame, numeric_only=False, figsize: tuple = (
     if not isinstance(figsize, tuple):
         raise ValueError("'figsize' must be a tuple.")
 
+    if method not in ['pearson', 'kendall', 'spearman']:
+        raise ValueError("Invalid correlation method. Supported methods: 'pearson', 'kendall', 'spearman'.")
+
     # Create the correlation dataset
-    df_corr = dataframe.corr(numeric_only=numeric_only)
+    df_corr = dataframe.corr(numeric_only=numeric_only, method=method)
 
     # Create a mask so that only the lower left triangle remains.
     mask = _np.triu(_np.ones_like(df_corr, dtype=bool))
@@ -227,3 +254,58 @@ def correlation(dataframe: _pd.DataFrame, numeric_only=False, figsize: tuple = (
     ax.set_title('Correlation')
     _plt.show()
 
+
+def correlation_categorical(dataframe: _pd.DataFrame, figsize: tuple = (12, 12), label_color='black') -> None:
+    """
+    Create a correlation matrix (heatmap) between categorical features in a DataFrame, uses
+    the point-biserial correlation coefficient to calculate the correlation.
+
+    Parameters:
+    - dataframe (pd.DataFrame): The input DataFrame with categorical features.
+    - figsize (tuple): Size of the figure.
+    - label_color (str): Color of axis labels and title.
+
+    Returns:
+    - None
+    """
+    # Validate input parameters
+    if not isinstance(dataframe, _pd.DataFrame):
+        raise ValueError("Input 'dataframe' must be a Pandas DataFrame.")
+
+    if not isinstance(figsize, tuple):
+        raise ValueError("'figsize' must be a tuple.")
+
+    # Select only object or categorical columns
+    categorical_columns = dataframe.select_dtypes(['object', 'category']).columns
+
+    # Create an empty correlation matrix
+    df_corr = _pd.DataFrame(index=categorical_columns, columns=categorical_columns)
+
+    for col1 in categorical_columns:
+        for col2 in categorical_columns:
+            if col1 != col2:
+                # Calculate point-biserial correlation coefficient
+                c, _ = _sp.stats.pointbiserialr(dataframe[col1].astype('category').cat.codes,
+                                                dataframe[col2].astype('category').cat.codes)
+                df_corr.loc[col1, col2] = c
+
+    # Create a mask so that only the lower left triangle remains.
+    mask = _np.triu(_np.ones_like(df_corr, dtype=bool))
+
+    # Set up the matplotlib figure
+    fig, ax = _plt.subplots(figsize=figsize)
+    fig.patch.set_alpha(0.0)  # Transparent background
+
+    # Create a heatmap using Seaborn
+    _sns.heatmap(df_corr.astype(float).round(2), mask=mask, vmin=-1, vmax=1, annot=True, cmap='coolwarm', ax=ax)
+
+    # Customize labels and title
+    ax.xaxis.label.set_color(label_color)  # Set color of x-axis label
+    ax.tick_params(axis='x', colors=label_color)  # Set color of x-axis ticks.
+
+    ax.yaxis.label.set_color(label_color)  # Set color of y-axis label
+    ax.tick_params(axis='y', colors=label_color)  # Set color of y-axis ticks.
+
+    ax.title.set_color(label_color)  # Set color of title
+    _plt.title('Correlation')
+    _plt.show()

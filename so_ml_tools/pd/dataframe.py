@@ -122,7 +122,7 @@ def column_as_dataframe(dataframe: _pd.DataFrame, column_name: str, drop_after: 
     return column
 
 
-def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_np.float64,
+def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_np.float64 | str,
                            inplace=True) -> _pd.DataFrame | None:
     """
     Converts the dtype of the given column to the specified dtype.

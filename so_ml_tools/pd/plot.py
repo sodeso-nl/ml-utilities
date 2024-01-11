@@ -1,6 +1,7 @@
 import matplotlib.pyplot as _plt
 import seaborn as _sns
 import pandas as _pd
+import numpy as _np
 
 
 def count_categories(dataframe: _pd.DataFrame, label_column: str = None, column_names: list[str] = None, cols=3, figsize: tuple = None):
@@ -178,18 +179,51 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
 
     _plt.show()
 
-def correlation(dataframe: _pd.DataFrame, numeric_only=False, figsize: tuple = (12, 12), label_color='black'):
-    fig, ax = _plt.subplots(figsize=figsize)
-    fig.patch.set_alpha(0.0)  # Transparant background
 
-    _sns.heatmap(data=dataframe.corr(numeric_only=numeric_only).round(2), vmin=-1, vmax=1, annot=True, cmap='coolwarm',
+def correlation(dataframe: _pd.DataFrame, numeric_only=False, figsize: tuple = (12, 12), label_color='black'):
+    """
+    Create a correlation heatmap for the given DataFrame.
+
+    Parameters:
+    - dataframe (pd.DataFrame): The input DataFrame.
+    - numeric_only (bool): Whether to include only numeric columns.
+    - figsize (tuple): Size of the figure.
+    - label_color (str): Color of axis labels and title.
+    - cmap (str): Colormap for the heatmap.
+    - vmin (float): Minimum value for color scale.
+    - vmax (float): Maximum value for color scale.
+    - annot (bool): Whether to annotate the cells with correlation values.
+
+    Returns:
+    - fig, ax: Matplotlib figure and axes objects.
+    """
+    # Validate input parameters
+    if not isinstance(dataframe, _pd.DataFrame):
+        raise ValueError("Input 'dataframe' must be a Pandas DataFrame.")
+
+    if not isinstance(figsize, tuple):
+        raise ValueError("'figsize' must be a tuple.")
+
+    # Create the correlation dataset
+    df_corr = dataframe.corr(numeric_only=numeric_only)
+
+    # Create a mask so that only the lower left triangle remains.
+    mask = _np.triu(_np.ones_like(df_corr, dtype=bool))
+
+    # Create heatmap.
+    fig, ax = _plt.subplots(figsize=figsize)
+    fig.patch.set_alpha(0.0)  # Transparent background
+    _sns.heatmap(data=df_corr.round(2), mask=mask, vmin=-1, vmax=1, annot=True, cmap='coolwarm',
                  ax=ax)
 
+    # Customize labels and title
     ax.xaxis.label.set_color(label_color)  # Set color of x-axis label
     ax.tick_params(axis='x', colors=label_color)  # Set color of x-axis ticks.
 
     ax.yaxis.label.set_color(label_color)  # Set color of y-axis label
     ax.tick_params(axis='y', colors=label_color)  # Set color of y-axis ticks.
+
     ax.title.set_color(label_color)  # Set color of title
     ax.set_title('Correlation')
     _plt.show()
+

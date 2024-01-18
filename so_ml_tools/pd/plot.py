@@ -140,7 +140,7 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
                     c = next(color)
                     if value > v.min():
                         axs[n].text(value, axs[n].get_ylim()[1] + 10, f'-{3 - idx}σ', rotation='vertical', ha='center',
-                                    va='bottom')
+                                    va='bottom', color=label_color)
                         axs[n].axvline(value, label=f'-{3 - idx}σ ({value:.2f})', color=c, linestyle='dotted')
 
                 z_score_max = [1 * v.std() + v.mean(), 2 * v.std() + v.mean(), 3 * v.std() + v.mean()]
@@ -149,7 +149,7 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
                     c = next(color)
                     if value < v.max():
                         axs[n].text(value, axs[n].get_ylim()[1] + 10, f'{idx + 1}σ', rotation='vertical', ha='center',
-                                    va='bottom')
+                                    va='bottom', color=label_color)
                         axs[n].axvline(value, label=f'{idx + 1}σ ({value:.2f})', color=c, linestyle='dotted')
 
                 # Display the IREQ and lower / upper bounds.
@@ -160,19 +160,23 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
                 irqu = q3 + (1.5 * irq)
 
                 if axs[n].get_xlim()[1] > irql > axs[n].get_xlim()[0]:
-                    axs[n].text(irql, axs[n].get_ylim()[1] + 10, 'IRQ-L', rotation='vertical', ha='center', va='bottom')
+                    axs[n].text(irql, axs[n].get_ylim()[1] + 10, 'IRQ-L', rotation='vertical', ha='center', va='bottom',
+                                color=label_color)
                     axs[n].axvline(irql, label=f'IRQ-L ({irql:.2f})', color='green', linestyle='dotted')
 
                 if axs[n].get_xlim()[1] > q1 > axs[n].get_xlim()[0]:
-                    axs[n].text(q1, axs[n].get_ylim()[1] + 10, 'Q1', rotation='vertical', ha='center', va='bottom')
+                    axs[n].text(q1, axs[n].get_ylim()[1] + 10, 'Q1', rotation='vertical', ha='center', va='bottom',
+                                color=label_color)
                     axs[n].axvline(q1, label=f'Q1 ({q1:.2f})', color='green', linestyle='dotted')
 
                 if axs[n].get_xlim()[1] > q1 > axs[n].get_xlim()[0]:
-                    axs[n].text(q3, axs[n].get_ylim()[1] + 10, 'Q3', rotation='vertical', ha='center', va='bottom')
+                    axs[n].text(q3, axs[n].get_ylim()[1] + 10, 'Q3', rotation='vertical', ha='center', va='bottom',
+                                color=label_color)
                     axs[n].axvline(q3, label=f'Q3 ({q3:.2f})', color='green', linestyle='dotted')
 
                 if axs[n].get_xlim()[1] > irqu > axs[n].get_xlim()[0]:
-                    axs[n].text(irqu, axs[n].get_ylim()[1] + 10, 'IRQ-U', rotation='vertical', ha='center', va='bottom')
+                    axs[n].text(irqu, axs[n].get_ylim()[1] + 10, 'IRQ-U', rotation='vertical', ha='center', va='bottom',
+                                color=label_color)
                     axs[n].axvline(irqu, label=f'IRQ-U ({irqu:.2f})', color='green', linestyle='dotted')
 
                 axs[n].legend()
@@ -255,13 +259,15 @@ def correlation(dataframe: _pd.DataFrame, numeric_only=False, method: str = 'pea
     _plt.show()
 
 
-def correlation_categorical(dataframe: _pd.DataFrame, figsize: tuple = (12, 12), label_color='black') -> None:
+def correlation_pb(dataframe: _pd.DataFrame, continuous_columns: list, dichotomous_column: str, figsize: tuple = (12, 6),
+                   label_color='black') -> None:
     """
-    Create a correlation matrix (heatmap) between categorical features in a DataFrame, uses
-    the point-biserial correlation coefficient to calculate the correlation.
+    Create a correlation bar plot between continuous features and a dichotomous feature using point-biserial correlation coefficient.
 
     Parameters:
-    - dataframe (pd.DataFrame): The input DataFrame with categorical features.
+    - dataframe (pd.DataFrame): The input DataFrame with continuous and dichotomous features.
+    - continuous_columns (list): List of continuous variable columns.
+    - dichotomous_column (str): Column name of the dichotomous variable.
     - figsize (tuple): Size of the figure.
     - label_color (str): Color of axis labels and title.
 
@@ -275,37 +281,53 @@ def correlation_categorical(dataframe: _pd.DataFrame, figsize: tuple = (12, 12),
     if not isinstance(figsize, tuple):
         raise ValueError("'figsize' must be a tuple.")
 
-    # Select only object or categorical columns
-    categorical_columns = dataframe.select_dtypes(['object', 'category']).columns
+    if not isinstance(continuous_columns, list) or not all(isinstance(col, str) for col in continuous_columns):
+        raise ValueError("'continuous_columns' must be a list of continuous variable column names.")
 
-    # Create an empty correlation matrix
-    df_corr = _pd.DataFrame(index=categorical_columns, columns=categorical_columns)
+    if not isinstance(dichotomous_column, str):
+        raise ValueError(
+            "'dichotomous_column' must be a string representing the column name of the dichotomous variable.")
 
-    for col1 in categorical_columns:
-        for col2 in categorical_columns:
-            if col1 != col2:
-                # Calculate point-biserial correlation coefficient
-                c, _ = _sp.stats.pointbiserialr(dataframe[col1].astype('category').cat.codes,
-                                                dataframe[col2].astype('category').cat.codes)
-                df_corr.loc[col1, col2] = c
+    if dichotomous_column not in dataframe.columns:
+        raise ValueError(f"'{dichotomous_column}' not found in the DataFrame columns.")
 
-    # Create a mask so that only the lower left triangle remains.
-    mask = _np.triu(_np.ones_like(df_corr, dtype=bool))
+    for col in continuous_columns:
+        if col not in dataframe.columns:
+            raise ValueError(f"'{col}' not found in the DataFrame columns.")
+
+    # Drop Null columns.
+    dataframe = dataframe.dropna()
+
+    # Calculate point-biserial correlation coefficients
+    corr_results = [_sp.stats.pointbiserialr(dataframe[col], dataframe[dichotomous_column]) for col in continuous_columns]
+
+    # Extract correlation coefficients and p-values
+    corr_coefficients = [result[0] for result in corr_results]
+    p_values = [result[1] for result in corr_results]
 
     # Set up the matplotlib figure
     fig, ax = _plt.subplots(figsize=figsize)
     fig.patch.set_alpha(0.0)  # Transparent background
 
-    # Create a heatmap using Seaborn
-    _sns.heatmap(df_corr.astype(float).round(2), mask=mask, vmin=-1, vmax=1, annot=True, cmap='coolwarm', ax=ax)
+    # Create a color palette for the bars
+    color_palette = _sns.color_palette("coolwarm", len(continuous_columns))
+
+    # Create a bar plot using Seaborn
+    _sns.barplot(x=continuous_columns, y=corr_coefficients, ax=ax, palette=color_palette)
+
+    for i, (value, p_value) in enumerate(zip(corr_coefficients, p_values)):
+        ax.text(i, value, f"c:{value:.2f}, p:{p_value:.4f}", ha='center', va='bottom')
 
     # Customize labels and title
-    ax.xaxis.label.set_color(label_color)  # Set color of x-axis label
-    ax.tick_params(axis='x', colors=label_color)  # Set color of x-axis ticks.
+    ax.set_xlabel("Continuous Variables", color=label_color)
+    ax.xaxis.label.set_color(label_color)
+    ax.tick_params(axis='x', colors=label_color)
 
-    ax.yaxis.label.set_color(label_color)  # Set color of y-axis label
-    ax.tick_params(axis='y', colors=label_color)  # Set color of y-axis ticks.
+    ax.set_ylabel("Point-Biserial Correlation Coefficient", color=label_color)
+    ax.yaxis.label.set_color(label_color)
+    ax.tick_params(axis='y', colors=label_color)
 
-    ax.title.set_color(label_color)  # Set color of title
-    _plt.title('Correlation')
+    ax.title.set_color(label_color)
+    _plt.title(f'Correlation with {dichotomous_column}')
+
     _plt.show()

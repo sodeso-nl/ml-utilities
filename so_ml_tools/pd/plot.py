@@ -128,7 +128,8 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
 
             if nunique > 3:
                 # Display the mean
-                axs[n].text(v.mean(), axs[n].get_ylim()[1] + 10, 'Mean', rotation='vertical', ha='center', va='bottom')
+                axs[n].text(v.mean(), axs[n].get_ylim()[1] + 10, 'Mean', rotation='vertical', ha='center', va='bottom',
+                            color=label_color)
 
                 axs[n].axvline(v.mean(), label=f'Mean ({v.mean():.2f})', color='black', linestyle='dotted')
 

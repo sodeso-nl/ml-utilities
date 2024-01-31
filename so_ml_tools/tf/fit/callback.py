@@ -55,9 +55,15 @@ def model_checkpoint_callback(dir_name='./checkpoints',
                               save_freq='epoch',
                               verbose=0) -> _ModelCheckpoint:
     if filename is None and save_best_only is False:
-        output_file = 'epoch-{{epoch:02d}}-{monitor}-{{{monitor}:.2f}}.hdf5'.format(monitor=monitor)
+        if save_weights_only:
+            output_file = 'epoch-{{epoch:02d}}-{monitor}-{{{monitor}:.2f}}.hdf5'.format(monitor=monitor)
+        else:
+            output_file = 'epoch-{{epoch:02d}}-{monitor}-{{{monitor}:.2f}}'.format(monitor=monitor)
     elif filename is None and save_best_only is True:
-        output_file = 'model.hdf5'
+        if save_weights_only:
+            output_file = 'model.hdf5'
+        else:
+            output_file = 'model'
     else:
         output_file = filename
 

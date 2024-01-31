@@ -6,8 +6,8 @@ from keras.callbacks import ModelCheckpoint as _ModelCheckpoint
 from keras.callbacks import EarlyStopping as _EarlyStopping
 from keras.callbacks import ReduceLROnPlateau as _ReduceLROnPlateau
 
-import datetime
-import os
+import datetime as _datetime
+import os as _os
 
 
 def reduce_lr_on_plateau_callback(monitor="val_loss",
@@ -48,15 +48,26 @@ def early_stopping_callback(monitor='val_loss',
 
 def model_checkpoint_callback(dir_name='./checkpoints',
                               experiment_name='/experiment',
-                              file_name='/epoch-{{epoch:02d}}-{metric}-{{{metric}:.2f}}.hdf5',
-                              metric='val_loss',
+                              filename=None,
+                              monitor='val_loss',
                               save_weights_only=True,
                               save_best_only=True,
                               save_freq='epoch',
                               verbose=0) -> _ModelCheckpoint:
-    log_dir = os.path.join(dir_name, experiment_name, file_name)
-    return _ModelCheckpoint(filepath=log_dir,
-                            monitor=metric,
+    if filename is None and save_best_only is False:
+        output_file = 'epoch-{{epoch:02d}}-{monitor}-{{{monitor}:.2f}}.hdf5'.format(monitor=monitor)
+    elif filename is None and save_best_only is True:
+        output_file = 'model.hdf5'
+    else:
+        output_file = filename
+
+    output_dir = _os.path.join(dir_name, experiment_name)
+    if not _os.path.exists(output_dir):
+        _os.makedirs(output_dir, exist_ok=True)
+
+    filepath = _os.path.join(dir_name, experiment_name, output_file)
+    return _ModelCheckpoint(filepath=filepath,
+                            monitor=monitor,
                             save_weights_only=save_weights_only,
                             save_best_only=save_best_only,
                             save_freq=save_freq,
@@ -79,7 +90,7 @@ def learning_rate_scheduler_callback(learning_rate_start=0.001, epochs=50) -> _L
 
 
 def tensorboard_callback(experiment_name: str, dir_name='./logs'):
-    log_dir = dir_name + '/' + experiment_name + '/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    log_dir = dir_name + '/' + experiment_name + '/' + _datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     print(f"Saving TensorBoard log files to: {log_dir}")
     return _TensorBoard(log_dir=log_dir)
 

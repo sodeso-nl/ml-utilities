@@ -1,4 +1,5 @@
 from . import (
+    loss,
     dataset,
     tensor,
     model,
@@ -8,6 +9,7 @@ from . import (
 )
 
 __all__ = [
+    "loss",
     "dataset",
     "tensor",
     "model",

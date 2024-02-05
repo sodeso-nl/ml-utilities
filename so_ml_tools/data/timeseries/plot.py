@@ -61,13 +61,15 @@ def timeseries(x: _np.ndarray,
 
     color_palette = _itertools.cycle(_sns.color_palette(palette="tab10", n_colors=len(x)))
     for idx, _y in enumerate(y):
+        _x = x[idx]
 
         # If the horizon of the data contains more then one day then reduce the
         if _y.ndim > 1:
             _y = _tf.reduce_mean(_y, axis=1)
+            labels[idx] = f"{labels[idx]} (mean)"
 
         _sns.lineplot(
-            x=x[start:],
+            x=_x[start:],
             y=_y[start:],
             color=next(color_palette),
             # s=7,

@@ -5,7 +5,7 @@ import numpy as _np
 import tensorflow as _tf
 
 
-def timeseries(x: _np.ndarray,
+def timeseries(x: list[_np.ndarray],
                y: list[_np.ndarray],
                labels: list[str] = None,
                title: str = None,
@@ -24,7 +24,7 @@ def timeseries(x: _np.ndarray,
     The use this method you can call it in the following ways:
 
     timeseries(
-        x=X[-len(dates):],
+        x=[X[-len(dates):], X[-len(dates):]],
         y=[y_label, Y_pred],
         labels=['Label', 'Pred'],
         start=300,
@@ -37,7 +37,7 @@ def timeseries(x: _np.ndarray,
     day = 2
 
     timeseries(
-        x=X[-len(dates):],
+        x=[X[-len(dates):], X[-len(dates):]],
         y=[y_label[:,day], Y_pred[:,day]],
         labels=['Label', 'Pred'],
         start=300,
@@ -47,8 +47,8 @@ def timeseries(x: _np.ndarray,
     Where day is set to the day in the range of the horizon, in this case the third day.
 
     Args:
-        x: An array of dates/times
-        y: An list containing one ore more arrays of labels and predictions
+        x: A list containing one ore more arrays of dates/times
+        y: A list containing one ore more arrays of labels and predictions
         labels: An array of labels where each label corresponds to an entry in the list of y.
         title: An optional title for the graph.
         x_label: An optional x-axis label for the graph.

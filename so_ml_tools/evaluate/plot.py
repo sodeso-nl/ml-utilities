@@ -104,7 +104,7 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
         raise "Must specify 'y_pred' or 'y_prob'"
 
     # Create the confusion matrix
-    cm = _confusion_matrix(y_true, y_pred)
+    cm = _confusion_matrix(y_true, y_pred, labels=class_names)
     cm_norm = cm.astype("float") / cm.sum(axis=1)[:, _np.newaxis]  # normalize our confusion matrix
     n_classes = cm.shape[0]
 

@@ -11,7 +11,6 @@ def timeseries(x: list[_np.ndarray],
                title: str = None,
                x_label: str = None,
                y_label: str = None,
-               start: int = None,
                figsize: tuple = (8, 6),
                label_color='black') -> None:
     """
@@ -24,25 +23,21 @@ def timeseries(x: list[_np.ndarray],
     The use this method you can call it in the following ways:
 
     timeseries(
-        x=[X[-len(dates):], X[-len(dates):]],
-        y=[y_label, Y_pred],
+        x=[
+            X_history,
+            X_pred
+        ],
+        y=[
+            y_history,
+            y_pred
+        ],
         labels=['Label', 'Pred'],
         start=300,
         x_label='Time', y_label
         ='Price')
 
-    Where both y_label and y_pred contain one ore more arrays of predictions (for example, a horizon of 1, 2, 3 days),
-    in case you only want to plot one of the days do the following:
-
-    day = 2
-
-    timeseries(
-        x=[X[-len(dates):], X[-len(dates):]],
-        y=[y_label[:,day], Y_pred[:,day]],
-        labels=['Label', 'Pred'],
-        start=300,
-        x_label='Time', y_label
-        ='Price')
+    Note that filling in the values for X and y might be different in certain circumstances, most often this has
+    to do with the shape, make sure they match.
 
     Where day is set to the day in the range of the horizon, in this case the third day.
 
@@ -53,7 +48,6 @@ def timeseries(x: list[_np.ndarray],
         title: An optional title for the graph.
         x_label: An optional x-axis label for the graph.
         y_label: An optional y-axis label for the graph.
-        start: An optional starting project for plotting the graph.
         figsize: An optional figure size. Default is (8, 6)
         label_color: An optional color for the labels of the axis, axis values and title.
     """
@@ -61,20 +55,31 @@ def timeseries(x: list[_np.ndarray],
 
     color_palette = _itertools.cycle(_sns.color_palette(palette="tab10", n_colors=len(x)))
     for idx, _y in enumerate(y):
+        print(f'{idx}, {len(labels)}')
+
         _x = x[idx]
 
         # If the horizon of the data contains more then one day then reduce the
-        if _y.ndim > 1:
+        if hasattr(_y, 'ndim') and _y.ndim > 1:
             _y = _tf.reduce_mean(_y, axis=1)
-            labels[idx] = f"{labels[idx]} (mean)"
+            if labels is not None and len(labels) > idx:
+                labels[idx] = f"{labels[idx]} (mean)"
+        else:
+            _y = y[idx]
+
+        _label = 'None'
+        if labels is not None and len(labels) > idx:
+            _label = labels[idx - 1]
+
+
 
         _sns.lineplot(
-            x=_x[start:],
-            y=_y[start:],
+            x=_x,
+            y=_y,
             color=next(color_palette),
             # s=7,
             ax=ax,
-            label=None if labels is None else labels[idx])
+            label=_label)
 
     if x_label:
         _plt.xlabel(x_label)

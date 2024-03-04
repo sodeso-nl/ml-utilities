@@ -28,20 +28,15 @@ def describe_inputs_and_outputs(dataset: _tf.data.Dataset) -> None:
         dataset: a `tf.data.Dataset`
     """
     if isinstance(dataset.element_spec, tuple):
-        inputs = dataset.element_spec[0]
-        outputs = dataset.element_spec[1]
-
-        print(f"          | {'dtype':<16} | shape")
-        # In case of a single input
-        if isinstance(inputs, _tf.TensorSpec):
-            print(f"Input     | {str(inputs.dtype.name):<16} | {str(inputs.shape)}")
-        else:
-            # In case of multiple concatenated datasets.
-            for i, input in enumerate(inputs):
-                print(f"Input  #{i} | {str(input.dtype.name):<16} | {str(input.shape)}")
-
-        if isinstance(outputs, _tf.TensorSpec):
-            print(f"Output    | {str(outputs.dtype.name):<16} | {str(outputs.shape)}")
+        print(f"{'dtype':<16} | shape")
+        for inputs in dataset.element_spec:
+            # In case of a single input
+            if isinstance(inputs, _tf.TensorSpec):
+                print(f"{str(inputs.dtype.name):<16} | {str(inputs.shape)}")
+            else:
+                # In case of multiple concatenated datasets.
+                for i, input in enumerate(inputs):
+                    print(f"{str(input.dtype.name):<16} | {str(input.shape)}")
 
 
 def add_rescaling_mapping(dataset: _tf.data.Dataset) -> _tf.data.Dataset:

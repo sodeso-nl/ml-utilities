@@ -117,7 +117,7 @@ def column_as_dataframe(dataframe: _pd.DataFrame, column_name: str, drop_after: 
     column = dataframe[[column_name]]
 
     if drop_after:
-        drop_columns(dataframe=dataframe, column_names=[column_name])
+        drop_columns(dataframe=dataframe, column_names=[column_name], inplace=True)
 
     return column
 
@@ -762,22 +762,31 @@ def delete_rows_not_numeric(dataframe: _pd.DataFrame, column_name: str, inplace=
                           inplace=inplace)
 
 
-def drop_columns(dataframe: _pd.DataFrame, column_names: list[str]) -> None:
+def drop_columns(dataframe: _pd.DataFrame, column_names: list[str], inplace=True) -> _pd.DataFrame | None:
     """
     Removes (inplace) the given column names from the dataframe.
 
     :param dataframe: the pd.DatFrame
     :param column_names: the names of the columns to remove
+    :param inplace: return a new instance of the DataFrame (False) or adjust the given DataFrame
     """
     if not type(column_names) == list and column_names is not None:
         column_names = [column_names]
 
+    work_df = dataframe
+    if not inplace:
+        work_df = dataframe.copy(deep=True)
+
     for c in column_names:
-        if c in dataframe:
-            dataframe.drop(c, axis=1, inplace=True)
+        if c in work_df:
+            work_df.drop(c, axis=1, inplace=True)
         else:
             print(f"drop_columns: Column '{c}' does not exist in dataframe.")
 
+    if inplace:
+        return None
+
+    return work_df
 
 def describe(dataframe: _pd.DataFrame, column_names: list[str] = None, round=2):
     # If the column_names argument is not a list then create a list

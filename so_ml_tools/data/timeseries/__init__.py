@@ -1,7 +1,9 @@
 from . import (
-    plot
+    plot,
+    window
 )
 
 __all__ = [
-    "plot"
+    "plot",
+    "window"
 ]

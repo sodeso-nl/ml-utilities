@@ -55,8 +55,6 @@ def timeseries(x: list[_np.ndarray],
 
     color_palette = _itertools.cycle(_sns.color_palette(palette="tab10", n_colors=len(x)))
     for idx, _y in enumerate(y):
-        print(f'{idx}, {len(labels)}')
-
         _x = x[idx]
 
         # If the horizon of the data contains more then one day then reduce the

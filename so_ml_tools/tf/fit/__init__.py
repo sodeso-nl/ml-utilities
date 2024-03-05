@@ -1,7 +1,9 @@
 from . import (
-    callback
+    callback,
+    metrics
 )
 
 __all__ = [
-    "callback"
+    "callback",
+    "metrics"
 ]

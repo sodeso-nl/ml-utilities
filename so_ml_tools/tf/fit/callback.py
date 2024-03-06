@@ -46,32 +46,13 @@ def early_stopping_callback(monitor='val_loss',
                           start_from_epoch=start_from_epoch)
 
 
-def model_checkpoint_callback(dir_name='./checkpoints',
-                              experiment_name='/experiment',
-                              filename=None,
+def model_checkpoint_callback(filepath='/path/to/model.h5',
                               monitor='val_loss',
                               save_weights_only=True,
                               save_best_only=True,
                               save_freq='epoch',
                               verbose=0) -> _ModelCheckpoint:
-    if filename is None and save_best_only is False:
-        if save_weights_only:
-            output_file = 'epoch-{{epoch:02d}}-{monitor}-{{{monitor}:.2f}}.hdf5'.format(monitor=monitor)
-        else:
-            output_file = 'epoch-{{epoch:02d}}-{monitor}-{{{monitor}:.2f}}'.format(monitor=monitor)
-    elif filename is None and save_best_only is True:
-        if save_weights_only:
-            output_file = 'model.hdf5'
-        else:
-            output_file = 'model'
-    else:
-        output_file = filename
 
-    output_dir = _os.path.join(dir_name, experiment_name)
-    if not _os.path.exists(output_dir):
-        _os.makedirs(output_dir, exist_ok=True)
-
-    filepath = _os.path.join(dir_name, experiment_name, output_file)
     return _ModelCheckpoint(filepath=filepath,
                             monitor=monitor,
                             save_weights_only=save_weights_only,

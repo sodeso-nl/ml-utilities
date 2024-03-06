@@ -99,6 +99,9 @@ def get_class_names_from_dataset_info(ds_info: dict):
     :param ds_info: The dataset info object
     :return: The labels / class names
     """
+    if hasattr(ds_info, 'features'):
+        return ds_info.features['label'].names
+
     return ds_info["features"]["label"].names
 
 

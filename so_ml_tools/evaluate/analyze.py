@@ -99,95 +99,96 @@ def classification_report(y_true, y_pred=None, y_prob=None) -> None:
 
 # Methods below are less intuitive and informative then using the classification_report.
 
-# def quality_metrics(y_true, y_pred=None, y_prob=None) -> _pd.DataFrame:
-#     """
-#     calculates model accuracy, precision, recall and F1-Score
-#
-#     Args:
-#         y_true: the truth labels
-#         y_pred: (optional) the predictions (either y_pred or y_prob should be supplied)
-#         y_prob: (optional) the probabilities (either y_pred or y_prob should be supplied)
-#
-#     Returns:
-#         A 'dict' containing accuracy, precision, recall, f1 score and support
-#     """
-#     y_true = _soml.util.label.to_prediction(y_prob=y_true)
-#
-#     # If y_pred is not supplied but y_prob is then calculatwe y_pred
-#     if y_pred is None and y_prob is not None:
-#         y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
-#     elif y_pred is None and y_prob is None:
-#         raise "Must specify 'y_pred' or 'y_prob'"
-#
-#     # Calculate model accuracy
-#     model_accuracy = _sklearn.metrics.accuracy_score(y_true, y_pred) * 100
-#
-#     # Calculate precision, recall and F1-score using "weighted" average,
-#     # weighted will also take the amount of samples for each in mind.
-#     model_precission, model_recall, model_f1_score, _ = \
-#         _sklearn.metrics.precision_recall_fscore_support(y_true, y_pred, average="weighted")
-#     model_results = \
-#         {
-#             "accuracy": model_accuracy,
-#             "precision": model_precission,
-#             "recall": model_recall,
-#             "f1-score": model_f1_score
-#         }
-#     return _pd.DataFrame(data=dict(sorted(model_results.items())), index=[0])
-#
-#
-# def quality_metrics_diff(metrics_1: _pd.DataFrame, metrics_2: _pd.DataFrame) -> _pd.DataFrame:
-#     """
-#     Returns the difference between 'metrics_1' and 'metrics_2'.
-#
-#     Args:
-#         metrics_1: the first set of metrics
-#         metrics_2: the second set of metrics
-#
-#     Returns
-#         A new 'pd.DataFrame' with the values of 'metrics_1' and 'metrics_2' and difference between these two.
-#     """
-#     c1 = {'metrics': 'metrics_1'}
-#     c1.update(metrics_1.to_dict('records')[0])
-#     m1 = _pd.DataFrame(data=c1, index=[0])
-#
-#     c2 = {'metrics': 'metrics_2'}
-#     c2.update(metrics_2.to_dict('records')[0])
-#     m2 = _pd.DataFrame(data=c2, index=[0])
-#
-#     diff = (m1.iloc[0][1:] - m2.iloc[0][1:]).to_frame().transpose()
-#     diff.insert(loc=0, column='metrics', value='diff')
-#
-#     complete = _pd.concat([m1, m2, diff])
-#     complete.reset_index(drop=True, inplace=True)
-#     return complete
-#
-#
-# def quality_metrics_combine(metrics: dict, sort_by: list[str] = None, ascending: bool | list[bool] | tuple[bool, ...] = False) -> _pd.DataFrame:
-#     """
-#     Combines all the given metrics into a single overview, call with a dictionary:
-#
-#         {
-#             "baseline": baseline_results,
-#             "model_1": model_1_results,
-#             "model_2": model_2_results,
-#             "model_3": model_3_results
-#         }
-#
-#     Args:
-#         metrics: a dictionary of quality metrics pd.DataFrame objects where the key is the name.
-#         sort_by: column to sort by, if None specified then the default "accuracy" will be used.
-#         ascending: a 'list' or 'tuple' or boolean value containing the sort order.
-#
-#     Returns:
-#         A 'pd.DataFrame' containing all quality metrics combined.
-#     """
-#     if sort_by is None:
-#         sort_by = ["accuracy"]
-#
-#     all_metrics_results = _pd.concat(metrics)
-#     all_metrics_results.reset_index(inplace=True)
-#     _soml.pd.dataframe.drop_columns(dataframe=all_metrics_results, column_names=['level_1'])
-#     all_metrics_results.rename(columns={"level_0": "name"}, inplace=True)
-#     all_metrics_results.sort_values(by=sort_by, inplace=True, ascending=ascending)
-#     return all_metrics_results
+
+def quality_metrics(y_true, y_pred=None, y_prob=None) -> _pd.DataFrame:
+    """
+    calculates model accuracy, precision, recall and F1-Score
+
+    Args:
+        y_true: the truth labels
+        y_pred: (optional) the predictions (either y_pred or y_prob should be supplied)
+        y_prob: (optional) the probabilities (either y_pred or y_prob should be supplied)
+
+    Returns:
+        A 'dict' containing accuracy, precision, recall, f1 score and support
+    """
+    y_true = _soml.util.label.to_prediction(y_prob=y_true)
+
+    # If y_pred is not supplied but y_prob is then calculatwe y_pred
+    if y_pred is None and y_prob is not None:
+        y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
+    elif y_pred is None and y_prob is None:
+        raise "Must specify 'y_pred' or 'y_prob'"
+
+    # Calculate model accuracy
+    model_accuracy = _sklearn.metrics.accuracy_score(y_true, y_pred) * 100
+
+    # Calculate precision, recall and F1-score using "weighted" average,
+    # weighted will also take the amount of samples for each in mind.
+    model_precission, model_recall, model_f1_score, _ = \
+        _sklearn.metrics.precision_recall_fscore_support(y_true, y_pred, average="weighted")
+    model_results = \
+        {
+            "accuracy": model_accuracy,
+            "precision": model_precission,
+            "recall": model_recall,
+            "f1-score": model_f1_score
+        }
+    return _pd.DataFrame(data=dict(sorted(model_results.items())), index=[0])
+
+
+def quality_metrics_diff(metrics_1: _pd.DataFrame, metrics_2: _pd.DataFrame) -> _pd.DataFrame:
+    """
+    Returns the difference between 'metrics_1' and 'metrics_2'.
+
+    Args:
+        metrics_1: the first set of metrics
+        metrics_2: the second set of metrics
+
+    Returns
+        A new 'pd.DataFrame' with the values of 'metrics_1' and 'metrics_2' and difference between these two.
+    """
+    c1 = {'metrics': 'metrics_1'}
+    c1.update(metrics_1.to_dict('records')[0])
+    m1 = _pd.DataFrame(data=c1, index=[0])
+
+    c2 = {'metrics': 'metrics_2'}
+    c2.update(metrics_2.to_dict('records')[0])
+    m2 = _pd.DataFrame(data=c2, index=[0])
+
+    diff = (m1.iloc[0][1:] - m2.iloc[0][1:]).to_frame().transpose()
+    diff.insert(loc=0, column='metrics', value='diff')
+
+    complete = _pd.concat([m1, m2, diff])
+    complete.reset_index(drop=True, inplace=True)
+    return complete
+
+
+def quality_metrics_combine(metrics: dict, sort_by: list[str] = None, ascending: bool | list[bool] | tuple[bool, ...] = False) -> _pd.DataFrame:
+    """
+    Combines all the given metrics into a single overview, call with a dictionary:
+
+        {
+            "baseline": baseline_results,
+            "model_1": model_1_results,
+            "model_2": model_2_results,
+            "model_3": model_3_results
+        }
+
+    Args:
+        metrics: a dictionary of quality metrics pd.DataFrame objects where the key is the name.
+        sort_by: column to sort by, if None specified then the default "accuracy" will be used.
+        ascending: a 'list' or 'tuple' or boolean value containing the sort order.
+
+    Returns:
+        A 'pd.DataFrame' containing all quality metrics combined.
+    """
+    if sort_by is None:
+        sort_by = ["accuracy"]
+
+    all_metrics_results = _pd.concat(metrics)
+    all_metrics_results.reset_index(inplace=True)
+    _soml.pd.dataframe.drop_columns(dataframe=all_metrics_results, column_names=['level_1'])
+    all_metrics_results.rename(columns={"level_0": "name"}, inplace=True)
+    all_metrics_results.sort_values(by=sort_by, inplace=True, ascending=ascending)
+    return all_metrics_results

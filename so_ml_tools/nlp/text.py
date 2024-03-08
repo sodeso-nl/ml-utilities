@@ -32,7 +32,7 @@ def count_unique_words(lines: list[str] | _tf.Tensor, standardize="lower_and_str
     return len(unique)
 
 
-def calculate_q_precentile_word_lengths(lines: list[str], q=95) -> int:
+def calculate_q_precentile_word_lengths(lines: list[str] | _tf.Tensor, q=95) -> int:
     """
     Calculates the q-percentile based on the lengths of the strings.
 
@@ -40,15 +40,32 @@ def calculate_q_precentile_word_lengths(lines: list[str], q=95) -> int:
     :param q: q-percentile (default 95%)
     :return: the percentile
     """
+    if _tf.is_tensor(x=lines):
+        lines = lines.numpy()
+
     return int(_np.percentile(a=__count_words_for_each_sentence(lines), q=q))
+
+
+def maximum_number_of_word_per_sentence(lines: list[str] | _tf.Tensor) -> int:
+    """
+    Returns the maximum number of words per sentence.
+
+
+    :param lines: a list of string values
+    :return: the max sentence length in words
+    """
+    if _tf.is_tensor(x=lines):
+        lines = lines.numpy()
+
+    return max(__count_words_for_each_sentence(lines))
 
 
 def average_number_of_word_per_sentence(lines: list[str] | _tf.Tensor) -> int:
     """
-    Returns the average length of the strings.
+    Returns the average number of words per sentence.
 
     :param lines: a list of string values
-    :return: the average sentence length
+    :return: the average sentence length in words
     """
     if _tf.is_tensor(x=lines):
         lines = lines.numpy()
@@ -60,11 +77,17 @@ def average_number_of_word_per_sentence(lines: list[str] | _tf.Tensor) -> int:
 # Character level functions
 ########################################################################################################################
 
-def count_unique_chars(lines: list[str], standardize="lower_and_strip_punctuation") -> (int, list[chr]):
+def count_unique_chars(lines: list[str] | _tf.Tensor, standardize="lower_and_strip_punctuation") -> (int, list[chr]):
     regex = _re.compile(PUNCTUATION)
+
+    if _tf.is_tensor(x=lines):
+        lines = lines.numpy()
 
     unique = set()
     for line in lines:
+        if isinstance(line, (bytes, bytearray)):
+            line = line.decode(encoding='utf-8')
+
         if standardize in (LOWER, LOWER_AND_STRIP_PUNCTUATION):
             line = line.lower()
         if standardize in (STRIP_PUNCTUATION, LOWER_AND_STRIP_PUNCTUATION):
@@ -73,7 +96,7 @@ def count_unique_chars(lines: list[str], standardize="lower_and_strip_punctuatio
     return len(unique), unique
 
 
-def length_per_sentence(lines: list[str]) -> list[int]:
+def length_per_sentence(lines: list[str] | _tf.Tensor) -> list[int]:
     """
     Calculates the length for each string value and returns a list containing
     these lengths.
@@ -81,10 +104,13 @@ def length_per_sentence(lines: list[str]) -> list[int]:
     :param lines: a list of string values
     :return:
     """
+    if _tf.is_tensor(x=lines):
+        lines = lines.numpy()
+
     return [len(sentence) for sentence in lines]
 
 
-def calculate_q_precentile_character_lengths_for_all_sentence(lines: list[str], q=95) -> int:
+def calculate_q_precentile_character_lengths_for_all_sentence(lines: list[str] | _tf.Tensor, q=95) -> int:
     """
     Calculates the q-percentile based on the lengths of the strings.
 
@@ -95,17 +121,20 @@ def calculate_q_precentile_character_lengths_for_all_sentence(lines: list[str], 
     return int(_np.percentile(a=length_per_sentence(lines), q=q))
 
 
-def calculate_average_character_length_for_all_sentences(lines: list[str]) -> int:
+def calculate_average_character_length_for_all_sentences(lines: list[str] | _tf.Tensor) -> int:
     """
     Returns the average length of the strings.
 
     :param lines: a list of string values
     :return: the average sentence length
     """
+    if _tf.is_tensor(x=lines):
+        lines = lines.numpy()
+
     return round(sum(length_per_sentence(lines)) / len(lines))
 
 
-def __count_words_for_each_sentence(lines: list[str]) -> list[int]:
+def __count_words_for_each_sentence(lines: list[str] | _tf.Tensor) -> list[int]:
     """
     Calculates the length for each string value and returns a list containing
     these lengths.
@@ -113,4 +142,7 @@ def __count_words_for_each_sentence(lines: list[str]) -> list[int]:
     :param lines: a list of string values
     :return:
     """
+    if _tf.is_tensor(x=lines):
+        lines = lines.numpy()
+
     return [len(i.split()) for i in lines]

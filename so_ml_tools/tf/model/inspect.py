@@ -1,7 +1,8 @@
 import tensorflow as _tf
+from typing import Union
 
 
-def collect_layers(model: [_tf.keras.Model | _tf.keras.Sequential], recursive=True, include_trainable=True, include_non_trainable=True) -> list:
+def collect_layers(model: Union[_tf.keras.Model, _tf.keras.Sequential], recursive=True, include_trainable=True, include_non_trainable=True) -> list:
     """
     Collects layers from the given model, if the model is functional then there might be sub-branches
     inside the model, for example:
@@ -43,14 +44,14 @@ def collect_layers(model: [_tf.keras.Model | _tf.keras.Sequential], recursive=Tr
     return layers
 
 
-def collect_layer_names(model: [_tf.keras.Model | _tf.keras.Sequential], recursive=True, include_trainable=True, include_non_trainable=True) -> \
+def collect_layer_names(model: Union[_tf.keras.Model, _tf.keras.Sequential], recursive=True, include_trainable=True, include_non_trainable=True) -> \
         list[str]:
     layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable,
                             include_non_trainable=include_non_trainable)
     return list(map(lambda layer: layer.name, layers))
 
 
-def list_model(model: [_tf.keras.Model | _tf.keras.Sequential], recursive=True, include_trainable=True, include_non_trainable=True) -> None:
+def list_model(model: Union[_tf.keras.Model, _tf.keras.Sequential], recursive=True, include_trainable=True, include_non_trainable=True) -> None:
     layers = collect_layers(model, recursive=recursive, include_trainable=include_trainable,
                             include_non_trainable=include_non_trainable)
 
@@ -104,7 +105,7 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
                 f"{non_trainable_params_s:<{len('Non-trainable Param #')}}")
 
 
-def calculate_parameters(object: [_tf.keras.Model | _tf.keras.Sequential | _tf.keras.layers.Layer]) -> (str, str, str):
+def calculate_parameters(object: Union[_tf.keras.Model, _tf.keras.Sequential, _tf.keras.layers.Layer]) -> (str, str, str):
     total_params_s = trainable_params_s = non_trainable_params_s = 'unknown'
     if object.built:
         total_params = sum([_tf.size(var).numpy() for var in object.variables])

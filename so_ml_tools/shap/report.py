@@ -1,9 +1,10 @@
 import shap as _sh
 import numpy as _np
 import tensorflow as _tf
+from typing import Union as _Union
 
 
-def create_kernel_explainer(model: [_tf.keras.Model | _tf.keras.Sequential], x: _np.array, sample_size=None) \
+def create_kernel_explainer(model: _Union[_tf.keras.Model, _tf.keras.Sequential], x: _np.array, sample_size=None) \
         -> _sh.Explainer:
     """
     Args:
@@ -21,7 +22,7 @@ def create_kernel_explainer(model: [_tf.keras.Model | _tf.keras.Sequential], x: 
     return _sh.KernelExplainer(model, x_sample)
 
 
-def calculate_shap_values(explainer: _sh.Explainer, x: _np.array, n_samples: [int | str] = "auto"):
+def calculate_shap_values(explainer: _sh.Explainer, x: _np.array, n_samples: _Union[int, str] = "auto"):
     """
     Args:
         explainer:
@@ -32,7 +33,7 @@ def calculate_shap_values(explainer: _sh.Explainer, x: _np.array, n_samples: [in
     return explainer.shap_values(x, nsamples=n_samples)
 
 
-def waterfall_plot(explainer, shap_values: list[_np.array], feature_names: list[str], max_features: [str | int] = 'max',
+def waterfall_plot(explainer, shap_values: list[_np.array], feature_names: list[str], max_features: _Union[str, int] = 'max',
                    display_entry: int = 0, display_class: int = 0):
     """
     Plot the breakdown of the

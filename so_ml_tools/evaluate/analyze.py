@@ -2,6 +2,7 @@ import pandas as _pd
 import tensorflow as _tf
 import sklearn as _sklearn
 import so_ml_tools as _soml
+from typing import Union as _Union
 
 
 def determine_outliers_for_multiclass_classification(x, y_true, y_pred=None, y_prob=None, top=10) -> _pd.DataFrame:
@@ -164,7 +165,7 @@ def quality_metrics_diff(metrics_1: _pd.DataFrame, metrics_2: _pd.DataFrame) -> 
     return complete
 
 
-def quality_metrics_combine(metrics: dict, sort_by: list[str] = None, ascending: bool | list[bool] | tuple[bool, ...] = False) -> _pd.DataFrame:
+def quality_metrics_combine(metrics: dict, sort_by: list[str] = None, ascending: _Union[bool, list[bool], tuple[bool, ...]] = False) -> _pd.DataFrame:
     """
     Combines all the given metrics into a single overview, call with a dictionary:
 

@@ -1,6 +1,6 @@
 import pandas as _pd
 import numpy as _np
-
+from typing import Union as _Union
 from sklearn.preprocessing import OneHotEncoder
 
 
@@ -122,8 +122,8 @@ def column_as_dataframe(dataframe: _pd.DataFrame, column_name: str, drop_after: 
     return column
 
 
-def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_np.float64 | str,
-                           inplace=True) -> _pd.DataFrame | None:
+def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype: _Union[type] = _np.float32,
+                           inplace=True):
     """
     Converts the dtype of the given column to the specified dtype.
 
@@ -146,8 +146,7 @@ def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype=_
     return work_df
 
 
-def delete_rows_where_columns_have_null_value(dataframe: _pd.DataFrame, column_names: list[str] = None, inplace=True) \
-        -> _pd.DataFrame | None:
+def delete_rows_where_columns_have_null_value(dataframe: _pd.DataFrame, column_names: list[str] = None, inplace=True):
     """
     Deletes all rows containing a null values inside the given column .
 
@@ -178,8 +177,7 @@ def delete_rows_where_columns_have_null_value(dataframe: _pd.DataFrame, column_n
     return work_df
 
 
-def delete_rows_where_value_equal_to(dataframe: _pd.DataFrame, column_name: str, value: object, inplace=True) \
-        -> _pd.DataFrame | None:
+def delete_rows_where_value_equal_to(dataframe: _pd.DataFrame, column_name: str, value: object, inplace=True):
     """
     Deletes all rows where the specified column has the specified value.
 
@@ -204,8 +202,7 @@ def delete_rows_where_value_equal_to(dataframe: _pd.DataFrame, column_name: str,
     return work_df
 
 
-def delete_rows_where_value_smaller_then(dataframe: _pd.DataFrame, column_name: str, value: object, inplace=True) \
-        -> _pd.DataFrame | None:
+def delete_rows_where_value_smaller_then(dataframe: _pd.DataFrame, column_name: str, value: object, inplace=True):
     """
     Deletes all rows where the specified column has the specified value.
 
@@ -230,8 +227,7 @@ def delete_rows_where_value_smaller_then(dataframe: _pd.DataFrame, column_name: 
     return work_df
 
 
-def delete_rows_where_value_larger_then(dataframe: _pd.DataFrame, column_name: str, value: object, inplace=True) \
-        -> _pd.DataFrame | None:
+def delete_rows_where_value_larger_then(dataframe: _pd.DataFrame, column_name: str, value: object, inplace=True):
     """
     Deletes all rows where the specified column has the specified value.
 
@@ -256,8 +252,7 @@ def delete_rows_where_value_larger_then(dataframe: _pd.DataFrame, column_name: s
     return work_df
 
 
-def fill_nan_with_value(dataframe: _pd.DataFrame, column_names: list[str], value, inplace=True, add_indicator=False) \
-        -> _pd.DataFrame | None:
+def fill_nan_with_value(dataframe: _pd.DataFrame, column_names: list[str], value, inplace=True, add_indicator=False):
     work_df = dataframe
     if not inplace:
         work_df = dataframe.copy(deep=True)
@@ -280,8 +275,7 @@ def fill_nan_with_value(dataframe: _pd.DataFrame, column_names: list[str], value
     return work_df
 
 
-def fill_nan_with_previous_value(dataframe: _pd.DataFrame, column_names: list[str], inplace=True, add_indicator=False) \
-        -> _pd.DataFrame | None:
+def fill_nan_with_previous_value(dataframe: _pd.DataFrame, column_names: list[str], inplace=True, add_indicator=False):
     """
         Fill in missing values based on the previous value.
 
@@ -312,8 +306,7 @@ def fill_nan_with_previous_value(dataframe: _pd.DataFrame, column_names: list[st
     return work_df
 
 
-def fill_nan_with_next_value(dataframe: _pd.DataFrame, column_names: list[str], inplace=True, add_indicator=False) \
-        -> _pd.DataFrame | None:
+def fill_nan_with_next_value(dataframe: _pd.DataFrame, column_names: list[str], inplace=True, add_indicator=False):
     """
         Fill in missing values based on the next value.
 
@@ -345,7 +338,7 @@ def fill_nan_with_next_value(dataframe: _pd.DataFrame, column_names: list[str], 
 
 
 def fill_nan_with_global_mode(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
-                              add_indicator=False) -> _pd.DataFrame | None:
+                              add_indicator=False):
     """
         Fill in missing values based on the mode (most often) value which is calculated on all non `NaN` values
         in the same column.
@@ -361,7 +354,7 @@ def fill_nan_with_global_mode(dataframe: _pd.DataFrame, column_names: list[str],
 
 
 def fill_nan_with_global_kurt(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
-                              add_indicator=False) -> _pd.DataFrame | None:
+                              add_indicator=False):
     """
         Fill in missing values based on kurt value which is calculated on all non `NaN` values in the same
         column.
@@ -377,7 +370,7 @@ def fill_nan_with_global_kurt(dataframe: _pd.DataFrame, column_names: list[str],
 
 
 def fill_nan_with_global_skew(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
-                              add_indicator=False) -> _pd.DataFrame | None:
+                              add_indicator=False):
     """
         Fill in missing values based on skew value which is calculated on all non `NaN` values in the same
         column.
@@ -393,7 +386,7 @@ def fill_nan_with_global_skew(dataframe: _pd.DataFrame, column_names: list[str],
 
 
 def fill_nan_with_global_median(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
-                                add_indicator=False) -> _pd.DataFrame | None:
+                                add_indicator=False):
     """
         Fill in missing values based on median value which is calculated on all non `NaN` values in the same
         column.
@@ -409,7 +402,7 @@ def fill_nan_with_global_median(dataframe: _pd.DataFrame, column_names: list[str
 
 
 def fill_nan_with_global_mean(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
-                              add_indicator=False) -> _pd.DataFrame | None:
+                              add_indicator=False):
     """
         Fill in missing values based on mean value which is calculated on all non `NaN` values in the same
         column.
@@ -441,7 +434,7 @@ def fill_nan_with_global_max(dataframe: _pd.DataFrame, column_names: list[str], 
 
 
 def fill_nan_with_global_min(dataframe: _pd.DataFrame, column_names: list[str], inplace=True,
-                             add_indicator=False) -> _pd.DataFrame | None:
+                             add_indicator=False):
     """
         Fill in missing values based on min value which is calculated on all non `NaN` values in the same
         column.
@@ -457,7 +450,7 @@ def fill_nan_with_global_min(dataframe: _pd.DataFrame, column_names: list[str], 
 
 
 def fill_nan_with_global_func(dataframe: _pd.DataFrame, column_names: list[str], agg_func: str, inplace=True,
-                              add_indicator=False) -> _pd.DataFrame | None:
+                              add_indicator=False):
     """
         Fill in missing values based on a func value which is calculated on all non `NaN` values in the same
         column.
@@ -490,7 +483,7 @@ def fill_nan_with_global_func(dataframe: _pd.DataFrame, column_names: list[str],
 
 
 def ffill_nan_with_groupby_mode(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
-                                  remainder_agg_func='mode', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+                                  remainder_agg_func='mode', inplace=True, add_indicator=False):
     """
     Fill in missing values based on the mode value (most often) which is calculated on all data having a similar value
     in another column. For example, fill in BMI values based on other BMI values that have the same age.
@@ -516,7 +509,7 @@ def ffill_nan_with_groupby_mode(dataframe: _pd.DataFrame, column_name: str, grou
 
 
 def fill_nan_with_groupby_kurt(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
-                                  remainder_agg_func='kurt', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+                                  remainder_agg_func='kurt', inplace=True, add_indicator=False):
     """
     Fill in missing values based on the kurt value which is calculated on all data having a similar value in
     another column. For example, fill in BMI values based on other BMI values that have the same age.
@@ -542,7 +535,7 @@ def fill_nan_with_groupby_kurt(dataframe: _pd.DataFrame, column_name: str, group
 
 
 def fill_nan_with_groupby_skew(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
-                                  remainder_agg_func='skew', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+                                  remainder_agg_func='skew', inplace=True, add_indicator=False):
     """
     Fill in missing values based on the skew value which is calculated on all data having a similar value in
     another column. For example, fill in BMI values based on other BMI values that have the same age.
@@ -568,7 +561,7 @@ def fill_nan_with_groupby_skew(dataframe: _pd.DataFrame, column_name: str, group
 
 
 def fill_nan_with_groupby_median(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
-                                    remainder_agg_func='median', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+                                    remainder_agg_func='median', inplace=True, add_indicator=False):
     """
     Fill in missing values based on the median value which is calculated on all data having a similar value in
     another column. For example, fill in BMI values based on other BMI values that have the same age.
@@ -594,7 +587,7 @@ def fill_nan_with_groupby_median(dataframe: _pd.DataFrame, column_name: str, gro
 
 
 def fill_nan_with_groupby_mean(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
-                                  remainder_agg_func='mean', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+                                  remainder_agg_func='mean', inplace=True, add_indicator=False):
     """
     Fill in missing values based on the mean value which is calculated on all data having a similar value in
     another column. For example, fill in BMI values based on other BMI values that have the same age.
@@ -620,7 +613,7 @@ def fill_nan_with_groupby_mean(dataframe: _pd.DataFrame, column_name: str, group
 
 
 def fill_nan_with_grouped_max(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
-                                 remainder_agg_func='max', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+                                 remainder_agg_func='max', inplace=True, add_indicator=False):
     """
     Fill in missing values based on the max value which is calculated on all data having a similar value in
     another column. For example, fill in BMI values based on other BMI values that have the same age.
@@ -646,7 +639,7 @@ def fill_nan_with_grouped_max(dataframe: _pd.DataFrame, column_name: str, group_
 
 
 def fill_nan_with_groupby_min(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
-                                 remainder_agg_func='min', inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+                                 remainder_agg_func='min', inplace=True, add_indicator=False):
     """
     Fill in missing values based on the min value which is calculated on all data having a similar value in
     another column. For example, fill in BMI values based on other BMI values that have the same age.
@@ -672,7 +665,7 @@ def fill_nan_with_groupby_min(dataframe: _pd.DataFrame, column_name: str, group_
 
 
 def fill_nan_with_groupby_func(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str, agg_func: str,
-                                  remainder_agg_func=None, inplace=True, add_indicator=False) -> _pd.DataFrame | None:
+                                  remainder_agg_func=None, inplace=True, add_indicator=False):
     """
     Fill in missing values based on a function  which is calculated on all data having a similar value in
     another column. For example, fill in BMI values based on other BMI values that have the same age.
@@ -762,7 +755,7 @@ def delete_rows_not_numeric(dataframe: _pd.DataFrame, column_name: str, inplace=
                           inplace=inplace)
 
 
-def drop_columns(dataframe: _pd.DataFrame, column_names: list[str], inplace=True) -> _pd.DataFrame | None:
+def drop_columns(dataframe: _pd.DataFrame, column_names: list[str], inplace=True):
     """
     Removes (inplace) the given column names from the dataframe.
 
@@ -787,6 +780,7 @@ def drop_columns(dataframe: _pd.DataFrame, column_names: list[str], inplace=True
         return None
 
     return work_df
+
 
 def describe(dataframe: _pd.DataFrame, column_names: list[str] = None, round=2):
     # If the column_names argument is not a list then create a list

@@ -1,7 +1,6 @@
 import numpy as _np
 import pandas as _pd
 import tensorflow as _tf
-import keras as _ks
 
 
 def is_multiclass_classification(y_prob: any) -> bool:
@@ -29,7 +28,7 @@ def is_multiclass_classification(y_prob: any) -> bool:
         y_prob = _np.expand_dims(y_prob.to_numpy(), axis=-1)
 
     if isinstance(y_prob, list):
-        return len(y_prob) > 0 and isinstance(y_prob[0], (list | _np.ndarray)) and len(y_prob[0]) > 1
+        return len(y_prob) > 0 and (isinstance(y_prob[0], list) or isinstance(y_prob[0], _np.ndarray)) and len(y_prob[0]) > 1
     elif _tf.is_tensor(y_prob):
         return y_prob.get_shape().ndims == 2 and y_prob.shape[1] > 1
     # elif isinstance(y_prob, _pd.DataFrame):
@@ -66,7 +65,7 @@ def is_binary_classification(y_prob: any) -> bool:
         y_prob = _np.expand_dims(y_prob.to_numpy(), axis=-1)
 
     if isinstance(y_prob, list):
-        if len(y_prob) > 0 and isinstance(y_prob[0], (list | _np.ndarray)):
+        if len(y_prob) > 0 and (isinstance(y_prob[0], list) or isinstance(y_prob[0], _np.ndarray)):
             if len(y_prob[0]) == 1: # [[1], [0], [1]]
                 if 0 <= _np.max(y_prob) <= 2:
                     return True

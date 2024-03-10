@@ -417,8 +417,7 @@ def fill_nan_with_global_mean(dataframe: _pd.DataFrame, column_names: list[str],
                                      add_indicator=add_indicator)
 
 
-def fill_nan_with_global_max(dataframe: _pd.DataFrame, column_names: list[str], inplace=True, add_indicator=False) \
-        -> _pd.DataFrame | None:
+def fill_nan_with_global_max(dataframe: _pd.DataFrame, column_names: list[str], inplace=True, add_indicator=False):
     """
         Fill in missing values based on max value which is calculated on all non `NaN` values in the same
         column.

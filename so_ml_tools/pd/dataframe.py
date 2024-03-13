@@ -192,7 +192,9 @@ def delete_rows_where_value_equal_to(dataframe: _pd.DataFrame, column_name: str,
         work_df = dataframe.copy(deep=True)
 
     if column_name in dataframe:
-        work_df.drop(dataframe[dataframe[column_name] == value].index, inplace=True)
+        rows_to_delete_index = dataframe[dataframe[column_name] == value].index
+        print(f"Number of rows deleted for column '{column_name}': {len(rows_to_delete_index)}")
+        work_df.drop(rows_to_delete_index, inplace=True)
     else:
         print(f"delete_rows_where_value_equal_to: Column '{column_name}' does not exist in dataframe.")
 
@@ -217,7 +219,9 @@ def delete_rows_where_value_smaller_then(dataframe: _pd.DataFrame, column_name: 
         work_df = dataframe.copy(deep=True)
 
     if column_name in dataframe:
-        work_df.drop(dataframe[dataframe[column_name] < value].index, inplace=True)
+        rows_to_delete_index = dataframe[dataframe[column_name] < value].index
+        print(f"Number of rows deleted for column '{column_name}': {len(rows_to_delete_index)}")
+        work_df.drop(rows_to_delete_index, inplace=True)
     else:
         print(f"delete_rows_where_value_equal_to: Column '{column_name}' does not exist in dataframe.")
 
@@ -242,7 +246,9 @@ def delete_rows_where_value_larger_then(dataframe: _pd.DataFrame, column_name: s
         work_df = dataframe.copy(deep=True)
 
     if column_name in dataframe:
-        work_df.drop(dataframe[dataframe[column_name] > value].index, inplace=True)
+        rows_to_delete_index = dataframe[dataframe[column_name] > value].index
+        print(f"Number of rows deleted for column '{column_name}': {len(rows_to_delete_index)}")
+        work_df.drop(rows_to_delete_index, inplace=True)
     else:
         print(f"delete_rows_where_value_equal_to: Column '{column_name}' does not exist in dataframe.")
 

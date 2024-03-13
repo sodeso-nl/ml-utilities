@@ -1,5 +1,4 @@
 from . import (
-    timeseries,
     image,
     loader,
     normalize,
@@ -8,7 +7,6 @@ from . import (
 )
 
 __all__ = [
-    "timeseries",
     "image",
     "loader",
     "normalize",

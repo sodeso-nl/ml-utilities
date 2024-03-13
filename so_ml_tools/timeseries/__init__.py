@@ -1,9 +1,9 @@
 from . import (
+    data,
     plot,
-    window
 )
 
 __all__ = [
+    "data",
     "plot",
-    "window"
 ]

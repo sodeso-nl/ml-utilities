@@ -1,33 +1,38 @@
 import tensorflow as _tf
 import numpy as _np
+import pandas as _pd
+from so_ml_tools.tf.loss.mase import mean_absolute_scaled_error as _mean_absolute_scaled_error
 
 
-def mean_absolute_scaled_error(y_true, y_pred):
-    """
-    Implement MASE (assuming no seasonality of data).
-    """
-    mae = _tf.reduce_mean(_tf.abs(y_true - y_pred))
+def evaluate_preds(y_true, y_pred, seasonality: int = None) -> dict:
+    y_true = _to_numpy(y_true)
+    y_pred = _to_numpy(y_pred)
 
-    # Find MAE of naive forecast (no seasonality)
-    mae_naive_no_season = _tf.reduce_mean(_tf.abs(y_true[1:] - y_true[:-1]))
+    y_true = y_true.astype(dtype=_np.float32).ravel()
+    y_pred = y_pred.astype(dtype=_np.float32).ravel()
 
-    return mae / mae_naive_no_season
-
-
-def evaluate_preds(y_true, y_pred) -> dict:
-    y_true = _tf.cast(y_true, dtype=_tf.float32)
-    y_pred = _tf.cast(y_pred, dtype=_tf.float32)
-
-    mse = _tf.keras.metrics.mean_squared_error(y_true, y_pred)
+    mae = _tf.keras.metrics.mean_absolute_error(y_true=y_true, y_pred=y_pred).numpy()
+    mse = _tf.keras.metrics.mean_squared_error(y_true=y_true, y_pred=y_pred).numpy()
     rmse = _np.sqrt(mse)
-
-    if not isinstance(rmse, _np.floating):
-        rmse = rmse.numpy()
+    mape = _tf.keras.metrics.mean_absolute_percentage_error(y_true=y_true, y_pred=y_pred).numpy()
+    mase = _mean_absolute_scaled_error(y_true=y_true, y_pred=y_pred, seasonality=seasonality)
 
     return {
-        'mae': _tf.keras.metrics.mean_absolute_error(y_true, y_pred).numpy(),
-        'mse': mse.numpy(),
+        'mae': mae,
+        'mse': mse,
         'rmse': rmse,
-        'mape': _tf.keras.metrics.mean_absolute_percentage_error(y_true, y_pred).numpy(),
-        'mase': mean_absolute_scaled_error(y_true, y_pred).numpy()
+        'mape': mape,
+        'mase': mase
     }
+
+
+def _to_numpy(x):
+    if not isinstance(x, _np.ndarray):
+        if isinstance(x, _pd.DataFrame) | isinstance(x, _pd.Series) | isinstance(x, _pd.DatetimeIndex):
+            return x.to_numpy()
+        elif isinstance(x, _tf.Tensor):
+            return x.numpy()
+        else:
+            return _tf.convert_to_tensor(value=x).numpy()
+
+    return x

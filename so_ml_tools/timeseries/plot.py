@@ -36,13 +36,14 @@ def plot_predictions(x, y_true, y_prob, start_index=None, end_index=None, title=
 
     _sns.lineplot(x=x.ravel()[start_index:end_index],
                   y=y_true.ravel()[start_index:end_index],
-                  ax=ax)
+                  ax=ax, label='Actual')
 
     _sns.lineplot(x=x.ravel()[start_index:end_index],
                   y=y_prob.ravel()[start_index:end_index],
-                  ax=ax)
+                  ax=ax, label='Predicted')
 
     _plt.title(f'{title} (range: {start_index}-{end_index})')
+    _plt.legend()
     ax.set_ylabel("Value")
     ax.set_xlabel("Time")
     _plt.show()

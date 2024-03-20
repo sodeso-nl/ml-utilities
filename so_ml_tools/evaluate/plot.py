@@ -384,7 +384,7 @@ def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8
     _plt.show()
 
 
-def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], figsize=(8, 4)):
+def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], log=True, figsize=(8, 4)):
     """
     Creates a histogram showing the confidence of the predictions. The digest of this method is the same
     as for the ´prediction_confidence´ method except that it displays the information as a histogram.
@@ -393,6 +393,7 @@ def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], figs
         y_true: Array of truth labels, must be same shape as y_pred.
         y_prob: Array of probabilities, must be same shape as y_true.
         class_names: Array of class labels (e.g. string form). If `None`, integer labels are used.
+        log: use a logarithmic scale for the y-axis or not.
         figsize: Size of output figure (default=(10, 8)).
 
     Returns:
@@ -460,15 +461,15 @@ def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], figs
             y = (_np.round(y_pred_single_class_translated / 10) * 10).astype(dtype=int)
 
             # Plot a histogram with the given values.
-            __plot_histogram(class_names=class_names, axs=axs, y=y, idx=idx)
+            __plot_histogram(class_names=class_names, axs=axs, y=y, idx=idx, log=log)
     else:
         raise "Could not determine if y_prob is a multi-class classification or a binary classification."
 
     _plt.show()
 
 
-def __plot_histogram(class_names: list[str], axs, y, idx) -> None:
+def __plot_histogram(class_names: list[str], axs, y, idx, log=True) -> None:
     class_name = str(idx) if class_names is None else class_names[idx]
-    axs[idx].hist(y, log=True, bins=11, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.5,
+    axs[idx].hist(y, log=log, bins=11, facecolor='#2ab0ff', edgecolor='#169acf', align='left', linewidth=0.5,
                   label=class_name)
     axs[idx].set(title=class_name, xlabel='Confidence (%)', ylabel='Predictions')

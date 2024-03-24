@@ -174,7 +174,7 @@ def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gr
         _logging.error(e)
 
 
-def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)) -> None:
+def show_images_from_dataset(dataset: _tf.data.Dataset, class_names = None, shape=(4, 8)) -> None:
     """
     Displays a number of images based on the shape size, the shape size must be the same
     as the batch size of the dataset. Default shape size is (4, 8) so the batch size
@@ -182,6 +182,7 @@ def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)) -> None:
 
     Args:
         dataset: the dataset containing the images
+        class_names: optional list of class names, if none provided then it will be extracted from dataset.
         shape: the shape size
 
     Returns:
@@ -200,6 +201,8 @@ def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)) -> None:
     assert shape[0] * shape[1] == len(x), f"Size of shape ({shape[0]}, {shape[1]}), with a total of " \
                                           f"{shape[0] * shape[1]} images, is not equal to the batch size of the dataset ({len(x)})."
 
-    class_names = _soml.tf.dataset.get_class_names(dataset=dataset)
+    if class_names is None:
+        class_names = _soml.tf.dataset.get_class_names(dataset=dataset)
+
     show_images_from_nparray_or_tensor(x=x, y=y_true, class_names=class_names, shape=shape)
     _plt.show()

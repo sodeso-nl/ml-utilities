@@ -213,5 +213,5 @@ def is_shuffled(dataset: _tf.data.Dataset) -> bool:
     return input_dataset.__class__.__name__ == '_ShuffleDataset'
 
 
-def show_images_from_dataset(dataset: _tf.data.Dataset, shape=(4, 8)):
-    _soml.data.image.show_images_from_dataset(dataset=dataset, shape=shape)
+def show_images_from_dataset(dataset: _tf.data.Dataset, class_names = None, shape=(4, 8)):
+    _soml.data.image.show_images_from_dataset(dataset=dataset, class_names=class_names, shape=shape)

@@ -11,7 +11,7 @@ import os as _os
 
 
 def reduce_lr_on_plateau_callback(monitor="val_loss",
-                                  factor=0.2,
+                                  factor=0.5,
                                   patience=4,
                                   verbose=1,
                                   mode="auto",

@@ -69,11 +69,11 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
                                        cmap: str = 'gray') -> None:
     """
     Shows images stored in a tensor / numpy array. The array should be a vector of images.
-    
+
     Args:
         x: a `tf.Tensor` containg the images
         y: a 'tf.Tensor' containing the labels associated with `x`
-        class_names: a `list` of class names 
+        class_names: a `list` of class names
         indices: a `list` of indices for the images to display, `None` to pick random images
         shape: A `tuple` specifying the number of images to display (width, height)
         cmap: A 'str' with the color map to use for displaying the images.
@@ -85,6 +85,8 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
 
     if is_image_float32_and_not_normalized(x):
         x = _tf.cast(x=x, dtype=_tf.uint8)
+
+    y = _tf.cast(x=y, dtype=_tf.uint8)
 
     if indices:
         assert shape[0] * shape[1] <= len(
@@ -174,7 +176,7 @@ def show_random_image_from_disk(target_dir, target_class, shape=(4, 6), cmap='gr
         _logging.error(e)
 
 
-def show_images_from_dataset(dataset: _tf.data.Dataset, class_names = None, shape=(4, 8)) -> None:
+def show_images_from_dataset(dataset: _tf.data.Dataset, class_names=None, shape=(4, 8)) -> None:
     """
     Displays a number of images based on the shape size, the shape size must be the same
     as the batch size of the dataset. Default shape size is (4, 8) so the batch size
@@ -204,5 +206,5 @@ def show_images_from_dataset(dataset: _tf.data.Dataset, class_names = None, shap
     if class_names is None:
         class_names = _soml.tf.dataset.get_class_names(dataset=dataset)
 
-    show_images_from_nparray_or_tensor(x=x, y=y_true, class_names=class_names, shape=shape)
+    show_images_from_nparray_or_tensor(x=x.numpy(), y=y_true.numpy(), class_names=class_names, shape=shape)
     _plt.show()

@@ -200,8 +200,8 @@ def show_images_from_dataset(dataset: _tf.data.Dataset, class_names=None, shape=
     batch_iter = iter(batches)
     x, y_true = batch_iter.next()
 
-    assert shape[0] * shape[1] == len(x), f"Size of shape ({shape[0]}, {shape[1]}), with a total of " \
-                                          f"{shape[0] * shape[1]} images, is not equal to the batch size of the dataset ({len(x)})."
+    assert shape[0] * shape[1] < len(x), f"Cannot display a total of {shape[0] * shape[1]}  images (shape ({shape[0]}, {shape[1]}), " \
+            f"the batch size of the dataset is only {len(x)} large, either increase batch size or decrease shape size."
 
     if class_names is None:
         class_names = _soml.tf.dataset.get_class_names(dataset=dataset)

@@ -250,7 +250,7 @@ def to_categorical(y, num_classes=None, dtype=None):
         A binary matrix representation of the input as a NumPy array. The class
         axis is placed last.
     """
-    _ks.utils.to_categorical(y, num_classes, dtype=dtype)
+    return _ks.utils.to_categorical(y, num_classes, dtype=dtype)
 
 
 def to_ordinal(y, num_classes=None, dtype=None):
@@ -272,4 +272,4 @@ def to_ordinal(y, num_classes=None, dtype=None):
         An ordinal regression matrix representation of the input as a NumPy
         array. The class axis is placed last.
     """
-    _ks.utils.to_ordinal(y, num_classes, dtype=dtype)
+    return _ks.utils.to_ordinal(y, num_classes, dtype=dtype)

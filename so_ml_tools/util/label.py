@@ -253,23 +253,24 @@ def to_categorical(y, num_classes=None, dtype=None):
     return _ks.utils.to_categorical(y, num_classes, dtype=dtype)
 
 
-def to_ordinal(y, num_classes=None, dtype=None):
+def to_ordinal(y, dtype=None):
     """
-    Converts a class vector (integers) to an ordinal regression matrix.
+        Converts a matrix of categorical values to ordinal values:
 
-    This utility encodes class vector to ordinal regression/classification
-    matrix where each sample is indicated by a row and rank of that sample is
-    indicated by number of ones in that row.
+        For example:
 
-    Args:
-        y: Array-like with class values to be converted into a matrix
-            (integers from 0 to `num_classes - 1`).
-        num_classes: Total number of classes. If `None`, this would be inferred
-            as `max(y) + 1`.
-        dtype: The data type expected by the input. Default: `'float32'`.
+        [
+            [0., 1., 0., 0., 0.],
+            [0., 0., 1., 0., 0.],
+            [0., 0., 0., 1., 0.],
+            [0., 0., 0., 0., 1.]
+        ]
 
-    Returns:
-        An ordinal regression matrix representation of the input as a NumPy
-        array. The class axis is placed last.
+        To:
+
+        [1, 2, 3, 4]
     """
-    return _ks.utils.to_ordinal(y, num_classes, dtype=dtype)
+    if dtype is None:
+        return _np.argmax(y, axis=1).astype(dtype)
+
+    return _np.argmax(y, axis=1)

@@ -82,8 +82,7 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
 
     """
     # Convert to categorical first so we can use the values as indices.
-    y = _soml.util.label.to_categorical(y=y)
-    y = _tf.cast(x=y, dtype=_tf.uint8)
+    y = _soml.util.label.to_ordinal(y=y, dtype=_tf.uint8)
 
     if is_image_float32_and_not_normalized(x):
         x = _tf.cast(x=x, dtype=_tf.uint8)

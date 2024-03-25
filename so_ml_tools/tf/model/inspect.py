@@ -108,13 +108,13 @@ def list_layers(layers: list[_tf.keras.layers.Layer], include_trainable=True, in
 def calculate_parameters(object: Union[_tf.keras.Model, _tf.keras.Sequential, _tf.keras.layers.Layer]) -> (str, str, str):
     total_params_s = trainable_params_s = non_trainable_params_s = 'unknown'
     if object.built:
-        if object is _tf.keras.layers.Layer:
-            total_params = sum([_tf.size(var).numpy() for var in object.variables])
-            trainable_params = sum([_tf.size(var).numpy() for var in object.trainable_variables])
-        else:
+        if isinstance(object, _tf.keras.Model) or isinstance(object, _tf.keras.Sequential):
             all_layers = collect_layers(object, recursive=True, include_trainable=True, include_non_trainable=True)
             total_params = sum([_tf.size(var).numpy() for layer in all_layers for var in layer.variables])
             trainable_params = sum([_tf.size(var).numpy() for layer in all_layers for var in layer.trainable_variables])
+        else:
+            total_params = sum([_tf.size(var).numpy() for var in object.variables])
+            trainable_params = sum([_tf.size(var).numpy() for var in object.trainable_variables])
 
         non_trainable_params = total_params - trainable_params
 

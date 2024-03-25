@@ -1,6 +1,7 @@
 import numpy as _np
 import pandas as _pd
 import tensorflow as _tf
+import tensorflow.keras as _ks
 
 
 def is_multiclass_classification(y_prob: any) -> bool:
@@ -230,3 +231,45 @@ def is_one_hot(x):
         x: the value to check
     """
     return (x.sum(axis=1)-_np.ones(x.shape[0])).sum() == 0
+
+
+def to_categorical(y, num_classes=None, dtype=None):
+    """
+    Converts a class vector (integers) to binary class matrix.
+
+    E.g. for use with `categorical_crossentropy`.
+
+    Args:
+        y: Array-like with class values to be converted into a matrix
+            (integers from 0 to `num_classes - 1`).
+        num_classes: Total number of classes. If `None`, this would be inferred
+          as `max(y) + 1`.
+        dtype: The data type expected by the input. Default: `'float32'`.
+
+    Returns:
+        A binary matrix representation of the input as a NumPy array. The class
+        axis is placed last.
+    """
+    _ks.utils.to_categorical(y, num_classes, dtype=dtype)
+
+
+def to_ordinal(y, num_classes=None, dtype=None):
+    """
+    Converts a class vector (integers) to an ordinal regression matrix.
+
+    This utility encodes class vector to ordinal regression/classification
+    matrix where each sample is indicated by a row and rank of that sample is
+    indicated by number of ones in that row.
+
+    Args:
+        y: Array-like with class values to be converted into a matrix
+            (integers from 0 to `num_classes - 1`).
+        num_classes: Total number of classes. If `None`, this would be inferred
+            as `max(y) + 1`.
+        dtype: The data type expected by the input. Default: `'float32'`.
+
+    Returns:
+        An ordinal regression matrix representation of the input as a NumPy
+        array. The class axis is placed last.
+    """
+    _ks.utils.to_ordinal(y, num_classes, dtype=dtype)

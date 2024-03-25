@@ -81,12 +81,12 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
     Returns:
 
     """
-    y = _soml.util.label.to_prediction(y_prob=y)
+    # Convert to categorical first so we can use the values as indices.
+    y = _soml.util.label.to_categorical(y=y)
+    y = _tf.cast(x=y, dtype=_tf.uint8)
 
     if is_image_float32_and_not_normalized(x):
         x = _tf.cast(x=x, dtype=_tf.uint8)
-
-    y = _tf.cast(x=y, dtype=_tf.uint8)
 
     if indices:
         assert shape[0] * shape[1] <= len(
@@ -200,7 +200,7 @@ def show_images_from_dataset(dataset: _tf.data.Dataset, class_names=None, shape=
     batch_iter = iter(batches)
     x, y_true = batch_iter.next()
 
-    assert shape[0] * shape[1] < len(x), f"Cannot display a total of {shape[0] * shape[1]}  images (shape ({shape[0]}, {shape[1]}), " \
+    assert shape[0] * shape[1] <= len(x), f"Cannot display a total of {shape[0] * shape[1]}  images (shape ({shape[0]}, {shape[1]}), " \
             f"the batch size of the dataset is only {len(x)} large, either increase batch size or decrease shape size."
 
     if class_names is None:

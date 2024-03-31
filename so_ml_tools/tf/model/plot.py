@@ -2,7 +2,7 @@ import matplotlib.pyplot as _plt
 import tensorflow as _tf
 
 
-def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], labels: list[str], figsize=(10, 6)):
+def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], labels: list[str], figsize=(30, 5)):
     """
     Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
 
@@ -51,8 +51,9 @@ def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], lab
 
     _plot_history_ends(histories, labels)
     _plt.title('Loss', size=20)
-    _plt.xticks(ticks, epoch_labels)
+    _plt.xticks(ticks=ticks, labels=epoch_labels, rotation='vertical')
     _plt.xlabel('Epoch', size=14)
+    _plt.margins(x=0)
     _plt.legend()
 
     if all_accuracy_history:
@@ -63,8 +64,9 @@ def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], lab
         _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
         _plot_history_ends(histories, labels)
         _plt.title('Accuracy', size=20)
-        _plt.xticks(ticks, epoch_labels)
+        _plt.xticks(ticks=ticks, labels=epoch_labels, rotation='vertical')
         _plt.xlabel('Epoch', size=14)
+        _plt.margins(x=0)
         _plt.legend()
 
     if all_mae_history:
@@ -75,12 +77,13 @@ def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], lab
         _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
         _plot_history_ends(histories, labels)
         _plt.title('Mean Absolute Accuracy', size=20)
-        _plt.xticks(ticks, epoch_labels)
+        _plt.xticks(ticks=ticks, labels=epoch_labels, rotation='vertical')
         _plt.xlabel('Epoch', size=14)
+        _plt.margins(x=0)
         _plt.legend()
 
 
-def plot_history(history: _tf.keras.callbacks.History, figsize=(10, 6)):
+def plot_history(history: _tf.keras.callbacks.History, figsize=(30, 5)):
     plot_consecutive_histories([history], ["Start history"], figsize=figsize)
 
 

@@ -1,4 +1,5 @@
 import numpy as _np
+import pandas as _pd
 import tensorflow as _tf
 import re as _re
 from typing import Union as _Union
@@ -61,7 +62,7 @@ def maximum_number_of_word_per_sentence(lines: _Union[list[str], _tf.Tensor]) ->
     return max(__count_words_for_each_sentence(lines))
 
 
-def average_number_of_word_per_sentence(lines: _Union[list[str], _tf.Tensor]) -> int:
+def average_number_of_word_per_sentence(lines: _Union[list[str], _tf.Tensor, _pd.DataFrame]) -> int:
     """
     Returns the average number of words per sentence.
 
@@ -135,7 +136,7 @@ def calculate_average_character_length_for_all_sentences(lines: _Union[list[str]
     return round(sum(length_per_sentence(lines)) / len(lines))
 
 
-def __count_words_for_each_sentence(lines: _Union[list[str], _tf.Tensor]) -> list[int]:
+def __count_words_for_each_sentence(lines: _Union[list[str], _tf.Tensor, _pd.Series]) -> list[int]:
     """
     Calculates the length for each string value and returns a list containing
     these lengths.
@@ -143,6 +144,10 @@ def __count_words_for_each_sentence(lines: _Union[list[str], _tf.Tensor]) -> lis
     :param lines: a list of string values
     :return:
     """
+    if isinstance(lines, _pd.DataFrame):
+        raise TypeError("lines is a Pandas DataFrame, select a series to calculate the length")
+    if isinstance(lines, _pd.Series):
+        lines = lines.numpy()
     if _tf.is_tensor(x=lines):
         lines = lines.numpy()
 

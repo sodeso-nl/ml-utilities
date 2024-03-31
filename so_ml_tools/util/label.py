@@ -2,6 +2,7 @@ import numpy as _np
 import pandas as _pd
 import tensorflow as _tf
 import tensorflow.keras as _ks
+import so_ml_tools as _soml
 
 
 def is_multiclass_classification(y_prob: any) -> bool:
@@ -274,3 +275,23 @@ def to_ordinal(y, dtype=None):
         return _np.argmax(y, axis=1).astype(dtype)
 
     return _np.argmax(y, axis=1)
+
+
+def diff_indexes(y_true, y_pred=None, y_prob=None):
+    if isinstance(y_true, _tf.data.Dataset):
+        y_true = _soml.tf.dataset.get_labels(dataset=y_true)
+
+    y_true = to_prediction(y_prob=y_true)
+    if y_pred is None and y_prob is not None:
+        y_pred = to_prediction(y_prob=y_prob)
+    elif y_pred is None and y_prob is None:
+        raise "Must specify 'y_pred' or 'y_prob'"
+
+    compare_to = y_pred
+
+    # Check if the shapes match, if not, try to fix it.
+    if y_pred.shape != y_true.shape:
+        compare_to = _np.reshape(y_pred, newshape=y_true.shape)
+
+    compared_result = y_true == compare_to
+    return _np.where(compared_result == False)[0]

@@ -34,9 +34,29 @@ def count_unique_words(lines: _Union[list[str], _tf.Tensor], standardize="lower_
     return len(unique)
 
 
+def describe(lines: _Union[list[str], _tf.Tensor]):
+    if _tf.is_tensor(x=lines):
+        lines = lines.numpy()
+
+    word_count_per_sentence = __count_words_for_each_sentence(lines)
+    word_count_for_90_percentile = int(_np.percentile(a=word_count_per_sentence, q=90))
+    word_count_for_95_percentile = int(_np.percentile(a=word_count_per_sentence, q=95))
+    word_count_for_97_percentile = int(_np.percentile(a=word_count_per_sentence, q=97))
+    word_count_for_99_percentile = int(_np.percentile(a=word_count_per_sentence, q=99))
+    word_count_for_max = max(word_count_per_sentence)
+    word_count_for_average = round(sum(word_count_per_sentence) / len(lines))
+    print(f'Word count for 90%: {word_count_for_90_percentile}')
+    print(f'Word count for 95%: {word_count_for_95_percentile}')
+    print(f'Word count for 97%: {word_count_for_97_percentile}')
+    print(f'Word count for 99%: {word_count_for_99_percentile}')
+    print(f'Word count for max (100%): {word_count_for_max}')
+    print(f'Word count for average: {word_count_for_average}')
+
+
 def calculate_q_precentile_word_lengths(lines: _Union[list[str], _tf.Tensor], q=95) -> int:
     """
-    Calculates the q-percentile based on the lengths of the strings.
+    Calculates the q-percentile based on the lengths of the strings, or in other words, how
+    long of a sentence covers X% of examples (where q is by default set to 95%)
 
     :param lines: a list of string values
     :param q: q-percentile (default 95%)
@@ -59,6 +79,8 @@ def maximum_number_of_word_per_sentence(lines: _Union[list[str], _tf.Tensor]) ->
     if _tf.is_tensor(x=lines):
         lines = lines.numpy()
 
+    print('Please also check: calculate_q_precentile_word_lengths which might work better in some situations.')
+
     return max(__count_words_for_each_sentence(lines))
 
 
@@ -71,6 +93,8 @@ def average_number_of_word_per_sentence(lines: _Union[list[str], _tf.Tensor, _pd
     """
     if _tf.is_tensor(x=lines):
         lines = lines.numpy()
+
+    print('Please also check: calculate_q_precentile_word_lengths which might work better in some situations.')
 
     return round(sum(__count_words_for_each_sentence(lines)) / len(lines))
 

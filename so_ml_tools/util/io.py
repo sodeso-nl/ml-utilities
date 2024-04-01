@@ -74,3 +74,9 @@ def list_dir_summary(folder='./data') -> None:
     """
     for dirpath, dirnames, filenames in _os.walk(folder):
         print(f"There are {len(dirnames)} directories, and {len(filenames)} in {dirpath}")
+
+
+def list_dir(folder='./data'):
+    filenames = [folder + filename for filename in _os.listdir(folder)]
+    for filename in filenames:
+        print(f"{filename}")

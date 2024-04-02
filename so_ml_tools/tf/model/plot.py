@@ -31,10 +31,12 @@ def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], lab
 
         if 'accuracy' in history.history:
             all_accuracy_history = [*all_accuracy_history, *history.history['accuracy']]
+        if 'val_accuracy' in history.history:
             all_val_accuracy_history = [*all_val_accuracy_history, *history.history['val_accuracy']]
 
         if 'mae' in history.history:
             all_mae_history = [*all_mae_history, *history.history['mae']]
+        if 'val_mae' in history.history:
             all_val_mae_history = [*all_val_mae_history, *history.history['val_mae']]
 
         if 'lr' in history.history:
@@ -60,7 +62,8 @@ def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], lab
         # Start a new figure
         _plt.figure(figsize=figsize, facecolor='#FFFFFF')
         _plot_history_graph_line(all_accuracy_history, label='Training accuracy', color='#0000FF')
-        _plot_history_graph_line(all_val_accuracy_history, label='Validation accuracy', color='#00FF00')
+        if len(all_val_accuracy_history) > 0:
+            _plot_history_graph_line(all_val_accuracy_history, label='Validation accuracy', color='#00FF00')
         _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
         _plot_history_ends(histories, labels)
         _plt.title('Accuracy', size=20)
@@ -73,7 +76,8 @@ def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], lab
         # Start a new figure
         _plt.figure(figsize=figsize, facecolor='#FFFFFF')
         _plot_history_graph_line(all_mae_history, label='Training mae', color='#0000FF')
-        _plot_history_graph_line(all_val_mae_history, label='Validation mae', color='#00FF00')
+        if len(all_val_mae_history) > 0:
+            _plot_history_graph_line(all_val_mae_history, label='Validation mae', color='#00FF00')
         _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
         _plot_history_ends(histories, labels)
         _plt.title('Mean Absolute Accuracy', size=20)

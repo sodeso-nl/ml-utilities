@@ -47,11 +47,11 @@ def word_count_for_sentences(lines: _Union[list[str], _tf.Tensor]):
     word_count_for_average = round(sum(word_count_per_sentence) / len(lines))
 
     print('Word count for x-percentile sentences:')
-    print(f'90%: {word_count_for_90_percentile}')
-    print(f'95%: {word_count_for_95_percentile}')
-    print(f'97%: {word_count_for_97_percentile}')
-    print(f'99%: {word_count_for_99_percentile}')
-    print(f'100%: {word_count_for_max}')
+    print(f' 90%: {word_count_for_90_percentile}')
+    print(f' 95%: {word_count_for_95_percentile}')
+    print(f' 97%: {word_count_for_97_percentile}')
+    print(f' 99%: {word_count_for_99_percentile}')
+    print(f'100%: {word_count_for_max}\n')
     print('Average word count for sentences:')
     print(f'Average: {word_count_for_average}')
 

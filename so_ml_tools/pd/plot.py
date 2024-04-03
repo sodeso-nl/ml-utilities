@@ -79,8 +79,6 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
     :param verbose: display messages when columns are not visualized
     :param label_color: label color of ticks, titles, x/y axis values / labels.
     """
-    # assert column_names is not None, "column_names cannot be None"
-
     # If the column_names argument is not a list then create a list
     if not type(column_names) == list and column_names is not None:
         column_names = [column_names]
@@ -89,7 +87,7 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
     if column_names is not None:
         columns = list(dataframe[column_names].columns)
     else:
-        columns = list(dataframe.columns)
+        columns = dataframe.select_dtypes(include=_np.number).columns.values
 
     # Calculate the number of rows / columns for the subplot.
     rows = max(int(len(columns) / cols), 1)
@@ -186,6 +184,89 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
             if verbose:
                 print(
                     f"Column '{v.name}' is not visualized, the number of nunique values ({nunique}) either exceeds {max_nunique} or is lower then {min_nunique} or the values are not numeric.")
+            continue
+
+        # Only rotate the x labels
+        for tick in axs[n].get_xticklabels():
+            tick.set_rotation(45)
+
+        # Remove unnecessary white space on the left/right side of the graph.
+        axs[n].margins(x=0)
+        axs[n].grid(axis='y')
+
+        axs[n].xaxis.label.set_color(label_color)  # Set color of x-axis label
+        axs[n].tick_params(axis='x', colors=label_color)  # Set color of x-axis ticks.
+
+        axs[n].yaxis.label.set_color(label_color)  # Set color of y-axis label
+        axs[n].tick_params(axis='y', colors=label_color)  # Set color of y-axis ticks.
+        axs[n].title.set_color(label_color)  # Set color of title
+
+        n += 1
+
+    for i in range(n, rows * cols):
+        fig.delaxes(axs[i])
+
+    _plt.show()
+
+
+def lineplot(dataframe: _pd.DataFrame, column_names: list[str] = None, figsize: tuple = None, cols=1,
+             verbose=1, label_color='black'):
+    """
+    Plots a histogram for each of the numeric columns in the DataFrame.
+
+    :param dataframe: the pandas dataframe
+    :param column_names: columns which exist within the DataFrame if none specified all columns that are numeric
+        will be processed
+    :param figsize: size of the plot, if None specified then one is calculated
+    :param cols: number of plots on the horizontal axis
+    :param verbose: display messages when columns are not visualized
+    :param label_color: label color of ticks, titles, x/y axis values / labels.
+    """
+    # assert column_names is not None, "column_names cannot be None"
+
+    # If the column_names argument is not a list then create a list
+    if not type(column_names) == list and column_names is not None:
+        column_names = [column_names]
+
+    # If we don't have a list of column names then create a histogram for every column.
+    if column_names is not None:
+        columns = list(dataframe[column_names].columns)
+    else:
+        columns = dataframe.select_dtypes(include=_np.number).columns.values
+
+    # Calculate the number of rows / columns for the subplot.
+    rows = max(int(len(columns) / cols), 1)
+    cols = min(cols, len(columns))
+    rows += 1 if rows * cols < len(columns) else 0
+
+    # If figsize is not specified then calculate the fig-size
+    if figsize is None:
+        figsize = (17, rows * 3)
+
+    fig, axs = _plt.subplots(nrows=rows, ncols=cols, figsize=figsize)
+
+    # If we have more then one column then flatten the axis so we can loop through them,
+    # if we have only one column then create list containing the axis so we can still loop through it.
+    if len(columns) > 1:
+        axs = axs.flatten()
+    else:
+        axs = [axs]
+
+    # Horizontal / vertical padding between the histograms.
+    fig.tight_layout(h_pad=10, w_pad=5)
+    fig.subplots_adjust(wspace=0, hspace=0.5)
+    fig.patch.set_alpha(0.0)  # Transparant background
+
+    n = 0
+    for c in columns:
+        v = dataframe[c]
+        if _pd.api.types.is_numeric_dtype(v):
+            _sns.lineplot(data=v, ax=axs[n])
+            axs[n].grid(False)
+        else:
+            if verbose:
+                print(
+                    f"Column '{v.name}' is not visualized, the values are not numeric.")
             continue
 
         # Only rotate the x labels

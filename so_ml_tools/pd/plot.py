@@ -292,7 +292,7 @@ def lineplot(dataframe: _pd.DataFrame, column_names: list[str] = None, figsize: 
     _plt.show()
 
 
-def correlation(dataframe: _pd.DataFrame, numeric_only=False, method: str = 'pearson', figsize: tuple = (12, 12),
+def correlation(dataframe: _pd.DataFrame, numeric_only=True, method: str = 'pearson', figsize: tuple = (12, 12),
                 label_color='black') -> None:
     """
     Create a correlation heatmap for the given DataFrame.
@@ -337,14 +337,17 @@ def correlation(dataframe: _pd.DataFrame, numeric_only=False, method: str = 'pea
     ax.tick_params(axis='y', colors=label_color)  # Set color of y-axis ticks.
 
     ax.title.set_color(label_color)  # Set color of title
-    ax.set_title('Correlation')
+    ax.set_title(f'Correlation (method: {method})')
     _plt.show()
 
 
-def correlation_pb(dataframe: _pd.DataFrame, continuous_columns: list, dichotomous_column: str, figsize: tuple = (12, 6),
+def correlation_pb(dataframe: _pd.DataFrame, continuous_columns: list[str], dichotomous_column: str, figsize: tuple = (12, 6),
                    label_color='black') -> None:
     """
-    Create a correlation bar plot between continuous features and a dichotomous feature using point-biserial correlation coefficient.
+    Create a correlation bar plot between continuous features and a dichotomous feature using point-biserial
+    correlation coefficient.
+
+    NOTE: A dichotomous feature is a feature which only has two possible values.
 
     Parameters:
     - dataframe (pd.DataFrame): The input DataFrame with continuous and dichotomous features.

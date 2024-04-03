@@ -25,7 +25,7 @@ def make_naive_predictions(y_true):
     return y_true[1:], naive_predictions
 
 
-def make_windows(x, window_size, horizon):
+def make_windows_univariate(x, window_size, horizon):
     """
     Turns 1 1D array into a 2D array of sequential labelled windows of window_size with horizon size labels.
 
@@ -54,15 +54,7 @@ def make_windows(x, window_size, horizon):
     if not isinstance(x, _tf.Tensor):
         x = _tf.convert_to_tensor(value=x)
 
-    # Check that we only have a single feature
-    assert x.ndim == 1, (f"Shape of x is not correct {x.shape}, should be 1D array (ie. [1, 2, 3, 4]), please check "
-                         f"the following:"
-                         f"* Does your data contain multiple columns, if so, select only a single column, if it is a "
-                         f"Pandas dataframe then use df['col'], if it is a tensor use slicing, for example t[:,2] to "
-                         f"select the third column, If your data is column based then convert it to row based "
-                         f"using tf.squeeze()")
-
-    x = x.numpy()
+    x = x.numpy().ravel()
 
     # 1. Create a window of specific window_size (add the horizon on the end for labelling later)
     window_step = _np.expand_dims(_np.arange(window_size + horizon), axis=0)

@@ -3,7 +3,7 @@ import so_ml_tools as _soml
 import numpy as _np
 
 
-def split(dataset: _tf.data.Dataset, split_pct: list[float]) -> tuple[_tf.data.Dataset, ...]:
+def split(dataset: _tf.data.Dataset, split_percentages: list[float]) -> tuple[_tf.data.Dataset, ...]:
     """
     Split a dataset into multiple seperate datasets, the order in the `splits` argument
     is the order in which the split datasets will be returned. Note that if the dataset is
@@ -15,17 +15,19 @@ def split(dataset: _tf.data.Dataset, split_pct: list[float]) -> tuple[_tf.data.D
 
     Args:
         dataset: Dataset to split
-        split_pct: the percentages to split the dataset into (between 0.0 and 1.0)
+        split_percentages: the percentages to split the dataset into (between 0.0 and 1.0)
 
     Returns: tuple containing the split datasets
     """
-    assert sum(split_pct) == 1.0, "The sum of split percentages should be equal to 1.0"
+    assert sum(split_percentages) == 1.0, "The sum of split percentages should be equal to 1.0"
+
+    # Convert percentages to actual lengths from the dataset.
+    split_lengths = [int(split_pct * len(dataset)) for split_pct in split_percentages]
 
     split_datasets = []
-    for split_pct in split_pct:
-        size = int(split_pct * len(dataset))
-        split_datasets.append(dataset.take(size))
-        dataset = dataset.skip(size)
+    for split_length in split_lengths:
+        split_datasets.append(dataset.take(split_length))
+        dataset = dataset.skip(split_length)
 
     return tuple(split_datasets)
 

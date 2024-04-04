@@ -2,6 +2,34 @@ import tensorflow as _tf
 import so_ml_tools as _soml
 import numpy as _np
 
+
+def split(dataset: _tf.data.Dataset, split_pct: list[float]) -> tuple[_tf.data.Dataset, ...]:
+    """
+    Split a dataset into multiple seperate datasets, the order in the `splits` argument
+    is the order in which the split datasets will be returned. Note that if the dataset is
+    batched that the split will be based on batches.
+
+    Important:
+
+    If a dataset is shuffled then the outcome will be randomly split.
+
+    Args:
+        dataset: Dataset to split
+        split_pct: the percentages to split the dataset into (between 0.0 and 1.0)
+
+    Returns: tuple containing the split datasets
+    """
+    assert sum(split_pct) == 1.0, "The sum of split percentages should be equal to 1.0"
+
+    split_datasets = []
+    for split_pct in split_pct:
+        size = int(split_pct * len(dataset))
+        split_datasets.append(dataset.take(size))
+        dataset = dataset.skip(size)
+
+    return tuple(split_datasets)
+
+
 def describe_pipeline(dataset: _tf.data.Dataset):
     """
     Describes the different steps in the `tf.data.Dataset` pipeline.
@@ -56,39 +84,6 @@ def add_rescaling_mapping(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
 
 def _rescale(x, y):
     return x / 255., y
-
-
-def add_batching(dataset: _tf.data.Dataset, batch_size=32) -> _tf.data.Dataset:
-    if is_batched(dataset=dataset):
-        print('WARN: Dataset is already batched.')
-    return dataset.batch(batch_size=batch_size)
-
-
-def add_caching(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
-    if is_cached(dataset=dataset):
-        print('WARN: Dataset is already cached.')
-    return dataset.cache()
-
-
-def add_shuffling(dataset: _tf.data.Dataset, buffer_size=_tf.data.AUTOTUNE) -> _tf.data.Dataset:
-    if is_shuffled(dataset=dataset):
-        print('WARN: Dataset is already shuffled.')
-
-    if buffer_size == _tf.data.AUTOTUNE:
-        if is_batched(dataset=dataset):
-            batch_size = get_batch_size(dataset)
-            buffer_size = batch_size * 8
-        else:
-            buffer_size = 1000
-
-        print(f'Buffer size for shuffle has been set to {buffer_size}')
-    return dataset.shuffle(buffer_size=buffer_size)
-
-
-def add_prefetching(dataset: _tf.data.Dataset, buffer_size=_tf.data.AUTOTUNE) -> _tf.data.Dataset:
-    if is_prefetched(dataset=dataset):
-        print('WARN: Dataset is already prefetched.')
-    return dataset.prefetch(buffer_size=buffer_size)
 
 
 def get_class_names_from_dataset_info(ds_info: dict):

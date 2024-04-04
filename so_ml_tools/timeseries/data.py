@@ -1,6 +1,7 @@
 import tensorflow as _tf
 import pandas as _pd
 import keras as _ks
+import numpy as _np
 
 
 def make_naive_predictions(y_true):
@@ -26,23 +27,67 @@ def make_naive_predictions(y_true):
     return y_true[1:], naive_predictions
 
 
-def dataset_from_dataframe_multivariate(dataframe: _pd.DataFrame, label_column, window_size, batch_size):
+def dataset_from_tensor_multivariate(
+        tensor: _tf.Tensor,
+        label_column_idx,
+        window_size,
+        horizon_size=1,
+        batch_size=None):
+    return dataset_from_array_multivariate(
+        array=tensor.numpy(),
+        label_column_idx=label_column_idx,
+        window_size=window_size,
+        horizon_size=horizon_size,
+        batch_size=batch_size)
+
+
+def dataset_from_dataframe_multivariate(
+        dataframe: _pd.DataFrame,
+        label_column: str,
+        window_size: int,
+        horizon_size: int = 1,
+        batch_size=None):
     label_idx = dataframe.columns.get_loc(label_column)
     return dataset_from_array_multivariate(
         array=dataframe.to_numpy(),
         label_column_idx=label_idx,
         window_size=window_size,
+        horizon_size=horizon_size,
         batch_size=batch_size)
 
 
-def dataset_from_array_multivariate(array, label_column_idx, window_size, batch_size) -> _tf.data.Dataset:
+def dataset_from_array_multivariate(
+        array: _np.ndarray,
+        label_column_idx,
+        window_size: int,
+        horizon_size: int = 1,
+        batch_size=None) -> _tf.data.Dataset:
     x = array
-    y = x[window_size:, label_column_idx]
+    y = x[:, label_column_idx]
 
-    return dataset_from_arrays_multivariate(x=x, y=y, window_size=window_size, batch_size=batch_size)
+    return dataset_from_arrays_multivariate(
+        x=x,
+        y=y,
+        window_size=window_size,
+        horizon_size=horizon_size,
+        batch_size=batch_size)
 
 
-def dataset_from_arrays_multivariate(x, y, window_size, batch_size) -> _tf.data.Dataset:
+def dataset_from_arrays_multivariate(
+        x: _np.ndarray,
+        y: _np.ndarray,
+        window_size: int,
+        horizon_size: int = 1,
+        batch_size=None) -> _tf.data.Dataset:
+    if horizon_size > 1:
+        horizon_start_offset = window_size
+        horizon_end_offset = window_size + horizon_size
+        y = [y[start_idx + horizon_start_offset:start_idx + horizon_end_offset] for start_idx, _ in
+             enumerate(y[window_size:])]
+
+        # Remove last set of lines which are not complete
+        y = y[0:-horizon_size + 1]
+
     return _ks.utils.timeseries_dataset_from_array(
         x,
         y,
@@ -51,19 +96,64 @@ def dataset_from_arrays_multivariate(x, y, window_size, batch_size) -> _tf.data.
         batch_size=batch_size)
 
 
-def dataset_from_dataframe_univariate(dataframe: _pd.DataFrame, window_size, batch_size) -> _tf.data.Dataset:
-    x = dataframe.to_numpy().ravel()
-    y = x[window_size:]
-    return dataset_from_arrays_univariate(x=x, y=y, window_size=window_size, batch_size=batch_size)
+def dataset_from_tensor_univariate(
+        tensor: _tf.Tensor,
+        window_size: int,
+        horizon_size: int = 1,
+        batch_size=None) \
+        -> _tf.data.Dataset:
+    return dataset_from_array_univariate(
+        array=tensor.numpy().ravel(),
+        window_size=window_size,
+        horizon_size=horizon_size,
+        batch_size=batch_size)
 
 
-def dataset_from_array_univariate(array, window_size, batch_size) -> _tf.data.Dataset:
+def dataset_from_dataframe_univariate(
+        dataframe: _pd.DataFrame,
+        window_size: int,
+        horizon_size: int = 1,
+        batch_size=None) \
+        -> _tf.data.Dataset:
+    return dataset_from_array_univariate(
+        array=dataframe.to_numpy().ravel(),
+        window_size=window_size,
+        horizon_size=horizon_size,
+        batch_size=batch_size)
+
+
+def dataset_from_array_univariate(
+        array: _np.ndarray,
+        window_size: int,
+        horizon_size: int = 1,
+        batch_size=None) -> _tf.data.Dataset:
     x = array.ravel()
     y = x[window_size:]
-    return dataset_from_arrays_univariate(x=x, y=y, window_size=window_size, batch_size=batch_size)
+
+    return dataset_from_arrays_univariate(
+        x=x,
+        y=y,
+        window_size=window_size,
+        horizon_size=horizon_size,
+        batch_size=batch_size)
 
 
-def dataset_from_arrays_univariate(x, y, window_size, batch_size) -> _tf.data.Dataset:
+def dataset_from_arrays_univariate(
+        x: _np.ndarray,
+        y: _np.ndarray,
+        window_size: int,
+        horizon_size: int = 1,
+        batch_size=None) -> _tf.data.Dataset:
+    x = x.ravel()
+    if horizon_size > 1:
+        horizon_start_offset = window_size
+        horizon_end_offset = window_size + horizon_size
+        y = [x[start_idx + horizon_start_offset:start_idx + horizon_end_offset]
+             for start_idx, _ in enumerate(y)]
+
+        # Remove last set of lines which are not complete
+        y = y[0:-horizon_size + 1]
+
     return _ks.utils.timeseries_dataset_from_array(
         x,
         y,

@@ -80,7 +80,7 @@ def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], lab
             _plot_history_graph_line(all_val_mae_history, label='Validation mae', color='#00FF00')
         _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
         _plot_history_ends(histories, labels)
-        _plt.title('Mean Absolute Accuracy', size=20)
+        _plt.title('Mean Absolute Error', size=20)
         _plt.xticks(ticks=ticks, labels=epoch_labels, rotation='vertical')
         _plt.xlabel('Epoch', size=14)
         _plt.margins(x=0)

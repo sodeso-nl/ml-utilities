@@ -145,14 +145,18 @@ def get_labels(dataset: _tf.data.Dataset):
     #     y_labels.append(labels.numpy())
     #
     # return y_labels
-    y_labels = _np.array([], dtype=_np.int64)
-    itr = iter(dataset)
+    y_labels = None
+    itr = dataset.unbatch().as_numpy_iterator()
     while True:
         try:
             _, batch_labels = next(itr)
-            y_labels = _np.append(y_labels, batch_labels.numpy())
+            if y_labels is None:
+                y_labels = _np.empty(shape=batch_labels.shape, dtype=np.int64)
+
+            y_labels = _np.vstack((y_labels, batch_labels))
         except StopIteration:
             break
+
     return y_labels
 
 

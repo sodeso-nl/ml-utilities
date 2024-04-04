@@ -217,7 +217,11 @@ def decision_boundary(model: _tf.keras.Model, x, y) -> None:
     _plt.ylim(yy.min(), yy.max())
 
 
-def y_pred_vs_y_true(y_true, y_pred, figsize=(10, 8)) -> None:
+import numpy as _np
+import matplotlib.pyplot as _plt
+
+
+def y_pred_vs_y_true(y_true, y_pred, figsize=(20, 8)) -> None:
     """
     Shows a graph with the predicted values vs the truth labels.
 
@@ -230,18 +234,20 @@ def y_pred_vs_y_true(y_true, y_pred, figsize=(10, 8)) -> None:
         None
     """
     # Merge the two columns into a single new numpy array.
-    m = _np.append(y_true.round(2), y_pred.round(2), axis=1)
+    ytrue_ypred = _np.append(y_true.round(2), y_pred.round(2), axis=1)
 
     # Add a third column with the difference
-    m_a = _np.append(m, y_true - y_pred, axis=1)
+    ytrue_ypred_diff = _np.append(ytrue_ypred, y_true - y_pred, axis=1)
+
+    mae = _np.round(_np.mean(_np.abs(ytrue_ypred_diff[:, 2])), 5)
 
     # sort based on y_true
-    s = m_a[m_a[:, 0].argsort()]
+    ytrue_ypred_diff = ytrue_ypred_diff[ytrue_ypred_diff[:, 0].argsort()]
     _plt.figure(figsize=figsize, facecolor='#FFFFFF')
-    _plt.plot(s[:, 0], label="y_true", color="#0000FF", linestyle="solid", linewidth=1.5)
-    _plt.plot(s[:, 1], label="y_pred", color="#FF0000", linestyle="solid", linewidth=1.5)
-    _plt.plot(s[:, 2], label="diff", color="#FF0000", linestyle="solid", linewidth=1.5)
-    _plt.title('y_true vs y_pred with difference', size=20)
+    _plt.plot(ytrue_ypred_diff[:, 1], label="y_pred", color="#FF0000", linestyle="solid", linewidth=1)
+    _plt.plot(ytrue_ypred_diff[:, 0], label="y_true", color="#00FF00", linestyle="solid", linewidth=1)
+    _plt.plot(ytrue_ypred_diff[:, 2], label="diff", color="#0000FF", linestyle="solid", linewidth=1)
+    _plt.title(f'y_true vs y_pred with difference {mae}', size=20)
     _plt.xlabel('Predictions', size=14)
     _plt.ylabel('Value', size=14)
     _plt.legend()

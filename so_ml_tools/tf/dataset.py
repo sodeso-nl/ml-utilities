@@ -151,7 +151,7 @@ def get_labels(dataset: _tf.data.Dataset):
         try:
             _, batch_labels = next(itr)
             if y_labels is None:
-                y_labels = _np.empty(shape=batch_labels.shape, dtype=np.int64)
+                y_labels = _np.empty(shape=batch_labels.shape, dtype=_np.int64)
 
             y_labels = _np.vstack((y_labels, batch_labels))
         except StopIteration:

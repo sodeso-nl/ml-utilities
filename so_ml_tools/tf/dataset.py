@@ -122,42 +122,48 @@ def get_class_names(dataset: _tf.data.Dataset):
     return input_dataset.class_names
 
 
-def get_labels(dataset: _tf.data.Dataset):
+def get_labels(dataset: _tf.data.Dataset) -> _np.ndarray:
     """
     Returns the labels from a (batched)Dataset
 
     :param dataset: the dataset from which we want the labels.
     :return: the labels
     """
-    # if not isinstance(dataset, _tf.data.Dataset):
-    #     raise TypeError('dataset is not a tf.data.Dataset')
-    #
-    # input_dataset = dataset
-    # while not hasattr(input_dataset, '_batch_size') and hasattr(input_dataset, '_input_dataset'):
-    #     # noinspection PyProtectedMember
-    #     input_dataset = input_dataset._input_dataset
-    #
-    # if hasattr(input_dataset, '_batch_size'):
-    #     dataset = dataset.unbatch()
-    #
-    # y_labels = []
-    # for _, labels in dataset:
-    #     y_labels.append(labels.numpy())
-    #
-    # return y_labels
-    y_labels = None
+    all_labels = None
     itr = dataset.unbatch().as_numpy_iterator()
     while True:
         try:
-            _, batch_labels = next(itr)
-            if y_labels is None:
-                y_labels = batch_labels
+            _, labels = next(itr)
+            if all_labels is None:
+                all_labels = labels
             else:
-                y_labels = _np.vstack((y_labels, batch_labels))
+                all_labels = _np.vstack((all_labels, labels))
         except StopIteration:
             break
 
-    return y_labels
+    return all_labels
+
+
+def get_features(dataset: _tf.data.Dataset) -> _np.ndarray:
+    """
+    Returns the features from a (batched)Dataset
+
+    :param dataset: the dataset from which we want the features.
+    :return: the features
+    """
+    all_features = None
+    itr = dataset.unbatch().as_numpy_iterator()
+    while True:
+        try:
+            features, _ = next(itr)
+            if all_features is None:
+                all_features = features
+            else:
+                all_features = _np.vstack((all_features, features))
+        except StopIteration:
+            break
+
+    return all_features
 
 
 def get_batch_dataset(dataset: _tf.data.Dataset) -> _tf.data.Dataset:

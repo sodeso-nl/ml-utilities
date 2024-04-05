@@ -217,10 +217,6 @@ def decision_boundary(model: _tf.keras.Model, x, y) -> None:
     _plt.ylim(yy.min(), yy.max())
 
 
-import numpy as _np
-import matplotlib.pyplot as _plt
-
-
 def y_pred_vs_y_true(y_true, y_pred, figsize=(20, 8)) -> None:
     """
     Shows a graph with the predicted values vs the truth labels.
@@ -242,15 +238,21 @@ def y_pred_vs_y_true(y_true, y_pred, figsize=(20, 8)) -> None:
     mae = _np.round(_np.mean(_np.abs(ytrue_ypred_diff[:, 2])), 5)
 
     # sort based on y_true
-    ytrue_ypred_diff = ytrue_ypred_diff[ytrue_ypred_diff[:, 0].argsort()]
-    _plt.figure(figsize=figsize, facecolor='#FFFFFF')
-    _plt.plot(ytrue_ypred_diff[:, 1], label="y_pred", color="#FF0000", linestyle="solid", linewidth=1)
-    _plt.plot(ytrue_ypred_diff[:, 0], label="y_true", color="#00FF00", linestyle="solid", linewidth=1)
-    _plt.plot(ytrue_ypred_diff[:, 2], label="diff", color="#0000FF", linestyle="solid", linewidth=1)
-    _plt.title(f'y_true vs y_pred with difference {mae}', size=20)
+    # ytrue_ypred_diff = ytrue_ypred_diff[ytrue_ypred_diff[:, 0].argsort()]
+
+    fig, ax = _plt.subplots(nrows=2, figsize=figsize, facecolor='#FFFFFF')
+    fig.suptitle(f'y_true vs y_pred with difference {mae}')
+    ax[0].plot(ytrue_ypred_diff[:, 1], label="y_pred", color="#FF0000", linestyle="solid", linewidth=1)
+    ax[0].plot(ytrue_ypred_diff[:, 0], label="y_true", color="#00FF00", linestyle="solid", linewidth=1)
+    ax[1].plot(ytrue_ypred_diff[:, 2], label="diff", color="#0000FF", linestyle="solid", linewidth=1)
+    ax[0].set_xticklabels([])
+    ax[0].grid(True)
+    ax[1].grid(True)
+    ax[0].legend()
+    ax[1].legend()
+    _plt.ylabel('Value', size=14, loc='top')
     _plt.xlabel('Predictions', size=14)
-    _plt.ylabel('Value', size=14)
-    _plt.legend()
+    _plt.subplots_adjust(wspace=0, hspace=0)
 
 
 def report_f1_score(y_true, y_pred=None, y_prob=None, class_names: list[str] = None, figsize=(10, 8)) -> None:

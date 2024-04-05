@@ -130,8 +130,11 @@ def get_labels(dataset: _tf.data.Dataset) -> _np.ndarray:
     :param dataset: the dataset from which we want the labels.
     :return: the labels
     """
+    if is_batched(dataset=dataset):
+        dataset = dataset.unbatch()
+
     all_labels = None
-    itr = dataset.unbatch().as_numpy_iterator()
+    itr = dataset.as_numpy_iterator()
     while True:
         try:
             _, labels = next(itr)
@@ -153,7 +156,10 @@ def get_features(dataset: _tf.data.Dataset) -> _np.ndarray:
     :return: the features
     """
     all_features = None
-    itr = dataset.unbatch().as_numpy_iterator()
+    if is_batched(dataset=dataset):
+        dataset = dataset.unbatch()
+
+    itr = dataset.as_numpy_iterator()
     while True:
         try:
             features, _ = next(itr)

@@ -190,7 +190,7 @@ def get_batch_dataset(dataset: _tf.data.Dataset) -> _Union[_tf.data.Dataset, Non
 
 def get_batch_size(dataset: _tf.data.Dataset) -> int:
     batch_dataset = get_batch_dataset(dataset=dataset)
-    if not batch_dataset:
+    if batch_dataset is not None:
         # noinspection PyUnresolvedReferences
         # noinspection PyProtectedMember
         return batch_dataset._batch_size
@@ -199,7 +199,7 @@ def get_batch_size(dataset: _tf.data.Dataset) -> int:
 
 
 def is_batched(dataset: _tf.data.Dataset) -> bool:
-    return not get_batch_dataset(dataset=dataset) is None
+    return get_batch_dataset(dataset=dataset) is not None
 
 
 def is_prefetched(dataset: _tf.data.Dataset) -> bool:

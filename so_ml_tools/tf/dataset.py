@@ -193,7 +193,7 @@ def get_batch_size(dataset: _tf.data.Dataset) -> int:
 
 
 def is_batched(dataset: _tf.data.Dataset) -> bool:
-    return not get_batch_dataset(dataset=dataset)
+    return not get_batch_dataset(dataset=dataset) is None
 
 
 def is_prefetched(dataset: _tf.data.Dataset) -> bool:

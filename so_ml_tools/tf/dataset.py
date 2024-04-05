@@ -1,6 +1,7 @@
 import tensorflow as _tf
 import so_ml_tools as _soml
 import numpy as _np
+from typing import Union as _Union
 
 
 def split(dataset: _tf.data.Dataset, split_percentages: list[float]) -> tuple[_tf.data.Dataset, ...]:
@@ -166,7 +167,7 @@ def get_features(dataset: _tf.data.Dataset) -> _np.ndarray:
     return all_features
 
 
-def get_batch_dataset(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
+def get_batch_dataset(dataset: _tf.data.Dataset) -> _Union[_tf.data.Dataset, None]:
     if not isinstance(dataset, _tf.data.Dataset):
         raise TypeError('dataset is not a tf.data.Dataset')
 
@@ -177,6 +178,8 @@ def get_batch_dataset(dataset: _tf.data.Dataset) -> _tf.data.Dataset:
 
     if input_dataset.__class__.__name__ == '_BatchDataset':
         return input_dataset
+
+    return None
 
 
 def get_batch_size(dataset: _tf.data.Dataset) -> int:

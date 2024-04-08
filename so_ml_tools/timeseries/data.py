@@ -62,32 +62,28 @@ def dataset_from_array_multivariate(
         label_column_idx,
         window_size: int,
         horizon_size: int = 1,
+        centered: bool = False,
         batch_size=None) -> _tf.data.Dataset:
+    assert horizon_size <= window_size, f"horizon_size '{horizon_size}' must be smaller or equal to window_size '{window_size}'"
+    assert not centered or (
+            centered and window_size > 2), f"Centered window requested but window_size is too small: '{window_size}', needs to be at least 3 or higher."
+
     x = array
-    y = x[:, label_column_idx]
 
-    return dataset_from_arrays_multivariate(
-        x=x,
-        y=y,
-        window_size=window_size,
-        horizon_size=horizon_size,
-        batch_size=batch_size)
+    label_offset = window_size
+    if centered:
+        label_offset = _math.floor(window_size / 2)
 
+    y = x[label_offset:, label_column_idx]
 
-def dataset_from_arrays_multivariate(
-        x: _np.ndarray,
-        y: _np.ndarray,
-        window_size: int,
-        horizon_size: int = 1,
-        batch_size=None) -> _tf.data.Dataset:
     if horizon_size > 1:
-        horizon_start_offset = window_size
-        horizon_end_offset = window_size + horizon_size
-        y = [y[start_idx + horizon_start_offset:start_idx + horizon_end_offset] for start_idx, _ in
-             enumerate(y[window_size:])]
+        horizon_start_offset = label_offset
+        horizon_end_offset = label_offset + horizon_size
+        y = [y[start_idx + horizon_start_offset:start_idx + horizon_end_offset]
+             for start_idx, _ in enumerate(y)]
 
         # Remove last set of lines which are not complete
-        y = y[0:-horizon_size + 1]
+        y = y[0:-window_size]
 
     return _ks.utils.timeseries_dataset_from_array(
         x,

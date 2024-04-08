@@ -141,7 +141,7 @@ def get_labels(dataset: _tf.data.Dataset) -> _np.ndarray:
             if all_labels is None:
                 all_labels = labels
             else:
-                all_labels = _np.vstack((all_labels, labels))
+                all_labels = _np.hstack((all_labels, labels))
         except StopIteration:
             break
 
@@ -164,9 +164,9 @@ def get_features(dataset: _tf.data.Dataset) -> _np.ndarray:
         try:
             features, _ = next(itr)
             if all_features is None:
-                all_features = features
+                all_features = _np.expand_dims(features, axis=0)
             else:
-                all_features = _np.vstack((all_features, features))
+                all_features = _np.vstack((all_features, _np.expand_dims(features, axis=0)))
         except StopIteration:
             break
 

@@ -33,12 +33,14 @@ def dataset_from_tensor_multivariate(
         label_column_idx,
         window_size,
         horizon_size=1,
+        centered=False,
         batch_size=None):
     return dataset_from_array_multivariate(
         array=tensor.numpy(),
         label_column_idx=label_column_idx,
         window_size=window_size,
         horizon_size=horizon_size,
+        centered=centered,
         batch_size=batch_size)
 
 
@@ -47,6 +49,7 @@ def dataset_from_dataframe_multivariate(
         label_column: str,
         window_size: int,
         horizon_size: int = 1,
+        centered: bool = False,
         batch_size=None):
     label_idx = dataframe.columns.get_loc(label_column)
     return dataset_from_array_multivariate(
@@ -54,6 +57,7 @@ def dataset_from_dataframe_multivariate(
         label_column_idx=label_idx,
         window_size=window_size,
         horizon_size=horizon_size,
+        centered=centered,
         batch_size=batch_size)
 
 

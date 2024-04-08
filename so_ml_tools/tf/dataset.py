@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as _tf
 import so_ml_tools as _soml
 import numpy as _np
@@ -139,9 +140,9 @@ def get_labels(dataset: _tf.data.Dataset) -> _np.ndarray:
         try:
             _, labels = next(itr)
             if all_labels is None:
-                all_labels = labels
+                all_labels = _np.expand_dims(labels, axis=0)
             else:
-                all_labels = _np.hstack((all_labels, labels))
+                all_labels = _np.vstack((all_labels, np.expand_dims(labels, axis=0)))
         except StopIteration:
             break
 

@@ -1,29 +1,30 @@
 from unittest import TestCase
 
-import tensorflow as tf
-import numpy as np
-import ml_utilities as ml
+import tensorflow as _tf
+import numpy as _np
+import so_ml_tools as _soml
 
 
 class Test(TestCase):
+
     def test_determine_outliers_multiclass_no_outliers(self):
         import pandas as pd
 
         x = pd.DataFrame(data=[["A"], ["B"], ["C"], ["D"], ["E"]], columns=['X'])
 
-        y_true = [1, 3, 2, 4, 0]
+        y_true = [1, 4, 2, 4, 0]
 
-        y_prob = tf.constant([
-            [0.20, 0.21, 0.20, 0.19, 0.20],
-            [0.20, 0.19, 0.20, 0.21, 0.21],
-            [0.20, 0.20, 0.21, 0.19, 0.20],
-            [0.19, 0.20, 0.20, 0.20, 0.21],
-            [0.21, 0.20, 0.20, 0.20, 0.19]
+        y_prob = _tf.constant([
+            [0.20, 0.21, 0.20, 0.19, 0.20], # 1
+            [0.20, 0.19, 0.20, 0.20, 0.21], # 4
+            [0.20, 0.20, 0.21, 0.19, 0.20], # 2
+            [0.19, 0.20, 0.20, 0.20, 0.21], # 4
+            [0.21, 0.20, 0.20, 0.20, 0.19]  # 0
         ])
 
-        y_pred = ml.util.label.to_prediction(y_prob=y_prob)
+        y_pred = _soml.util.prediction.multiclass_probability_to_prediction(y_probs=y_prob)
 
-        pd = ml.multiclass.evaluate.determine_outliers(
+        pd = _soml.evaluate.analyze.determine_outliers_for_multiclass_classification(
             x=x,
             y_true=y_true,
             y_pred=y_pred,
@@ -44,17 +45,17 @@ class Test(TestCase):
             ["E"]
         ], columns=['X'])
 
-        y_true = [1, 3, 2, 4, 0]
+        y_true = [1, 4, 2, 4, 0]
 
-        y_prob = tf.constant([
+        y_prob = _tf.constant([
             [0.20, 0.20, 0.12, 0.20, 0.28],
-            [0.20, 0.19, 0.20, 0.21, 0.21],
+            [0.20, 0.19, 0.20, 0.20, 0.21],
             [0.20, 0.20, 0.21, 0.19, 0.20],
             [0.14, 0.26, 0.20, 0.20, 0.20],
             [0.21, 0.20, 0.20, 0.20, 0.19]
-        ], dtype=tf.float16)
+        ], dtype=_tf.float16)
 
-        pd = ml.multiclass.evaluate.determine_outliers(
+        pd = _soml.evaluate.analyze.determine_outliers_for_multiclass_classification(
             x=x,
             y_true=y_true,
             y_prob=y_prob,
@@ -62,11 +63,11 @@ class Test(TestCase):
         )
 
         result = pd.to_numpy().astype(str)
-        compare_to = np.array([
+        compare_to = _np.array([
             ['A', 1, 4, 0.28],
             ['D', 4, 1, 0.26]
         ])
-        self.assertTrue(np.array_equal(result, compare_to))
+        self.assertTrue(_np.array_equal(result, compare_to))
 
     def test_determine_outliers_binary_with_outliers(self):
         import pandas as pd
@@ -75,7 +76,7 @@ class Test(TestCase):
 
         y_true = [1, 0, 0, 1, 1]
 
-        y_prob = tf.constant([
+        y_prob = _tf.constant([
             [0.79],
             [0.23],
             [0.78],
@@ -83,9 +84,9 @@ class Test(TestCase):
             [0.19]
         ])
 
-        y_pred = ml.util.label.to_prediction(y_prob=y_prob)
+        y_pred = _soml.util.prediction.binary_probability_to_prediction(y_probs=y_prob)
 
-        pd = ml.multiclass.evaluate.determine_outliers(
+        pd = _soml.evaluate.analyze.determine_outliers_for_multiclass_classification(
             x=x,
             y_true=y_true,
             y_pred=y_pred,
@@ -94,9 +95,9 @@ class Test(TestCase):
         )
 
         result = pd.to_numpy().astype(str)
-        compare_to = np.array([
+        compare_to = _np.array([
             ['C', 0, 1, 0.78],
             ['E', 1, 0, 0.19]
         ])
 
-        self.assertTrue(np.array_equal(result, compare_to))
+        self.assertTrue(_np.array_equal(result, compare_to))

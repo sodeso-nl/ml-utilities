@@ -32,7 +32,7 @@ def roc_curve(y_true, y_prob=None, figsize=(5, 5), label_color='black'):
         raise TypeError('y_true is a dataset, please get the labels from the dataset using '
                         '\'y_labels = soml.tf.dataset.get_labels(dataset=dataset)\'')
 
-    y_true = _soml.util.label.to_prediction(y_prob=y_true)
+    y_true = _soml.util.prediction.probability_to_prediction(y_probs=y_true)
 
     precision_fpr, sensitivity_tpr, thresholds = _sk.metrics.roc_curve(y_true=y_true, y_score=y_prob)
 
@@ -97,9 +97,9 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
         raise TypeError('y_true is a dataset, please get the labels from the dataset using '
                         '\'y_labels = soml.tf.dataset.get_labels(dataset=dataset)\'')
 
-    y_true = _soml.util.label.to_prediction(y_prob=y_true)
+    y_true = _soml.util.prediction.probability_to_prediction(y_probs=y_true)
     if y_pred is None and y_prob is not None:
-        y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
+        y_pred = _soml.util.prediction.probability_to_prediction(y_probs=y_prob)
     elif y_pred is None and y_prob is None:
         raise "Must specify 'y_pred' or 'y_prob'"
 
@@ -274,9 +274,9 @@ def report_f1_score(y_true, y_pred=None, y_prob=None, class_names: list[str] = N
             'y_true is a dataset, please get the labels from the dataset using '
             '\'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')
 
-    y_true = _soml.util.label.to_prediction(y_prob=y_true)
+    y_true = _soml.util.prediction.probability_to_prediction(y_probs=y_true)
     if y_pred is None and y_prob is not None:
-        y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
+        y_pred = _soml.util.prediction.probability_to_prediction(y_probs=y_prob)
     elif y_pred is None and y_prob is None:
         raise "y_pred or y_prob argument should be provided."
 
@@ -332,7 +332,7 @@ def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8
     """
     _plt.figure(figsize=figsize)
 
-    if _soml.util.label.is_multiclass_classification(y_prob=y_true):
+    if _soml.util.prediction.is_multiclass_classification(y=y_true):
 
         # For each column (class) in y_true
         for n in range(y_true.shape[1]):
@@ -351,7 +351,7 @@ def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8
             # Plot a graph with the given values.
             class_name = str(n) if class_names is None else class_names[n]
             _plt.plot(y_class_sorted, label=class_name, linewidth=1.5)
-    elif _soml.util.label.is_binary_classification(y_prob=y_true):
+    elif _soml.util.prediction.is_binary_classification(y=y_true):
         # In binary classification we have two possible best outcomes, 0 and 1, both ends mean that something has
         # been positively identified, so we need to first extract the two classes based on y_true (0 is the first class
         # and 1 is the second class), then we need to translate the value ranges, for results
@@ -361,7 +361,7 @@ def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8
         positivate_range_translation = _interp1d([0., 1.], [0, 100])
         negative_range_translation = _interp1d([0., 1.], [100, 0])
 
-        y_true_int = _soml.util.label.probability_to_binary(y_true)
+        y_true_int = _soml.util.prediction.binary_probability_to_prediction(y_probs=y_true)
         for n in range(2):
             # Filter out only the rows thar are applicatie to the n'th class
             y_pred_single_class = y_prob[_np.in1d(y_true_int[:, 0], [n])]
@@ -409,7 +409,7 @@ def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], log=
     """
     bins = range(0, 110, 10)
 
-    if _soml.util.label.is_multiclass_classification(y_prob=y_true):
+    if _soml.util.prediction.is_multiclass_classification(y=y_true):
         fig, axs = _plt.subplots(nrows=max(int(len(class_names) / 4), 1), ncols=min(4, len(class_names)),
                                  figsize=figsize)
         axs = axs.flatten()
@@ -436,7 +436,7 @@ def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], log=
 
             # Plot a histogram with the given values.
             __plot_histogram(class_names=class_names, axs=axs, y=y, idx=idx)
-    elif _soml.util.label.is_binary_classification(y_prob=y_true):
+    elif _soml.util.prediction.is_binary_classification(y=y_true):
         fig, axs = _plt.subplots(nrows=1, ncols=2, figsize=figsize)
 
         # Spacing between the graphs
@@ -454,7 +454,7 @@ def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], log=
         positivate_range_translation = _interp1d([0., 1.], [0, 100])
         negative_range_translation = _interp1d([0., 1.], [100, 0])
 
-        y_true_int = _soml.util.label.probability_to_binary(y_true)
+        y_true_int = _soml.util.prediction.binary_probability_to_prediction(y_probs=y_true)
         for idx in range(2):
             # Filter out only the rows thar are applicatie to the n'th class
             y_pred_single_class = y_prob[_np.in1d(y_true_int[:, 0], [idx])]

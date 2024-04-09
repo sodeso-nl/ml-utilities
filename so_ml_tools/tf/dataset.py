@@ -1,25 +1,30 @@
 import numpy as np
 import tensorflow as _tf
-import so_ml_tools as _soml
 import numpy as _np
 from typing import Union as _Union
+from typing import Tuple as _Tuple
 
 
 def split(dataset: _tf.data.Dataset, split_percentages: list[float]) -> tuple[_tf.data.Dataset, ...]:
-    """
-    Split a dataset into multiple seperate datasets, the order in the `splits` argument
-    is the order in which the split datasets will be returned. Note that if the dataset is
-    batched that the split will be based on batches.
-
-    Important:
-
-    If a dataset is shuffled then the outcome will be randomly split.
+    """Splits a TensorFlow dataset into multiple datasets based on the provided split percentages.
 
     Args:
-        dataset: Dataset to split
-        split_percentages: the percentages to split the dataset into (between 0.0 and 1.0)
+        dataset (tensorflow.data.Dataset): Input TensorFlow dataset to be split.
+        split_percentages (List[float]): List of float values representing the percentages of each split.
 
-    Returns: tuple containing the split datasets
+    Returns:
+        Tuple[tensorflow.data.Dataset, ...]: Tuple of TensorFlow datasets after splitting.
+
+    Raises:
+        AssertionError: If the sum of split percentages is not equal to 1.0.
+
+    Examples:
+        >>> import tensorflow as tf
+        >>> dataset = tf.data.Dataset.range(10)
+        >>> splits = split(dataset, split_percentages=[0.7, 0.2, 0.1])
+        >>> for split in splits:
+        ...     print(list(split.as_numpy_iterator()))
+        [0, 1, 2, 3, 4, 5, 6], [7, 8], [9]
     """
     assert sum(split_percentages) == 1.0, "The sum of split percentages should be equal to 1.0"
 
@@ -40,9 +45,6 @@ def describe_pipeline(dataset: _tf.data.Dataset):
 
     :param dataset: the dataset.
     """
-    if not isinstance(dataset, _tf.data.Dataset):
-        raise TypeError('dataset is not a tf.data.Dataset')
-
     input_dataset = dataset
     print(f"{input_dataset.__class__.__name__}", end="")
 
@@ -124,32 +126,34 @@ def get_class_names(dataset: _tf.data.Dataset):
     return input_dataset.class_names
 
 
-def get_labels(dataset: _tf.data.Dataset) -> _np.ndarray:
+def get_labels(dataset: _tf.data.Dataset, max_samples: int = None) -> _np.ndarray:
     """
     Returns the labels from a (batched)Dataset
 
     :param dataset: the dataset from which we want the labels.
     :return: the labels
     """
+    all_labels = None
     if is_batched(dataset=dataset):
         dataset = dataset.unbatch()
 
-    all_labels = None
+    current_sample = 0
     itr = dataset.as_numpy_iterator()
-    while True:
+    while max_samples is None or current_sample < max_samples:
         try:
             _, labels = next(itr)
             if all_labels is None:
                 all_labels = _np.expand_dims(labels, axis=0)
             else:
                 all_labels = _np.vstack((all_labels, np.expand_dims(labels, axis=0)))
+            current_sample += 1
         except StopIteration:
             break
 
     return all_labels
 
 
-def get_features(dataset: _tf.data.Dataset) -> _np.ndarray:
+def get_features(dataset: _tf.data.Dataset, max_samples: int = None) -> _np.ndarray:
     """
     Returns the features from a (batched)Dataset
 
@@ -160,24 +164,29 @@ def get_features(dataset: _tf.data.Dataset) -> _np.ndarray:
     if is_batched(dataset=dataset):
         dataset = dataset.unbatch()
 
+    current_sample = 0
     itr = dataset.as_numpy_iterator()
-    while True:
+    while max_samples is None or current_sample < max_samples:
         try:
             features, _ = next(itr)
             if all_features is None:
                 all_features = _np.expand_dims(features, axis=0)
             else:
                 all_features = _np.vstack((all_features, _np.expand_dims(features, axis=0)))
+            current_sample += 1
         except StopIteration:
             break
 
     return all_features
 
 
-def get_batch_dataset(dataset: _tf.data.Dataset) -> _Union[_tf.data.Dataset, None]:
-    if not isinstance(dataset, _tf.data.Dataset):
-        raise TypeError('dataset is not a tf.data.Dataset')
+def get_features_and_labels(dataset: _tf.data.Dataset, max_samples: int = None) -> _Tuple[_np.array, _np.ndarray]:
+    features = get_features(dataset=dataset, max_samples=max_samples)
+    labels = get_labels(dataset=dataset, max_samples=max_samples)
+    return features, labels
 
+
+def get_batch_dataset(dataset: _tf.data.Dataset) -> _Union[_tf.data.Dataset, None]:
     input_dataset = dataset
     while not input_dataset.__class__.__name__ == '_BatchDataset' and hasattr(input_dataset, '_input_dataset'):
         # noinspection PyProtectedMember
@@ -237,7 +246,3 @@ def is_shuffled(dataset: _tf.data.Dataset) -> bool:
         input_dataset = input_dataset._input_dataset
 
     return input_dataset.__class__.__name__ == '_ShuffleDataset'
-
-
-def show_images_from_dataset(dataset: _tf.data.Dataset, class_names = None, shape=(4, 8)):
-    _soml.data.image.show_images_from_dataset(dataset=dataset, class_names=class_names, shape=shape)

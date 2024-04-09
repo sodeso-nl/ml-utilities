@@ -1,11 +1,17 @@
 from . import (
     io,
     label,
-    random
+    random,
+    prediction,
+    types,
+    onehot
 )
 
 __all__ = [
     "io",
     "label",
-    "random"
+    "random",
+    "prediction",
+    "types",
+    "onehot"
 ]

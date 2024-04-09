@@ -82,7 +82,8 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
 
     """
     # Convert to categorical first so we can use the values as indices.
-    y = _soml.util.label.to_ordinal(y=y, dtype=_tf.uint8)
+    if _soml.util.onehot.is_one_hot_encoded(value=y):
+        y = _soml.util.onehot.one_hot_to_indices(value=y)
 
     if is_image_float32_and_not_normalized(x):
         x = _tf.cast(x=x, dtype=_tf.uint8)
@@ -108,8 +109,8 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
 
         _plt.imshow(x[rand_index], cmap=cmap)
 
-        if _soml.util.label.is_multiclass_classification(y):
-            class_index = _soml.util.label.probability_to_class(y)
+        if _soml.util.prediction.is_multiclass_classification(y=y):
+            class_index = _soml.util.prediction.probability_to_prediction(y)
         else:
             # Integer encoded labels
             class_index = y[rand_index]

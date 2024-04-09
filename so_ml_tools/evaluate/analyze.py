@@ -1,5 +1,3 @@
-import pandas as _pd
-import tensorflow as _tf
 import sklearn as _sklearn
 import so_ml_tools as _soml
 from typing import Union as _Union
@@ -11,8 +9,8 @@ from so_ml_tools.tf.loss.mase import mean_absolute_scaled_error as _mean_absolut
 
 
 def evaluate_preds(y_true, y_pred, seasonality: int = None) -> dict:
-    y_true = _to_numpy(y_true)
-    y_pred = _to_numpy(y_pred)
+    y_true = _soml.util.types.to_numpy(y_true)
+    y_pred = _soml.util.types.to_numpy(y_pred)
 
     y_true = y_true.astype(dtype=_np.float32).ravel()
     y_pred = y_pred.astype(dtype=_np.float32).ravel()
@@ -54,15 +52,15 @@ def determine_outliers_for_multiclass_classification(x, y_true, y_pred=None, y_p
     # If y_pred is None then determine the predictions, otherwise check if we need to convert to numpy.
     _y_pred = y_pred
     if y_pred is None:
-        _y_pred = _soml.util.label.to_prediction(y_prob=_y_prob)
+        _y_pred = _soml.util.prediction.multiclass_probability_to_prediction(y_probs=_y_prob)
     elif _tf.is_tensor(x=y_pred):
         _y_pred = y_pred.numpy()
 
     # Create a matrix containing the y_true, y_pred and y_prob value in columns.
     data = None
-    if _soml.util.label.is_multiclass_classification(_y_prob):
+    if _soml.util.prediction.is_multiclass_classification(y=_y_prob):
         data = [[y_true[i], x, _y_prob[i][x]] for i, x in enumerate(_y_pred)]
-    elif _soml.util.label.is_binary_classification(_y_prob):
+    elif _soml.util.prediction.is_binary_classification(y=_y_prob):
         data = [[y_true[i], x[0], _y_prob[i][0]] for i, x in enumerate(_y_pred)]
 
     if data is None:
@@ -115,11 +113,11 @@ def determine_outliers_for_binary_classification(x, y_true, y_pred, target_colum
 
 
 def classification_report(y_true, y_pred=None, y_prob=None) -> None:
-    y_true = _soml.util.label.to_prediction(y_prob=y_true)
+    y_true = _soml.util.prediction.probability_to_prediction(y_probs=y_true)
 
     # If y_pred is not supplied but y_prob is then calculatwe y_pred
     if y_pred is None and y_prob is not None:
-        y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
+        y_pred = _soml.util.prediction.probability_to_prediction(y_probs=y_prob)
     elif y_pred is None and y_prob is None:
         raise "Must specify 'y_pred' or 'y_prob'"
 
@@ -140,11 +138,11 @@ def quality_metrics(y_true, y_pred=None, y_prob=None) -> _pd.DataFrame:
     Returns:
         A 'dict' containing accuracy, precision, recall, f1 score and support
     """
-    y_true = _soml.util.label.to_prediction(y_prob=y_true)
+    y_true = _soml.util.prediction.probability_to_prediction(y_probs=y_true)
 
     # If y_pred is not supplied but y_prob is then calculatwe y_pred
     if y_pred is None and y_prob is not None:
-        y_pred = _soml.util.label.to_prediction(y_prob=y_prob)
+        y_pred = _soml.util.probability_to_prediction.probability_to_prediction(y_probs=y_prob)
     elif y_pred is None and y_prob is None:
         raise "Must specify 'y_pred' or 'y_prob'"
 
@@ -220,15 +218,3 @@ def quality_metrics_combine(metrics: dict, sort_by: list[str] = None, ascending:
     all_metrics_results.rename(columns={"level_0": "name"}, inplace=True)
     all_metrics_results.sort_values(by=sort_by, inplace=True, ascending=ascending)
     return all_metrics_results
-
-
-def _to_numpy(x):
-    if not isinstance(x, _np.ndarray):
-        if isinstance(x, _pd.DataFrame) | isinstance(x, _pd.Series) | isinstance(x, _pd.DatetimeIndex):
-            return x.to_numpy()
-        elif isinstance(x, _tf.Tensor):
-            return x.numpy()
-        else:
-            return _tf.convert_to_tensor(value=x).numpy()
-
-    return x

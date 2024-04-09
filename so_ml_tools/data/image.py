@@ -65,7 +65,7 @@ def is_image_float32_and_not_normalized(x) -> bool:
     return x.dtype == _tf.float32 and _tf.math.reduce_max(x).numpy() > 1.0
 
 
-def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indices=None, shape: tuple = (4, 6),
+def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, shape: tuple = (4, 6),
                                        cmap: str = 'gray') -> None:
     """
     Shows images stored in a tensor / numpy array. The array should be a vector of images.
@@ -74,7 +74,6 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
         x: a `tf.Tensor` containg the images
         y: a 'tf.Tensor' containing the labels associated with `x`
         class_names: a `list` of class names
-        indices: a `list` of indices for the images to display, `None` to pick random images
         shape: A `tuple` specifying the number of images to display (width, height)
         cmap: A 'str' with the color map to use for displaying the images.
 
@@ -85,16 +84,8 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
     if _soml.util.onehot.is_one_hot_encoded(value=y):
         y = _soml.util.onehot.one_hot_to_indices(value=y)
 
-    if is_image_float32_and_not_normalized(x):
+    if _soml.data.image.is_image_float32_and_not_normalized(x):
         x = _tf.cast(x=x, dtype=_tf.uint8)
-
-    if indices:
-        assert shape[0] * shape[1] <= len(
-            indices), f"Size of shape ({shape[0]}, {shape[1]}), with a total of " \
-                      f"{shape[0] * shape[1]} images, is larger then number of indices supplied ({len(indices)})."
-        for i in indices:
-            if i > len(x):
-                assert False, f"Values of indices point to an index ({i}) which is out of bounds of X (length: {len(x)})"
 
     fig = _plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
     fig.patch.set_facecolor('gray')
@@ -102,19 +93,14 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, indi
         ax = _plt.subplot(shape[0], shape[1], i + 1)
         ax.axis('off')
 
-        if indices is None:
-            rand_index = _random.choice(range(len(x)))
-        else:
-            rand_index = indices[i]
+        # if indices is None:
+        rand_index = _random.choice(range(len(x)))
+        # else:
+        #     rand_index = indices[i]
 
         _plt.imshow(x[rand_index], cmap=cmap)
 
-        if _soml.util.prediction.is_multiclass_classification(y=y):
-            class_index = _soml.util.prediction.probability_to_prediction(y)
-        else:
-            # Integer encoded labels
-            class_index = y[rand_index]
-
+        class_index = y[rand_index]
         if class_names is None:
             _plt.title(class_index, color='white')
         else:
@@ -191,20 +177,9 @@ def show_images_from_dataset(dataset: _tf.data.Dataset, class_names=None, shape=
         None
     """
     assert isinstance(dataset, _tf.data.Dataset), f"The dataset supplied is not a tensorflow.data.Dataset."
-
-    # Retrieve first batch, depending on the initalization of the dataset the batch size is default 32
-    # so when performing a take of (1) we retreive the first batch
-    batches = dataset.take(1)
-
-    # Use an iterator to get the first batch of images and labels
-    batch_iter = iter(batches)
-    x, y_true = batch_iter.next()
-
-    assert shape[0] * shape[1] <= len(x), f"Cannot display a total of {shape[0] * shape[1]}  images (shape ({shape[0]}, {shape[1]}), " \
-            f"the batch size of the dataset is only {len(x)} large, either increase batch size or decrease shape size."
+    x, y = _soml.tf.dataset.get_features_and_labels(dataset=dataset, max_samples=shape[0] * shape[1])
 
     if class_names is None:
         class_names = _soml.tf.dataset.get_class_names(dataset=dataset)
 
-    show_images_from_nparray_or_tensor(x=x.numpy(), y=y_true.numpy(), class_names=class_names, shape=shape)
-    _plt.show()
+    show_images_from_nparray_or_tensor(x=x, y=y, class_names=class_names, shape=shape)

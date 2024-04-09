@@ -60,14 +60,7 @@ def one_hot_to_indices(value) -> _np.ndarray:
     if not isinstance(value, _np.ndarray):
         value = _soml.util.types.to_numpy(value=value)
 
-    if is_one_hot_encoded(value):
-        return value
+    if not _soml.util.onehot.is_one_hot_encoded(value):
+        raise ValueError('Input is not recognized as a one-hot encoded value.')
 
-    if not isinstance(value, _np.ndarray):
-        raise ValueError("Input must be a NumPy array.")
-
-    if len(value.shape) != 1:
-        raise ValueError("Input must be a one-dimensional array.")
-
-    indices = _np.where(value == 1)[0]
-    return indices.tolist()
+    return _np.argmax(value, axis=1)

@@ -142,7 +142,7 @@ def quality_metrics(y_true, y_pred=None, y_prob=None) -> _pd.DataFrame:
 
     # If y_pred is not supplied but y_prob is then calculatwe y_pred
     if y_pred is None and y_prob is not None:
-        y_pred = _soml.util.probability_to_prediction.probability_to_prediction(y=y_prob)
+        y_pred = _soml.util.prediction.probability_to_prediction(y=y_prob)
     elif y_pred is None and y_prob is None:
         raise "Must specify 'y_pred' or 'y_prob'"
 

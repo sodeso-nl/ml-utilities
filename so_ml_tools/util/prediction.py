@@ -21,21 +21,24 @@ def is_binary_classification(y: _Union[list, _np.ndarray, _pd.Series, _pd.DataFr
     if not isinstance(y, _np.ndarray):
         y = _soml.util.types.to_numpy(value=y)
 
+    if y.size == 0:
+        return False
+
     # When there is one dimension we can have two situations, one is they are probabilities so all
     # values have a real number between 0 and (including) 1, or it can be 0 or 1 when we talk about
     # predictions.
     if len(y.shape) == 1:
         return _np.all(_np.logical_and(y >= 0, y <= 1))
 
-    # When there are two dimensions where the second dimension contains multiple values
-    # we expect a probability type of data, so values should be between 0 and (including) 1
-    if len(y.shape) == 2 and len(y[0]) > 1:
-        return _np.all(_np.logical_and(y >= 0, y <= 1))
+    # # When there are two dimensions where the second dimension contains multiple values
+    # # we expect a probability type of data, so values should be between 0 and (including) 1
+    # if len(y.shape) == 2 and len(y[0]) > 1:
+    #     return _np.all(_np.logical_and(y >= 0, y <= 1))
 
     # When there are two dimensions where the second dimension only contains a single
     # value we expect this to be whole numbers only.
     if len(y.shape) == 2 and len(y[0]) == 1:
-        return _np.all(_np.equal(_np.mod(y, 1), 0))
+        return _np.all(_np.logical_and(y >= 0, y <= 1))
 
     return False
 

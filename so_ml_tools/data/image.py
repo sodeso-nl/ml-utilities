@@ -108,7 +108,7 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, shap
         if class_names is None:
             _plt.title(class_index, color='white')
         else:
-            _plt.title(f"{class_names[class_index]}, {x[rand_index].shape}", color='white')
+            _plt.title(f"{class_names[int(class_index)]}, {x[rand_index].shape}", color='white')
     _plt.show()
 
 

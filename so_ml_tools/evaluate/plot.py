@@ -32,7 +32,7 @@ def roc_curve(y_true, y_prob=None, figsize=(5, 5), label_color='black'):
         raise TypeError('y_true is a dataset, please get the labels from the dataset using '
                         '\'y_labels = soml.tf.dataset.get_labels(dataset=dataset)\'')
 
-    y_true = _soml.util.prediction.probability_to_prediction(y_probs=y_true)
+    y_true = _soml.util.prediction.probability_to_prediction(y=y_true)
 
     precision_fpr, sensitivity_tpr, thresholds = _sk.metrics.roc_curve(y_true=y_true, y_score=y_prob)
 
@@ -97,9 +97,9 @@ def confusion_matrix(y_true, y_pred=None, y_prob=None, class_names: list[str] = 
         raise TypeError('y_true is a dataset, please get the labels from the dataset using '
                         '\'y_labels = soml.tf.dataset.get_labels(dataset=dataset)\'')
 
-    y_true = _soml.util.prediction.probability_to_prediction(y_probs=y_true)
+    y_true = _soml.util.prediction.probability_to_prediction(y=y_true)
     if y_pred is None and y_prob is not None:
-        y_pred = _soml.util.prediction.probability_to_prediction(y_probs=y_prob)
+        y_pred = _soml.util.prediction.probability_to_prediction(y=y_prob)
     elif y_pred is None and y_prob is None:
         raise "Must specify 'y_pred' or 'y_prob'"
 
@@ -274,9 +274,9 @@ def report_f1_score(y_true, y_pred=None, y_prob=None, class_names: list[str] = N
             'y_true is a dataset, please get the labels from the dataset using '
             '\'y_labels = get_labels_from_dataset(dataset=dataset, index_only=True)\'')
 
-    y_true = _soml.util.prediction.probability_to_prediction(y_probs=y_true)
+    y_true = _soml.util.prediction.probability_to_prediction(y=y_true)
     if y_pred is None and y_prob is not None:
-        y_pred = _soml.util.prediction.probability_to_prediction(y_probs=y_prob)
+        y_pred = _soml.util.prediction.probability_to_prediction(y=y_prob)
     elif y_pred is None and y_prob is None:
         raise "y_pred or y_prob argument should be provided."
 
@@ -361,7 +361,7 @@ def prediction_confidence(y_true, y_prob, class_names: list[str], figsize=(10, 8
         positivate_range_translation = _interp1d([0., 1.], [0, 100])
         negative_range_translation = _interp1d([0., 1.], [100, 0])
 
-        y_true_int = _soml.util.prediction.binary_probability_to_prediction(y_probs=y_true)
+        y_true_int = _soml.util.prediction.binary_probability_to_prediction(y=y_true)
         for n in range(2):
             # Filter out only the rows thar are applicatie to the n'th class
             y_pred_single_class = y_prob[_np.in1d(y_true_int[:, 0], [n])]
@@ -454,7 +454,7 @@ def prediction_confidence_histogram(y_true, y_prob, class_names: list[str], log=
         positivate_range_translation = _interp1d([0., 1.], [0, 100])
         negative_range_translation = _interp1d([0., 1.], [100, 0])
 
-        y_true_int = _soml.util.prediction.binary_probability_to_prediction(y_probs=y_true)
+        y_true_int = _soml.util.prediction.binary_probability_to_prediction(y=y_true)
         for idx in range(2):
             # Filter out only the rows thar are applicatie to the n'th class
             y_pred_single_class = y_prob[_np.in1d(y_true_int[:, 0], [idx])]

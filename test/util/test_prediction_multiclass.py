@@ -31,20 +31,20 @@ class Test(TestCase):
     def test_multiclass_probability_to_prediction(self):
         with self.assertRaises(ValueError):
             y_prob = [0.1, 0.9]
-            _prediction.multiclass_probability_to_prediction(y_probs=y_prob)
+            _prediction.multiclass_probability_to_prediction(y=y_prob)
 
         with self.assertRaises(ValueError):
             y_prob = [[0.1], [0.9]]
-            _prediction.multiclass_probability_to_prediction(y_probs=y_prob)
+            _prediction.multiclass_probability_to_prediction(y=y_prob)
 
         y_prob = [[0.1, 0.9]]
-        y_pred = _prediction.multiclass_probability_to_prediction(y_probs=y_prob)
+        y_pred = _prediction.multiclass_probability_to_prediction(y=y_prob)
         _np.testing.assert_array_equal(y_pred, _np.array([1]))
 
         y_prob = [[0.1, 0.0, 0.9], [0.5, 0.2, 0.3]]
-        y_pred = _prediction.multiclass_probability_to_prediction(y_probs=y_prob)
+        y_pred = _prediction.multiclass_probability_to_prediction(y=y_prob)
         _np.testing.assert_array_equal(y_pred, _np.array([2, 0]))
 
         y_prob = [[0.1, 0.0, 0.9], [0.5, 0.2, 0.3]]
-        y_pred = _prediction.multiclass_probability_to_prediction(y_probs=y_prob, maintain_shape=True)
+        y_pred = _prediction.multiclass_probability_to_prediction(y=y_prob, maintain_shape=True)
         _np.testing.assert_array_equal(y_pred, _np.array([[2], [0]]))

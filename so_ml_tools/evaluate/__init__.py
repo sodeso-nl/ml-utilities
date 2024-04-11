@@ -1,9 +1,11 @@
 from . import (
     analyze,
-    plot
+    plot,
+    classification
 )
 
 __all__ = [
     "analyze",
-    "plot"
+    "plot",
+    "classification"
 ]

@@ -7,35 +7,44 @@ from typing import Union as _Union
 
 
 def is_binary_classification(y: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor]) -> bool:
-    """Check if the input array represents a binary classification.
+    """
+        Checks if the input array represents a multiclass classification problem.
 
-        Args:
-            y (list or numpy.ndarray or pandas.Series or pandas.DataFrame or tensorflow.Tensor):
-                Input array to be checked.
+        Parameters:
+        y : Union[list, numpy.ndarray, pandas.Series, pandas.DataFrame, tensorflow.Tensor]
+            The input array representing the target variable.
 
         Returns:
-            bool: True if the input array represents a binary classification, False otherwise.
-
-        Raises:
-            None
+        bool
+            True if the input array represents a multiclass classification problem, False otherwise.
         """
     if not isinstance(y, _np.ndarray):
         y = _soml.util.types.to_numpy(value=y)
 
-    if len(y.shape) == 1 and len(y) > 0:
-        return True
+    # When there is one dimension we can have two situations, one is they are probabilities so all
+    # values have a real number between 0 and (including) 1, or it can be 0 or 1 when we talk about
+    # predictions.
+    if len(y.shape) == 1:
+        return _np.all(_np.logical_and(y >= 0, y <= 1))
 
-    if len(y.shape) == 2:
-        return y.shape[1] == 1
+    # When there are two dimensions where the second dimension contains multiple values
+    # we expect a probability type of data, so values should be between 0 and (including) 1
+    if len(y.shape) == 2 and len(y[0]) > 1:
+        return _np.all(_np.logical_and(y >= 0, y <= 1))
+
+    # When there are two dimensions where the second dimension only contains a single
+    # value we expect this to be whole numbers only.
+    if len(y.shape) == 2 and len(y[0]) == 1:
+        return _np.all(_np.equal(_np.mod(y, 1), 0))
 
     return False
 
 
-def is_binary_probability(y_probs: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor]) -> bool:
+def is_binary_probability(y: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor]) -> bool:
     """Check if the input array represents binary probabilities.
 
         Args:
-            y_probs (list or numpy.ndarray or pandas.Series or pandas.DataFrame or tensorflow.Tensor):
+            y (list or numpy.ndarray or pandas.Series or pandas.DataFrame or tensorflow.Tensor):
                 Input array to be checked.
 
         Returns:
@@ -44,29 +53,29 @@ def is_binary_probability(y_probs: _Union[list, _np.ndarray, _pd.Series, _pd.Dat
         Raises:
             None
         """
-    if not isinstance(y_probs, _np.ndarray):
-        y_probs = _soml.util.types.to_numpy(value=y_probs)
+    if not isinstance(y, _np.ndarray):
+        y = _soml.util.types.to_numpy(value=y)
 
-    if not is_binary_classification(y=y_probs):
+    if not is_binary_classification(y=y):
         return False
 
-    if _np.all((y_probs >= 0) & (y_probs <= 1)):
+    if _np.all((y >= 0) & (y <= 1)):
         return True
 
-    elif len(y_probs.shape) == 2:
+    elif len(y.shape) == 2:
         # Check if the second dimension only contains a 1-dimensional array
-        if all(isinstance(y_prob, _np.ndarray) and len(y_prob.shape) == 1 for y_prob in y_probs):
-            return all(_np.all((y_prob >= 0) & (y_prob <= 1)) for y_prob in y_probs)
+        if all(isinstance(y_prob, _np.ndarray) and len(y_prob.shape) == 1 for y_prob in y):
+            return all(_np.all((y_prob >= 0) & (y_prob <= 1)) for y_prob in y)
 
     return False
 
 
-def binary_probability_to_prediction(y_probs: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor],
+def binary_probability_to_prediction(y: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor],
                                      maintain_shape: bool = True, threshold: float = 0.5) -> _np.ndarray:
     """Converts binary probabilities to binary predictions based on a threshold.
 
         Args:
-            y_probs (list or numpy.ndarray or pandas.Series or pandas.DataFrame or tensorflow.Tensor):
+            y (list or numpy.ndarray or pandas.Series or pandas.DataFrame or tensorflow.Tensor):
                 Input array of binary probabilities to be converted.
             maintain_shape (bool, optional): Whether to maintain the shape of the input array. Defaults to True.
             threshold (float, optional): Threshold value for binary classification. Defaults to 0.5.
@@ -77,13 +86,13 @@ def binary_probability_to_prediction(y_probs: _Union[list, _np.ndarray, _pd.Seri
         Raises:
             ValueError: If the input array does not represent binary probabilities.
         """
-    if not isinstance(y_probs, _np.ndarray):
-        y_probs = _soml.util.types.to_numpy(value=y_probs)
+    if not isinstance(y, _np.ndarray):
+        y = _soml.util.types.to_numpy(value=y)
 
-    if not is_binary_probability(y_probs):
+    if not is_binary_probability(y):
         raise ValueError('Input must be a binary probability array.')
 
-    y_preds = _np.where(y_probs > threshold, 1, 0).astype(_np.int64)
+    y_preds = _np.where(y > threshold, 1, 0).astype(_np.int64)
     if maintain_shape:
         return y_preds
 
@@ -109,11 +118,11 @@ def is_multiclass_classification(y: _Union[list, _np.ndarray, _pd.Series, _pd.Da
     return len(y.shape) == 2 and len(y[0]) > 1
 
 
-def is_multiclass_propabilities(y_probs: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor]) -> bool:
+def is_multiclass_propabilities(y: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor]) -> bool:
     """Check if the input array represents multiclass probabilities.
 
         Args:
-            y_probs (list or numpy.ndarray or pandas.Series or pandas.DataFrame or tensorflow.Tensor):
+            y (list or numpy.ndarray or pandas.Series or pandas.DataFrame or tensorflow.Tensor):
                 Input array to be checked.
 
         Returns:
@@ -122,21 +131,21 @@ def is_multiclass_propabilities(y_probs: _Union[list, _np.ndarray, _pd.Series, _
         Raises:
             None
         """
-    if not isinstance(y_probs, _np.ndarray):
-        y_probs = _soml.util.types.to_numpy(value=y_probs)
+    if not isinstance(y, _np.ndarray):
+        y = _soml.util.types.to_numpy(value=y)
 
-    if not is_multiclass_classification(y=y_probs):
+    if not is_multiclass_classification(y=y):
         return False
 
-    return _np.all(_np.isclose(_np.sum(y_probs, axis=1), 1.0))
+    return _np.all(_np.isclose(_np.sum(y, axis=1), 1.0))
 
 
-def multiclass_probability_to_prediction(y_probs: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor],
+def multiclass_probability_to_prediction(y: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor],
                                          maintain_shape=False) -> _np.ndarray:
     """Converts multiclass probabilities to multiclass predictions.
 
     Args:
-        y_probs (list or numpy.ndarray or pandas.Series or pandas.DataFrame or tensorflow.Tensor):
+        y (list or numpy.ndarray or pandas.Series or pandas.DataFrame or tensorflow.Tensor):
             Input array of multiclass probabilities to be converted.
         maintain_shape (bool, optional): Whether to maintain the shape of the input array. Defaults to False.
 
@@ -146,24 +155,24 @@ def multiclass_probability_to_prediction(y_probs: _Union[list, _np.ndarray, _pd.
     Raises:
         ValueError: If the input array does not represent multiclass probabilities.
     """
-    if not isinstance(y_probs, _np.ndarray):
-        y_probs = _soml.util.types.to_numpy(value=y_probs)
+    if not isinstance(y, _np.ndarray):
+        y = _soml.util.types.to_numpy(value=y)
 
-    if not is_multiclass_propabilities(y_probs):
+    if not is_multiclass_propabilities(y):
         raise ValueError('Input must be a multi-class probability array.')
 
     if maintain_shape:
-        return _np.reshape(_np.argmax(y_probs, axis=1), newshape=(y_probs.shape[0], 1))
+        return _np.reshape(_np.argmax(y, axis=1), newshape=(y.shape[0], 1))
 
-    return _np.argmax(y_probs, axis=1)
+    return _np.argmax(y, axis=1)
 
 
-def probability_to_prediction(y_probs: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor],
+def probability_to_prediction(y: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor],
                               maintain_shape=None) -> _np.ndarray:
     """Converts probabilities to binary or multiclass predictions based on the input array shape.
 
         Args:
-            y_probs (list or numpy.ndarray or pandas.Series or pandas.DataFrame or tensorflow.Tensor):
+            y (list or numpy.ndarray or pandas.Series or pandas.DataFrame or tensorflow.Tensor):
                 Input array of probabilities to be converted.
             maintain_shape (bool, optional): Whether to maintain the shape of the input array.
                 If None, the function automatically determines the shape based on the input type.
@@ -175,16 +184,22 @@ def probability_to_prediction(y_probs: _Union[list, _np.ndarray, _pd.Series, _pd
         Raises:
             ValueError: If the input array does not represent binary or multiclass probabilities.
     """
-    if not isinstance(y_probs, _np.ndarray):
-        y_probs = _soml.util.types.to_numpy(value=y_probs)
+    if not isinstance(y, _np.ndarray):
+        y = _soml.util.types.to_numpy(value=y)
 
-    if is_multiclass_propabilities(y_probs=y_probs):
-        if maintain_shape is None:
-            maintain_shape = False
-        return multiclass_probability_to_prediction(y_probs, maintain_shape=maintain_shape)
-    elif is_binary_probability(y_probs=y_probs):
-        if maintain_shape is None:
-            maintain_shape = True
-        return binary_probability_to_prediction(y_probs, maintain_shape=maintain_shape)
+    if is_multiclass_classification(y=y):
+        if is_multiclass_propabilities(y=y):
+            if maintain_shape is None:
+                maintain_shape = False
+            return multiclass_probability_to_prediction(y, maintain_shape=maintain_shape)
+        else:
+            return y
+    elif is_binary_classification(y=y):
+        if is_binary_probability(y=y):
+            if maintain_shape is None:
+                maintain_shape = True
+            return binary_probability_to_prediction(y, maintain_shape=maintain_shape)
+        else:
+            return y
 
     raise ValueError('Input must be either a binary or multi-class probability array.')

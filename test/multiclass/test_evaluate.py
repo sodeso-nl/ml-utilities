@@ -22,7 +22,7 @@ class Test(TestCase):
             [0.21, 0.20, 0.20, 0.20, 0.19]  # 0
         ])
 
-        y_pred = _soml.util.prediction.multiclass_probability_to_prediction(y_probs=y_prob)
+        y_pred = _soml.util.prediction.multiclass_probability_to_prediction(y=y_prob)
 
         pd = _soml.evaluate.analyze.determine_outliers_for_multiclass_classification(
             x=x,
@@ -84,7 +84,7 @@ class Test(TestCase):
             [0.19]
         ])
 
-        y_pred = _soml.util.prediction.binary_probability_to_prediction(y_probs=y_prob)
+        y_pred = _soml.util.prediction.binary_probability_to_prediction(y=y_prob)
 
         pd = _soml.evaluate.analyze.determine_outliers_for_multiclass_classification(
             x=x,

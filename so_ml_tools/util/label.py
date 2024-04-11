@@ -43,9 +43,9 @@ def diff_indexes(y_true, y_pred=None, y_prob=None):
     if isinstance(y_true, _tf.data.Dataset):
         y_true = _soml.tf.dataset.get_labels(dataset=y_true)
 
-    y_true = _soml.util.prediction.probability_to_prediction(y_probs=y_true)
+    y_true = _soml.util.prediction.probability_to_prediction(y=y_true)
     if y_pred is None and y_prob is not None:
-        y_pred = _soml.util.prediction.probability_to_prediction(y_probs=y_prob)
+        y_pred = _soml.util.prediction.probability_to_prediction(y=y_prob)
     elif y_pred is None and y_prob is None:
         raise "Must specify 'y_pred' or 'y_prob'"
 

@@ -6,20 +6,35 @@ import so_ml_tools as _soml
 
 def to_categorical(y, num_classes=None, dtype=None):
     """
-    Converts a class vector (integers) to binary class matrix.
-
-    E.g. for use with `categorical_crossentropy`.
+    Converts a class vector (integers) to binary class matrix (one-hot encoded).
 
     Args:
-        y: Array-like with class values to be converted into a matrix
-            (integers from 0 to `num_classes - 1`).
-        num_classes: Total number of classes. If `None`, this would be inferred
-          as `max(y) + 1`.
-        dtype: The data type expected by the input. Default: `'float32'`.
+        y (array-like): Class vector to be converted into a matrix (integers from 0 to num_classes - 1).
+        num_classes (int, optional): Total number of classes. If not provided, the number of classes is inferred from
+            the input data. Default is None.
+        dtype (str or numpy.dtype, optional): Data type of the output matrix. If not provided, the default data type
+            is used. Default is None.
 
     Returns:
-        A binary matrix representation of the input as a NumPy array. The class
-        axis is placed last.
+        numpy.ndarray: Binary matrix representation of the input class vector. Each row corresponds to one sample, and
+        each column corresponds to one class. The value at (i, j) represents whether sample i belongs to class j,
+        where 1 indicates membership and 0 indicates non-membership.
+
+    Raises:
+        ValueError: If y contains values outside the range [0, num_classes).
+        ValueError: If num_classes is not provided and cannot be inferred from the input data.
+
+    Examples:
+        >>> y = [0, 1, 2, 1]
+        >>> to_categorical(y)
+        array([[1., 0., 0.],
+               [0., 1., 0.],
+               [0., 0., 1.],
+               [0., 1., 0.]], dtype=float32)
+
+    References:
+        - Original implementation: https://github.com/keras-team/keras/blob/main/keras/utils/np_utils.py#L11
+
     """
     return _ks.utils.to_categorical(y, num_classes, dtype=dtype)
 

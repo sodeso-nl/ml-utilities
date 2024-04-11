@@ -1,6 +1,7 @@
 import random as _random
 import os as _os
 import logging as _logging
+import numpy as _np
 
 import tensorflow as _tf
 import matplotlib.pyplot as _plt
@@ -65,7 +66,7 @@ def is_image_float32_and_not_normalized(x) -> bool:
     return x.dtype == _tf.float32 and _tf.math.reduce_max(x).numpy() > 1.0
 
 
-def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, shape: tuple = (4, 6),
+def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, shape: tuple = (4, 8),
                                        cmap: str = 'gray') -> None:
     """
     Shows images stored in a tensor / numpy array. The array should be a vector of images.
@@ -80,6 +81,9 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, shap
     Returns:
 
     """
+    if not isinstance(y, _np.ndarray):
+        y = _soml.util.types.to_numpy(y)
+
     # Convert to categorical first so we can use the values as indices.
     if _soml.util.onehot.is_one_hot_encoded(value=y):
         y = _soml.util.onehot.one_hot_to_indices(value=y)

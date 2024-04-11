@@ -18,8 +18,7 @@ def to_numpy(value: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Ten
             ValueError: If the input data type is unsupported.
     """
     if isinstance(value, list):
-        if any(isinstance(item, list) for item in value):
-            return _np.array(value)
+        return _np.array(value)
     elif isinstance(value, _np.ndarray):
         return value
     elif isinstance(value, (_pd.DataFrame, _pd.Series)):
@@ -31,5 +30,4 @@ def to_numpy(value: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Ten
     elif hasattr(value, 'to_numpy'):
         return value.to_numpy()
 
-    else:
-        raise ValueError("Unsupported data type. Please provide a tensor, dataset, dataframe, or series.")
+    raise ValueError("Unsupported data type. Please provide a tensor, dataset, dataframe, or series.")

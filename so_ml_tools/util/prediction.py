@@ -177,7 +177,7 @@ def multiclass_probability_to_prediction(y: _Union[list, _np.ndarray, _pd.Series
 
 
 def probability_to_prediction(y: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor],
-                              maintain_shape=None) -> _np.ndarray:
+                              maintain_shape=None, from_logits=False) -> _np.ndarray:
     """Converts probabilities to binary or multiclass predictions based on the input array shape.
 
         Args:
@@ -196,6 +196,10 @@ def probability_to_prediction(y: _Union[list, _np.ndarray, _pd.Series, _pd.DataF
     if not isinstance(y, _np.ndarray):
         y = _soml.util.types.to_numpy(value=y)
 
+    # In case the values are logits, convert them using softmax.
+    if from_logits:
+        y = _soml.util.types.to_numpy(value=_tf.nn.softmax(y, axis=1))
+
     if is_multiclass_classification(y=y):
         if is_multiclass_propabilities(y=y):
             if maintain_shape is None:
@@ -211,4 +215,4 @@ def probability_to_prediction(y: _Union[list, _np.ndarray, _pd.Series, _pd.DataF
         else:
             return y
 
-    raise ValueError('Input must be either a binary or multi-class probability array.')
+    raise ValueError('Input must be either a binary or multi-class probability array, is the value a logits value?')

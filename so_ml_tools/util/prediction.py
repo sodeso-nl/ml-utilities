@@ -118,7 +118,13 @@ def is_multiclass_classification(y: _Union[list, _np.ndarray, _pd.Series, _pd.Da
     if not isinstance(y, _np.ndarray):
         y = _soml.util.types.to_numpy(value=y)
 
-    return len(y.shape) == 2 and len(y[0]) > 1
+    if len(y.shape) == 2 and len(y[0]) > 1:
+        return _np.all(_np.logical_and(y >= 0, y <= 1))
+
+    if len(y.shape) == 2 and len(y[0]) == 1:
+        return _np.all(_np.logical_and(_np.equal(_np.mod(y, 1), 0), y >= 0))
+
+    return False
 
 
 def is_multiclass_propabilities(y: _Union[list, _np.ndarray, _pd.Series, _pd.DataFrame, _tf.Tensor]) -> bool:

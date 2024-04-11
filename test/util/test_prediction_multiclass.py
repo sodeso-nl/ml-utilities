@@ -9,8 +9,11 @@ class Test(TestCase):
         y = _np.array([[0, 1], [1, 0], [0, 0]])
         self.assertTrue(_prediction.is_multiclass_classification(y))
 
-        y = _np.array([[0], [1], [0], [1]])
+        y = _np.array([[0], [-1], [3], [1], [2]])
         self.assertFalse(_prediction.is_multiclass_classification(y))
+
+        y = _np.array([[0], [1], [3], [1], [2]])
+        self.assertTrue(_prediction.is_multiclass_classification(y))
 
         y = _np.array([0, 1, 0, 1])
         self.assertFalse(_prediction.is_multiclass_classification(y))
@@ -19,7 +22,15 @@ class Test(TestCase):
         self.assertFalse(_prediction.is_multiclass_classification(y))
 
     def test_is_multiclass_propabilities(self):
+        self.assertFalse(_prediction.is_multiclass_propabilities(_np.array([[0], [1], [3], [1], [2]])))
+
         y_prob = _np.array([0.2, 0.3, 0.5])
+        self.assertFalse(_prediction.is_multiclass_propabilities(y_prob))
+
+        y_prob = _np.array([[-0.2, 0.3, 0.5], [0.1, 0.6, 0.3]])
+        self.assertFalse(_prediction.is_multiclass_propabilities(y_prob))
+
+        y_prob = _np.array([[0.0, 0.3, 0.5], [0.1, 0.6, 1.1]])
         self.assertFalse(_prediction.is_multiclass_propabilities(y_prob))
 
         y_prob = _np.array([[0.2, 0.3, 0.5], [0.1, 0.6, 0.3]])

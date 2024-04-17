@@ -217,7 +217,7 @@ def get_features_and_labels(dataset: _tf.data.Dataset, max_samples: int = None) 
                 all_labels = _np.expand_dims(labels, axis=0)
             else:
                 all_features = _np.vstack((all_features, _np.expand_dims(features, axis=0)))
-                all_labels = _np.vstack((all_labels, _np.expand_dims(features, axis=0)))
+                all_labels = _np.vstack((all_labels, _np.expand_dims(labels, axis=0)))
             current_sample += 1
         except StopIteration:
             break

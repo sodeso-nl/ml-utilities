@@ -131,13 +131,18 @@ def get_labels(dataset: _tf.data.Dataset, max_samples: int = None) -> _np.ndarra
     Returns the labels from a (batched)Dataset
 
     :param dataset: the dataset from which we want the labels.
+    :param max_samples: the maximum number of samples to return
     :return: the labels
     """
-    all_labels = None
+    if is_shuffled(dataset=dataset):
+        print("WARNING: Dataset is shuffled, retrieving features and labels separate will result in "
+              "different order of features and labels")
+
     if is_batched(dataset=dataset):
         dataset = dataset.unbatch()
 
     current_sample = 0
+    all_labels = None
     itr = dataset.as_numpy_iterator()
     while max_samples is None or current_sample < max_samples:
         try:
@@ -158,13 +163,18 @@ def get_features(dataset: _tf.data.Dataset, max_samples: int = None) -> _np.ndar
     Returns the features from a (batched)Dataset
 
     :param dataset: the dataset from which we want the features.
+    :param max_samples: the maximum number of samples to return
     :return: the features
     """
-    all_features = None
+    if is_shuffled(dataset=dataset):
+        print("WARNING: Dataset is shuffled, retrieving features and labels separate will result in "
+              "different order of features and labels")
+
     if is_batched(dataset=dataset):
         dataset = dataset.unbatch()
 
     current_sample = 0
+    all_features = None
     itr = dataset.as_numpy_iterator()
     while max_samples is None or current_sample < max_samples:
         try:
@@ -181,9 +191,38 @@ def get_features(dataset: _tf.data.Dataset, max_samples: int = None) -> _np.ndar
 
 
 def get_features_and_labels(dataset: _tf.data.Dataset, max_samples: int = None) -> _Tuple[_np.array, _np.ndarray]:
-    features = get_features(dataset=dataset, max_samples=max_samples)
-    labels = get_labels(dataset=dataset, max_samples=max_samples)
-    return features, labels
+    """
+    Returns the features and labels from a (batched)Dataset as a tupple (features, labels)
+
+    :param dataset: the dataset from which we want the features and labels.
+    :param max_samples: the maximum number of samples to return
+    :return: the features and labels
+    """
+    if is_shuffled(dataset=dataset):
+        print("WARNING: Dataset is shuffled, retrieved features and labels will match accordingly, however performing"
+              "this action twice will result in different order.")
+
+    if is_batched(dataset=dataset):
+        dataset = dataset.unbatch()
+
+    current_sample = 0
+    all_features = None
+    all_labels = None
+    itr = dataset.as_numpy_iterator()
+    while max_samples is None or current_sample < max_samples:
+        try:
+            features, labels = next(itr)
+            if all_features is None:
+                all_features = _np.expand_dims(features, axis=0)
+                all_labels = _np.expand_dims(labels, axis=0)
+            else:
+                all_features = _np.vstack((all_features, _np.expand_dims(features, axis=0)))
+                all_labels = _np.vstack((all_labels, _np.expand_dims(features, axis=0)))
+            current_sample += 1
+        except StopIteration:
+            break
+
+    return all_features, all_labels
 
 
 def get_batch_dataset(dataset: _tf.data.Dataset) -> _Union[_tf.data.Dataset, None]:

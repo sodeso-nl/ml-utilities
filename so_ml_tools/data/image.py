@@ -92,27 +92,34 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, shap
     if _soml.data.image.is_image_float32_and_not_normalized(x):
         x = _tf.cast(x=x, dtype=_tf.uint8)
 
+    # Check if we need to perform randomization on image selection, if
+    # we have more images to choose from compared to the number of images
+    # we are going to visualize then use randomization.
+    use_random = False
+    if len(x) >= shape[0] * shape[1]:
+        use_random = True
+
     fig = _plt.figure(figsize=(shape[1] * 3, shape[0] * 3))
     fig.patch.set_facecolor('gray')
     for i in range(shape[0] * shape[1]):
         ax = _plt.subplot(shape[0], shape[1], i + 1)
         ax.axis('off')
 
-        # if indices is None:
-        rand_index = _random.choice(range(len(x)))
-        # else:
-        #     rand_index = indices[i]
+        if use_random:
+            idx = _random.choice(range(len(x)))
+        else:
+            idx = i
 
-        _plt.imshow(x[rand_index], cmap=cmap)
+        _plt.imshow(x[idx], cmap=cmap)
 
         class_index = 'unknown'
         if y is not None:
-            class_index = y[rand_index]
+            class_index = y[idx]
 
         if class_names is None:
             _plt.title(class_index, color='white')
         else:
-            _plt.title(f"{class_names[int(class_index)]}, {x[rand_index].shape}", color='white')
+            _plt.title(f"{class_names[int(class_index)]}, {x[idx].shape}", color='white')
     _plt.show()
 
 

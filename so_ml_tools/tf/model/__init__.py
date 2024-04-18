@@ -3,7 +3,6 @@ from . import (
     plot,
     predict,
     io,
-    augment,
     layer
 )
 
@@ -12,6 +11,5 @@ __all__ = [
     'plot',
     'predict',
     'io',
-    'augment',
     'layer'
 ]

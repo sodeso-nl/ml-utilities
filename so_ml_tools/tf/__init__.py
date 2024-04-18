@@ -5,7 +5,8 @@ from . import (
     model,
     fit,
     mixed_precision,
-    tensorboard
+    tensorboard,
+    augment
 )
 
 __all__ = [
@@ -15,5 +16,6 @@ __all__ = [
     "model",
     "fit",
     "mixed_precision",
-    "tensorboard"
+    "tensorboard",
+    "augment"
 ]

@@ -81,12 +81,13 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, shap
     Returns:
 
     """
-    if not isinstance(y, _np.ndarray):
-        y = _soml.util.types.to_numpy(y)
+    if y is not None:
+        if not isinstance(y, _np.ndarray):
+            y = _soml.util.types.to_numpy(y)
 
-    # Convert to categorical first so we can use the values as indices.
-    if _soml.util.onehot.is_one_hot_encoded(value=y):
-        y = _soml.util.onehot.one_hot_to_indices(value=y)
+        # Convert to categorical first so we can use the values as indices.
+        if _soml.util.onehot.is_one_hot_encoded(value=y):
+            y = _soml.util.onehot.one_hot_to_indices(value=y)
 
     if _soml.data.image.is_image_float32_and_not_normalized(x):
         x = _tf.cast(x=x, dtype=_tf.uint8)
@@ -104,7 +105,10 @@ def show_images_from_nparray_or_tensor(x, y, class_names: list[str] = None, shap
 
         _plt.imshow(x[rand_index], cmap=cmap)
 
-        class_index = y[rand_index]
+        class_index = 'unknown'
+        if y is not None:
+            class_index = y[rand_index]
+
         if class_names is None:
             _plt.title(class_index, color='white')
         else:

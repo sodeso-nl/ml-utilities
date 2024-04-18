@@ -200,7 +200,7 @@ def get_features_and_labels(dataset: _tf.data.Dataset, max_samples: int = None) 
     """
     if is_shuffled(dataset=dataset):
         print("WARNING: Dataset is shuffled, retrieved features and labels will match accordingly, however performing"
-              "this action twice will result in different order.")
+              " this action twice will result in different order.")
 
     if is_batched(dataset=dataset):
         dataset = dataset.unbatch()

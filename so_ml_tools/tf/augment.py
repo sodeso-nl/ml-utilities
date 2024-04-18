@@ -57,4 +57,5 @@ def show_samples(augmentation: _ks.Sequential, x: _Union[list, _np.ndarray, _tf.
     _soml.data.image.show_images_from_nparray_or_tensor(
         x=x_augmented_images,
         y=y_augmented_images,
-        class_names=class_names)
+        class_names=class_names,
+        shape=shape)

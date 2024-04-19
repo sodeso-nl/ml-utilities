@@ -1,6 +1,8 @@
 import numpy as _np
+import numpy as np
 import pandas as _pd
 import tensorflow as _tf
+import nltk as _nltk
 import re as _re
 import so_ml_tools as _soml
 
@@ -15,6 +17,60 @@ PUNCTUATION = r'[!"#$%&()\*\+,-\./:;<=>?@\[\\\]^_`{|}~\']'
 LOWER_AND_STRIP_PUNCTUATION = "lower_and_strip_punctuation"
 STRIP_PUNCTUATION = "strip_punctuation"
 LOWER = "lower"
+
+
+def strip_punctuation(text: _Union[str, list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series], standardize="lower_and_strip_punctuation") -> _Union[str, list[str]]:
+    if isinstance(text, str):
+        converted = np.array([text])
+    elif not isinstance(text, _np.ndarray):
+        converted = _soml.util.types.to_numpy(text)
+    else:
+        converted = text
+
+    regex = _re.compile(PUNCTUATION)
+
+    result = []
+    for line in converted:
+        if isinstance(line, (bytes, bytearray)):
+            line = line.decode(encoding='utf-8')
+
+        result.append(regex.sub('', line))
+
+    if isinstance(text, str):
+        return result[0]
+
+    return result
+
+
+def nltk_lemmatize_sentence(sentence):
+    lemmatizer = _nltk.stem.WordNetLemmatizer()
+
+    # tokenize the sentence and find the POS tag for each token
+    nltk_tagged = _nltk.pos_tag(_nltk.word_tokenize(sentence))
+    # tuple of (token, wordnet_tag)
+    wordnet_tagged = map(lambda x: (x[0], _nltk_tag_to_wordnet_tag(x[1])), nltk_tagged)
+    lemmatized_sentence = []
+    for word, tag in wordnet_tagged:
+        if tag is None:
+            # if there is no available tag, append the token as is
+            lemmatized_sentence.append(word)
+        else:
+            # else use the tag to lemmatize the token
+            lemmatized_sentence.append(lemmatizer.lemmatize(word, tag))
+    return " ".join(lemmatized_sentence)
+
+
+def _nltk_tag_to_wordnet_tag(nltk_tag):
+    if nltk_tag.startswith('J'):
+        return _nltk.corpus.wordnet.ADJ
+    elif nltk_tag.startswith('V'):
+        return _nltk.corpus.wordnet.VERB
+    elif nltk_tag.startswith('N'):
+        return _nltk.corpus.wordnet.NOUN
+    elif nltk_tag.startswith('R'):
+        return _nltk.corpus.wordnet.ADV
+    else:
+        return None
 
 
 def count_unique_words(corpus: _Union[list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series], standardize="lower_and_strip_punctuation") -> int:

@@ -869,6 +869,8 @@ def describe(dataframe: _pd.DataFrame, column_names: list[str] = None, round=2):
             return css;
         elif col.name == 'Null':
             return ['color: red' if val > 0 else '' for val in col]
+        elif col.name == 'Empty':
+            return ['color: red' if val > 0 else '' for val in col]
 
         return ['color: lightgrey' if _pd.isnull(val) else '' for val in col]
 

@@ -823,14 +823,18 @@ def describe(dataframe: _pd.DataFrame, column_names: list[str] = None, round=2):
             _irq_lower = _q25 - (1.5 * _irq)
             _irq_upper = _q75 + (1.5 * _irq)
 
+        _empty = 0
+        if _pd.api.types.is_object_dtype(v):
+            _empty = (v.values == '').sum()
+
         data.append([
-            v.name, v.dtype, v.count(), v.isna().sum(), v.nunique(), _mean, _std, z_score_negative, z_score_positive,
+            v.name, v.dtype, v.count(), v.isna().sum(), _empty, v.nunique(), _mean, _std, z_score_negative, z_score_positive,
             _min, _q25,
             _q50, _q75, _max, _irq_lower, _irq, _irq_upper
         ])
 
     data = _pd.DataFrame(
-        columns=['Column', 'DType', 'NotNull', 'Null', 'Unique', 'Mean', 'Std', '-3σ', '3σ', 'Min', '25%', '50%',
+        columns=['Column', 'DType', 'NotNull', 'Null', 'Empty', 'Unique', 'Mean', 'Std', '-3σ', '3σ', 'Min', '25%', '50%',
                  '75%', 'Max', 'IRQ-L', 'IRQ', 'IRQ-U'], data=data)
 
     def highlight_columns(col):

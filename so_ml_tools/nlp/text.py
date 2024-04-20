@@ -122,7 +122,6 @@ def nltk_remove_stopwords_english(text: _Union[str, list[str], _tf.Tensor, _np.n
     Returns:
         The filtered text
     """
-
     if isinstance(text, str):
         converted_text = np.array([text])
     elif not isinstance(text, _np.ndarray):
@@ -138,6 +137,15 @@ def nltk_remove_stopwords_english(text: _Union[str, list[str], _tf.Tensor, _np.n
         return ' '.join(filtered_sentence)
 
     return [remove_stopwords(sentence) for sentence in converted_text]
+
+
+def remove_empty_lines(text: _Union[list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series]) -> _np.array:
+    if not isinstance(text, _np.ndarray):
+        converted_text = _soml.util.types.to_numpy(text)
+    else:
+        converted_text = text
+
+    return converted_text[_np.char.str_len(converted_text.astype(np.str_)) > 0]
 
 
 def count_unique_words(corpus: _Union[list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series], standardize="lower_and_strip_punctuation") -> int:

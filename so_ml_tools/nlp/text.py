@@ -109,6 +109,37 @@ def _nltk_tag_to_wordnet_tag(nltk_tag):
         return None
 
 
+def nltk_remove_stopwords_english(text: _Union[str, list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series]) -> _Union[str, list[str]]:
+    """
+    Remove stopwords from the given text
+
+    Usage:
+    >>> data['text'] = soml.nlp.text.nltk_remove_stopwords_english(data['text']))
+
+    Args:
+        text: the text to filter out stopwords.
+
+    Returns:
+        The filtered text
+    """
+
+    if isinstance(text, str):
+        converted_text = np.array([text])
+    elif not isinstance(text, _np.ndarray):
+        converted_text = _soml.util.types.to_numpy(text)
+    else:
+        converted_text = text
+
+    stop_words = _nltk.corpus.stopwords.words('english')
+
+    def remove_stopwords(sentence):
+        word_tokens = _nltk.word_tokenize(sentence)
+        filtered_sentence = [word for word in word_tokens if not word.lower() in stop_words]
+        return ' '.join(filtered_sentence)
+
+    return [remove_stopwords(sentence) for sentence in converted_text]
+
+
 def count_unique_words(corpus: _Union[list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series], standardize="lower_and_strip_punctuation") -> int:
     if not isinstance(corpus, _np.ndarray):
         corpus = _soml.util.types.to_numpy(corpus)
@@ -128,7 +159,7 @@ def count_unique_words(corpus: _Union[list[str], _tf.Tensor, _np.ndarray, _pd.Da
     return len(unique)
 
 
-def sentence_statistics(corpus: _Union[list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series]):
+def text_statistics(corpus: _Union[list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series]):
     if not isinstance(corpus, _np.ndarray):
         corpus = _soml.util.types.to_numpy(corpus)
 

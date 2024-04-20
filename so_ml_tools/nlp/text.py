@@ -19,22 +19,36 @@ STRIP_PUNCTUATION = "strip_punctuation"
 LOWER = "lower"
 
 
-def strip_punctuation(text: _Union[str, list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series], standardize="lower_and_strip_punctuation") -> _Union[str, list[str]]:
+def strip_punctuation(text: _Union[str, list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series]) -> _Union[str, list[str]]:
+    """
+    Strip punctuation from input text.
+
+    Usage:
+    >>> soml.nlp.text.strip_punctuation(data['text'])
+    >>>
+
+    Args:
+        text: Text to be stripped
+
+    Returns:
+        The stripped text
+    """
     if isinstance(text, str):
-        converted = np.array([text])
+        converted_text = np.array([text])
     elif not isinstance(text, _np.ndarray):
-        converted = _soml.util.types.to_numpy(text)
+        converted_text = _soml.util.types.to_numpy(text)
     else:
-        converted = text
+        converted_text = text
 
     regex = _re.compile(PUNCTUATION)
 
-    result = []
-    for line in converted:
-        if isinstance(line, (bytes, bytearray)):
-            line = line.decode(encoding='utf-8')
+    def strip_sentence(sentence):
+        if isinstance(sentence, (bytes, bytearray)):
+            sentence = sentence.decode(encoding='utf-8')
 
-        result.append(regex.sub('', line))
+        return regex.sub('', sentence)
+
+    result = [strip_sentence(sentence) for sentence in converted_text]
 
     if isinstance(text, str):
         return result[0]
@@ -42,22 +56,44 @@ def strip_punctuation(text: _Union[str, list[str], _tf.Tensor, _np.ndarray, _pd.
     return result
 
 
-def nltk_lemmatize_sentence(sentence):
+def nltk_lemmatize(text: _Union[str, list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series]) -> _Union[str, list[str]]:
+    """
+    Lemmatize the the given sentence.
+
+    Usage:
+    >>> data['text'] = soml.nlp.text.nltk_lemmatize(data['text']))
+
+    Args:
+        text: the text to lemmatize.
+
+    Returns:
+        The lemmatized sentence
+    """
+    if isinstance(text, str):
+        converted_text = np.array([text])
+    elif not isinstance(text, _np.ndarray):
+        converted_text = _soml.util.types.to_numpy(text)
+    else:
+        converted_text = text
+
     lemmatizer = _nltk.stem.WordNetLemmatizer()
 
-    # tokenize the sentence and find the POS tag for each token
-    nltk_tagged = _nltk.pos_tag(_nltk.word_tokenize(sentence))
-    # tuple of (token, wordnet_tag)
-    wordnet_tagged = map(lambda x: (x[0], _nltk_tag_to_wordnet_tag(x[1])), nltk_tagged)
-    lemmatized_sentence = []
-    for word, tag in wordnet_tagged:
-        if tag is None:
-            # if there is no available tag, append the token as is
-            lemmatized_sentence.append(word)
-        else:
-            # else use the tag to lemmatize the token
-            lemmatized_sentence.append(lemmatizer.lemmatize(word, tag))
-    return " ".join(lemmatized_sentence)
+    def lemmatize_sentence(sentence):
+        # tokenize the sentence and find the POS tag for each token
+        nltk_tagged = _nltk.pos_tag(_nltk.word_tokenize(sentence))
+        # tuple of (token, wordnet_tag)
+        wordnet_tagged = map(lambda x: (x[0], _nltk_tag_to_wordnet_tag(x[1])), nltk_tagged)
+        lemmatized_sentence = []
+        for word, tag in wordnet_tagged:
+            if tag is None:
+                # if there is no available tag, append the token as is
+                lemmatized_sentence.append(word)
+            else:
+                # else use the tag to lemmatize the token
+                lemmatized_sentence.append(lemmatizer.lemmatize(word, tag))
+        return " ".join(lemmatized_sentence)
+
+    return [lemmatize_sentence(sentence) for sentence in converted_text]
 
 
 def _nltk_tag_to_wordnet_tag(nltk_tag):
@@ -92,7 +128,7 @@ def count_unique_words(corpus: _Union[list[str], _tf.Tensor, _np.ndarray, _pd.Da
     return len(unique)
 
 
-def word_count_for_sentences(corpus: _Union[list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series]):
+def sentence_statistics(corpus: _Union[list[str], _tf.Tensor, _np.ndarray, _pd.DataFrame, _pd.Series]):
     if not isinstance(corpus, _np.ndarray):
         corpus = _soml.util.types.to_numpy(corpus)
 

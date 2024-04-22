@@ -3,6 +3,7 @@ import pandas as _pd
 import tensorflow as _tf
 import nltk as _nltk
 import re as _re
+import multiprocessing as _multiprocessing
 import so_ml_tools as _soml
 
 from typing import Union as _Union
@@ -33,7 +34,7 @@ def strip_punctuation(text: _Union[str, list[str], _tf.Tensor, _np.ndarray, _pd.
         The stripped text
     """
     if isinstance(text, str):
-        converted_text = np.array([text])
+        converted_text = _np.array([text])
     elif not isinstance(text, _np.ndarray):
         converted_text = _soml.util.types.to_numpy(text)
     else:
@@ -69,30 +70,39 @@ def nltk_lemmatize(text: _Union[str, list[str], _tf.Tensor, _np.ndarray, _pd.Dat
         The lemmatized sentence
     """
     if isinstance(text, str):
-        converted_text = np.array([text])
+        converted_text = _np.array([text])
     elif not isinstance(text, _np.ndarray):
         converted_text = _soml.util.types.to_numpy(text)
     else:
         converted_text = text
 
+    # Determine the number of CPU cores available
+    num_cores = _multiprocessing.cpu_count()
+
+    # Create a multiprocessing pool
+    with _multiprocessing.Pool(processes=num_cores) as pool:
+        processed_lines = list(pool.imap(_lemmatize_sentence, converted_text))
+
+    return processed_lines
+
+
+def _lemmatize_sentence(sentence):
+    # sentence = converted_text[idx]
+    # tokenize the sentence and find the POS tag for each token
     lemmatizer = _nltk.stem.WordNetLemmatizer()
 
-    def lemmatize_sentence(sentence):
-        # tokenize the sentence and find the POS tag for each token
-        nltk_tagged = _nltk.pos_tag(_nltk.word_tokenize(sentence))
-        # tuple of (token, wordnet_tag)
-        wordnet_tagged = map(lambda x: (x[0], _nltk_tag_to_wordnet_tag(x[1])), nltk_tagged)
-        lemmatized_sentence = []
-        for word, tag in wordnet_tagged:
-            if tag is None:
-                # if there is no available tag, append the token as is
-                lemmatized_sentence.append(word)
-            else:
-                # else use the tag to lemmatize the token
-                lemmatized_sentence.append(lemmatizer.lemmatize(word, tag))
-        return " ".join(lemmatized_sentence)
-
-    return [lemmatize_sentence(sentence) for sentence in converted_text]
+    nltk_tagged = _nltk.pos_tag(_nltk.word_tokenize(sentence))
+    # tuple of (token, wordnet_tag)
+    wordnet_tagged = map(lambda x: (x[0], _nltk_tag_to_wordnet_tag(x[1])), nltk_tagged)
+    lemmatized_sentence = []
+    for word, tag in wordnet_tagged:
+        if tag is None:
+            # if there is no available tag, append the token as is
+            lemmatized_sentence.append(word)
+        else:
+            # else use the tag to lemmatize the token
+            lemmatized_sentence.append(lemmatizer.lemmatize(word, tag))
+    return " ".join(lemmatized_sentence)
 
 
 def _nltk_tag_to_wordnet_tag(nltk_tag):

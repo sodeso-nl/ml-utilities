@@ -1,14 +1,18 @@
 import matplotlib.pyplot as _plt
 import seaborn as _sns
+import numpy as _np
 import so_ml_tools as _soml
 
 
 def plot_predictions(x, y_true, y_prob, start_index=None, end_index=None, title='Predictions', figsize=(30, 8)):
     fig, ax = _plt.subplots(figsize=figsize)
 
-    x = _soml.util.types.to_numpy(x)
-    y_true = _soml.util.types.to_numpy(y_true)
-    y_prob = _soml.util.types.to_numpy(y_prob)
+    if not isinstance(x, _np.ndarray):
+        x = _soml.util.types.to_numpy(x)
+    if not isinstance(y_true, _np.ndarray):
+        y_true = _soml.util.types.to_numpy(y_true)
+    if not isinstance(y_prob, _np.ndarray):
+        y_prob = _soml.util.types.to_numpy(y_prob)
 
     if start_index is None:
         start_index = 0

@@ -9,13 +9,14 @@ from . import (
     sklearn,
     feature_selection,
     imblearn,
-    timeseries
+    timeseries,
+    regression
 )
 
 # We follow Semantic Versioning (https://semver.org/spec/v2.0.0.html)
 _MAJOR_VERSION = '0'
 _MINOR_VERSION = '1'
-_PATCH_VERSION = '207'
+_PATCH_VERSION = '208'
 
 __version__ = '.'.join([
     _MAJOR_VERSION,
@@ -35,5 +36,6 @@ __all__ = [
     "feature_selection",
     "imblearn",
     "timeseries",
+    "regression",
     "__version__"
 ]

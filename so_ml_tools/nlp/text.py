@@ -24,6 +24,7 @@ def strip_punctuation(text: _Union[str, list[str], _tf.Tensor, _np.ndarray, _pd.
     Strip punctuation from input text.
 
     Usage:
+    >>> import so_ml_tools as soml
     >>> soml.nlp.text.strip_punctuation(data['text'])
     >>>
 
@@ -61,6 +62,7 @@ def nltk_lemmatize(text: _Union[str, list[str], _tf.Tensor, _np.ndarray, _pd.Dat
     Lemmatize the the given sentence.
 
     Usage:
+    >>> import so_ml_tools as soml
     >>> data['text'] = soml.nlp.text.nltk_lemmatize(data['text']))
 
     Args:
@@ -123,6 +125,7 @@ def nltk_remove_stopwords_english(text: _Union[str, list[str], _tf.Tensor, _np.n
     Remove stopwords from the given text
 
     Usage:
+    >>> import so_ml_tools as soml
     >>> data['text'] = soml.nlp.text.nltk_remove_stopwords_english(data['text']))
 
     Args:

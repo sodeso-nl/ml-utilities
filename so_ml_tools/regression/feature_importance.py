@@ -84,7 +84,9 @@ def permutation_feature_importance(
 
         permuted_scores[feature_name] = (base_r2_score / n) - permuted_r2_score
 
-    return _pd.DataFrame(list(permuted_scores.items()), columns=['Feature', 'Importance'])
+    return (_pd.DataFrame(list(permuted_scores.items()), columns=['Feature', 'Importance'])
+            .set_index('Feature')
+            .sort_values(by='Importance', ascending=False))
 
 
 def _plot(scores: _pd.DataFrame, label_color='black', figsize=(10, 6)):

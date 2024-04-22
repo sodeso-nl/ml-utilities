@@ -7,7 +7,6 @@ from . import (
     evaluate,
     shap,
     sklearn,
-    feature_selection,
     imblearn,
     timeseries,
     regression
@@ -16,7 +15,7 @@ from . import (
 # We follow Semantic Versioning (https://semver.org/spec/v2.0.0.html)
 _MAJOR_VERSION = '0'
 _MINOR_VERSION = '1'
-_PATCH_VERSION = '210'
+_PATCH_VERSION = '211'
 
 __version__ = '.'.join([
     _MAJOR_VERSION,
@@ -33,7 +32,6 @@ __all__ = [
     "util",
     "evaluate",
     "sklearn",
-    "feature_selection",
     "imblearn",
     "timeseries",
     "regression",

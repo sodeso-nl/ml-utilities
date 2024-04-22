@@ -7,6 +7,133 @@ import matplotlib.pyplot as _plt
 
 from typing import Union as _Union
 
+from sklearn.feature_selection import SelectKBest as _SelectKBest
+from sklearn.feature_selection import mutual_info_classif as _mutual_info_classif
+from sklearn.feature_selection import f_classif as _f_classif
+
+from sklearn.feature_selection import mutual_info_regression as _mutual_info_regression
+
+
+def mutual_information_regression(x: _pd.DataFrame, k='all', y=_pd.DataFrame, seed=42) -> _pd.DataFrame:
+    """
+    Calculate mutual information scores for feature selection in a regression problem.
+
+    This function calculates mutual information scores for feature selection in a regression problem using mutual information regression.
+
+    Args:
+        x (pd.DataFrame): Input features.
+        k (int or 'all', optional): Number of top features to select. If 'all', select all features. Defaults to 'all'.
+        y (pd.DataFrame, optional): Target variable. Defaults to an empty DataFrame.
+        seed (int, optional): Seed for the random number generator. Defaults to 42.
+
+    Returns:
+        pd.DataFrame: DataFrame containing mutual information scores for each feature.
+    """
+    _np.random.seed(seed)
+    selector = _SelectKBest(score_func=_mutual_info_regression, k=k)
+    selector.fit(x, y.values.ravel())
+    return _pd.DataFrame(selector.scores_, index=x.columns, columns=['Score']).sort_values(by='Score', ascending=False)
+
+
+def mutual_information_regression_plot(x: _pd.DataFrame, y=_pd.DataFrame, seed=42, label_color='black') -> None:
+    """
+    Plot mutual information scores for feature selection in a regression problem.
+
+    This function plots mutual information scores for feature selection in a regression problem using mutual information regression.
+
+    Args:
+        x (pd.DataFrame): Input features.
+        y (pd.DataFrame, optional): Target variable. Defaults to an empty DataFrame.
+        seed (int, optional): Seed for the random number generator. Defaults to 42.
+        label_color (str, optional): Color for the axis labels. Defaults to 'black'.
+
+    Returns:
+        None
+    """
+    scores = mutual_information_regression(x=x, y=y, seed=seed)
+    _plot(scores=scores, label_color=label_color)
+
+
+def mutual_information_classification(x: _pd.DataFrame, k='all', y=_pd.DataFrame, seed=42) -> _pd.DataFrame:
+    """
+    Calculate mutual information scores for feature selection in a classification problem.
+
+    This function calculates mutual information scores for feature selection in a classification problem using mutual information classification.
+
+    Args:
+        x (pd.DataFrame): Input features.
+        k (int or 'all', optional): Number of top features to select. If 'all', select all features. Defaults to 'all'.
+        y (pd.DataFrame, optional): Target variable. Defaults to an empty DataFrame.
+        seed (int, optional): Seed for the random number generator. Defaults to 42.
+
+    Returns:
+        pd.DataFrame: DataFrame containing mutual information scores for each feature.
+    """
+    _np.random.seed(seed)
+    selector = _SelectKBest(score_func=_mutual_info_classif, k=k)
+    selector.fit(x, y.values.ravel())
+    return _pd.DataFrame(selector.scores_, index=x.columns, columns=['Score']).sort_values(by='Score', ascending=False)
+
+
+def mutual_information_classification_plot(x: _pd.DataFrame, y=_pd.DataFrame, seed=42, label_color='black') -> None:
+    """
+    Plot mutual information scores for feature selection in a classification problem.
+
+    This function plots mutual information scores for feature selection in a classification problem using mutual information classification.
+
+    Args:
+        x (pd.DataFrame): Input features.
+        y (pd.DataFrame, optional): Target variable. Defaults to an empty DataFrame.
+        seed (int, optional): Seed for the random number generator. Defaults to 42.
+        label_color (str, optional): Color for the axis labels. Defaults to 'black'.
+
+    Returns:
+        None
+
+    """
+    scores = mutual_information_classification(x=x, y=y, seed=seed)
+    _plot(scores=scores, label_color=label_color)
+
+
+def anova_f_classification(x: _pd.DataFrame, k='all', y=_pd.DataFrame, seed=42) -> _pd.DataFrame:
+    """
+    Calculate ANOVA F-values for feature selection in a classification problem.
+
+    This function calculates ANOVA F-values for feature selection in a classification problem.
+
+    Args:
+        x (pd.DataFrame): Input features.
+        k (int or 'all', optional): Number of top features to select. If 'all', select all features. Defaults to 'all'.
+        y (pd.DataFrame, optional): Target variable. Defaults to an empty DataFrame.
+        seed (int, optional): Seed for the random number generator. Defaults to 42.
+
+    Returns:
+        pd.DataFrame: DataFrame containing ANOVA F-values for each feature.
+    """
+    _np.random.seed(seed)
+    selector = _SelectKBest(score_func=_f_classif, k=k)
+    selector.fit(x, y.values.ravel())
+    return _pd.DataFrame(selector.scores_, index=x.columns, columns=['Score']).sort_values(by='Score', ascending=False)
+
+
+def anova_f_classification_plot(x: _pd.DataFrame, y=_pd.DataFrame, seed=42, label_color='black') -> None:
+    """
+    Plot ANOVA F-values for feature selection in a classification problem.
+
+    This function plots ANOVA F-values for feature selection in a classification problem.
+
+    Args:
+        x (pd.DataFrame): Input features.
+        y (pd.DataFrame, optional): Target variable. Defaults to an empty DataFrame.
+        seed (int, optional): Seed for the random number generator. Defaults to 42.
+        label_color (str, optional): Color for the axis labels. Defaults to 'black'.
+
+    Returns:
+        None
+    """
+    scores = anova_f_classification(x=x, y=y, seed=seed)
+    _plot(scores=scores, label_color=label_color)
+
 
 def permutation_feature_importance_plot(
         model: _Union[_tf.keras.Model, _tf.keras.Sequential],
@@ -16,7 +143,25 @@ def permutation_feature_importance_plot(
         n: int = 10,
         seed: int = 42,
         label_color: str = 'black',
-        figsize: tuple = (10, 6)):
+        figsize: tuple = (10, 6)) -> None:
+    """
+        Plot permutation feature importance scores.
+
+        This function calculates and plots permutation feature importance scores for a given model and dataset.
+
+        Args:
+            model (Union[tf.keras.Model, tf.keras.Sequential]): A trained Keras model.
+            x (Union[np.ndarray, pd.Series, pd.DataFrame, tf.Tensor]): Input data.
+            y (Union[list, np.ndarray, pd.Series, pd.DataFrame, tf.Tensor]): Target data.
+            feature_names (list[str]): Names of the features.
+            n (int, optional): Number of permutations to compute the importance score. Defaults to 10.
+            seed (int, optional): Seed for the random number generator. Defaults to 42.
+            label_color (str, optional): Color for the axis labels. Defaults to 'black'.
+            figsize (tuple, optional): Figure size. Defaults to (10, 6).
+
+        Returns:
+            None
+        """
     permuted_scores = permutation_feature_importance(
         model=model,
         x=x,

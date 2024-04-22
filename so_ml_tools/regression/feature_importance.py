@@ -15,6 +15,7 @@ def permutation_feature_importance_plot(
         feature_names: list[str],
         n: int = 10,
         seed: int = 42,
+        label_color: str = 'black',
         figsize: tuple = (10, 6)):
     permuted_scores = permutation_feature_importance(
         model=model,
@@ -24,7 +25,7 @@ def permutation_feature_importance_plot(
         n=n,
         seed=seed
     )
-    _plt.figure(permuted_scores, figsize=figsize)
+    _plot(scores=permuted_scores, label_color=label_color, figsize=figsize)
 
 
 def permutation_feature_importance(
@@ -52,14 +53,12 @@ def permutation_feature_importance(
         TypeError: If the input `x` or `y` is not supported.
 
     Example:
-        import numpy as np
-        import tensorflow as tf
-        from so_ml_tools import util
-        from sklearn.metrics import r2_score
+        from so_ml_tools import soml
+
 
         # Assuming 'model' is a trained Keras sequential model
         # 'x' is the input data, 'y' is the target data, and 'feature_names' is a list of feature names
-        importance_scores = permutation_feature_importance(model, x, y, feature_names)
+        importance_scores = soml.regression.feature_importance.permutation_feature_importance(model, x, y, feature_names)
     """
     if seed is not None:
         _np.random.seed(seed=seed)
@@ -70,7 +69,7 @@ def permutation_feature_importance(
     if not isinstance(y, _np.ndarray):
         y = _soml.util.types.to_numpy(value=y)
 
-    y_prob_base = model.predict(x)
+    y_prob_base = model.predict(x, verbose=0)
     base_r2_score = _sk.metrics.r2_score(y, y_prob_base)
 
     permuted_scores = {}
@@ -88,7 +87,7 @@ def permutation_feature_importance(
     return _pd.DataFrame(list(permuted_scores.items()), columns=['Feature', 'Importance'])
 
 
-def _plot(scores: _pd.DataFrame, label_color, figsize=(10, 6)):
+def _plot(scores: _pd.DataFrame, label_color='black', figsize=(10, 6)):
     fig, ax = _plt.subplots(figsize=figsize)
     fig.patch.set_alpha(0.0)  # Transparant background
 

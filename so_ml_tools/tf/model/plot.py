@@ -1,116 +1,135 @@
 import matplotlib.pyplot as _plt
 import tensorflow as _tf
+import numpy as _np
+import keras as _ks
 
 
-def plot_consecutive_histories(histories: list[_tf.keras.callbacks.History], labels: list[str], figsize=(30, 5)):
+_titles = {
+    'mse': 'Mean Squared Error',
+    'mae': 'Mean Absolute Error',
+    'mape': 'Mean Absolute Percentage Error',
+    'rmse': 'Root Mean Squared Error',
+    'msle': 'Mean Squared Logarithmic Error',
+    'loss': 'Loss',
+    'lr': 'Learning Rate'}
+
+
+def plot_history(history: _ks.callbacks.History, figsize=(30, 5)):
     """
-    Plots (when available), the validation loss and accuracy, training loss and accuracy and learning rate.
+    Plots the history of a single Keras History object.
 
-    :param histories: the history objects returned from fitting models.
-    :param labels: the labels for each history object for seperating the epochs
-    :param figsize: figure size (default: (10, 6))
-    :return: two graphs, one for loss and one for accuracy
+    Args:
+        history (_ks.callbacks.History): A Keras History object containing training metrics.
+        figsize (tuple, optional): Size of the plot. Defaults to (30, 5).
     """
-    all_loss_history = []
-    all_val_loss_history = []
-    all_accuracy_history = []
-    all_val_accuracy_history = []
-    all_mae_history = []
-    all_val_mae_history = []
-    all_lr_history = []
+    plot_consecutive_histories(histories=[history], labels=[], figsize=figsize)
 
-    first_epoch = 10000
-    last_epoch = -1
+
+def plot_consecutive_histories(histories: list[_ks.callbacks.History], labels: list[str], reset_epochs=False,
+                               figsize=(30, 5)):
+    """
+    Plots metrics from consecutive Keras History objects.
+
+    Args:
+        histories (list[_ks.callbacks.History]): List of Keras History objects.
+        labels (list[str]): List of labels for the histories.
+        reset_epochs (bool, optional): If True, resets the epoch count. Defaults to False.
+        figsize (tuple, optional): Size of the plot. Defaults to (30, 5).
+    """
+    merged_histories, merged_epochs = _merge_histories(histories=histories)
+
+    if reset_epochs:
+        merged_epochs = _np.arange(1, len(merged_epochs), 1)
+
+    keys_processed = []
+    for key, value in merged_histories.items():
+        if key not in keys_processed:
+
+            # Find the accompanying val_ or non val_ key.
+            val_key, val_value = None, None
+            if key.startswith('val_'):
+                val_key = key
+                val_value = value
+                key = key[4:]
+                value = merged_histories[key]
+            elif 'val_' + key in merged_histories:
+                val_key = 'val_' + key
+                val_value = merged_histories[val_key]
+
+            _plt.figure(figsize=figsize, facecolor='#FFFFFF')
+            _plt.plot(value, label=key, linestyle='solid', linewidth=1.5, color='#0000FF')
+
+            if val_key:
+                _plt.plot(val_value, label=val_key, linestyle='solid', linewidth=1.5, color='#00FF00')
+
+            if key in _titles:
+                title = _titles[key]
+            else:
+                title = key
+
+            _plt.title(title, size=20)
+            _plt.xticks(ticks=merged_epochs, labels=merged_epochs, rotation='vertical')
+            _plt.xlabel('Epoch', size=14)
+            _plt.margins(x=0)
+
+            # Only plot history boundaries when we have more then one history object.
+            if len(histories) > 1:
+                for idx, history in enumerate(histories):
+                    _plt.axvline(min(history.epoch), label=f'{labels[idx]}')
+
+            # Mark the lowest point with a dot
+            min_value = min(value)
+            min_index = _tf.argmin(value)
+            _plt.plot(min_index, min_value, marker='.', markersize=8, color='#FF0000', label=f'low {min_value}')
+
+            if val_key:
+                min_value = min(val_value)
+                min_index = _tf.argmin(val_value)
+                _plt.plot(min_index, min_value, marker='.', markersize=8, color='#FF0000', label=f'val_low {min_value}')
+
+            _plt.legend()
+
+            keys_processed += [key, val_key]
+
+
+def _merge_histories(histories: list[_ks.callbacks.History]) -> (dict, list[int]):
+    """
+        Merges multiple Keras History objects into a single history.
+
+        This method takes a list of Keras History objects and merges their metrics
+        and epochs into a single history.
+
+        Args:
+            histories (list[_ks.callbacks.History]): A list of Keras History objects.
+
+        Returns:
+            tuple: A tuple containing the merged metrics (dict) and epochs (list[int]).
+
+        Example:
+            >>> import keras as ks
+            >>> # Create a history object
+            >>> history1 = ks.callbacks.History()
+            >>> history1.history = {'loss': [0.1, 0.2], 'accuracy': [0.9, 0.85]}
+            >>> history1.epoch = [0, 1]
+            >>> # Create a second history object
+            >>> history2 = ks.callbacks.History()
+            >>> history2.history = {'loss': [0.15, 0.25], 'accuracy': [0.88, 0.82]}
+            >>> history2.epoch = [2, 3]
+            >>> # Merge the history objects
+            >>> merged_metrics, merged_epochs = _merge_histories([history1, history2])
+            >>> print(merged_metrics)
+            {'loss': [0.1, 0.2, 0.15, 0.25], 'accuracy': [0.9, 0.85, 0.88, 0.82]}
+            >>> print(merged_epochs)
+            [0, 1, 2, 3]
+        """
+    merged_metrics = {}
+    merged_epochs = []
     for history in histories:
-        first_epoch = min(first_epoch, min(history.epoch))
-        last_epoch = max(last_epoch, max(history.epoch))
+        for key, value in history.history.items():
+            if key in merged_metrics:
+                merged_metrics[key] = [*merged_metrics[key], *value]
+            else:
+                merged_metrics[key] = value
+        merged_epochs += history.epoch
 
-        all_loss_history = [*all_loss_history, *history.history['loss']]
-        if 'val_loss' in history.history:
-            all_val_loss_history = [*all_val_loss_history, *history.history['val_loss']]
-
-        if 'accuracy' in history.history:
-            all_accuracy_history = [*all_accuracy_history, *history.history['accuracy']]
-        if 'val_accuracy' in history.history:
-            all_val_accuracy_history = [*all_val_accuracy_history, *history.history['val_accuracy']]
-
-        if 'mae' in history.history:
-            all_mae_history = [*all_mae_history, *history.history['mae']]
-        if 'val_mae' in history.history:
-            all_val_mae_history = [*all_val_mae_history, *history.history['val_mae']]
-
-        if 'lr' in history.history:
-            all_lr_history = [*all_lr_history, *history.history['lr']]
-
-    epoch_labels = range(first_epoch + 1, last_epoch + 2)
-    ticks = range(len(epoch_labels))
-    _plt.figure(figsize=figsize, facecolor='#FFFFFF')
-    _plot_history_graph_line(all_loss_history, label='Training loss', color='#0000FF')
-    _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
-
-    if all_val_loss_history:
-        _plot_history_graph_line(all_val_loss_history, label='Validation loss', color='#00FF00')
-
-    _plot_history_ends(histories, labels)
-    _plt.title('Loss', size=20)
-    _plt.xticks(ticks=ticks, labels=epoch_labels, rotation='vertical')
-    _plt.xlabel('Epoch', size=14)
-    _plt.margins(x=0)
-    _plt.legend()
-
-    if all_accuracy_history:
-        # Start a new figure
-        _plt.figure(figsize=figsize, facecolor='#FFFFFF')
-        _plot_history_graph_line(all_accuracy_history, label='Training accuracy', color='#0000FF')
-        if len(all_val_accuracy_history) > 0:
-            _plot_history_graph_line(all_val_accuracy_history, label='Validation accuracy', color='#00FF00')
-        _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
-        _plot_history_ends(histories, labels)
-        _plt.title('Accuracy', size=20)
-        _plt.xticks(ticks=ticks, labels=epoch_labels, rotation='vertical')
-        _plt.xlabel('Epoch', size=14)
-        _plt.margins(x=0)
-        _plt.legend()
-
-    if all_mae_history:
-        # Start a new figure
-        _plt.figure(figsize=figsize, facecolor='#FFFFFF')
-        _plot_history_graph_line(all_mae_history, label='Training mae', color='#0000FF')
-        if len(all_val_mae_history) > 0:
-            _plot_history_graph_line(all_val_mae_history, label='Validation mae', color='#00FF00')
-        _plot_history_graph_line(all_lr_history, label='Learning rate', color='#000000', linestyle='dashed')
-        _plot_history_ends(histories, labels)
-        _plt.title('Mean Absolute Error', size=20)
-        _plt.xticks(ticks=ticks, labels=epoch_labels, rotation='vertical')
-        _plt.xlabel('Epoch', size=14)
-        _plt.margins(x=0)
-        _plt.legend()
-
-
-def plot_history(history: _tf.keras.callbacks.History, figsize=(30, 5)):
-    plot_consecutive_histories([history], ["Start history"], figsize=figsize)
-
-
-def _plot_history_ends(histories: list[_tf.keras.callbacks.History], labels: list[str]) -> None:
-    """
-    Internal method which will plot a vertical line showing where a histories last epoch is visible.
-
-    :param histories: the history objects returned from fitting models.
-    :param labels: the labels for each history object for separating the epochs
-    """
-    for idx, history in enumerate(histories):
-        _plt.axvline(min(history.epoch), label=f'{labels[idx]}')
-        # _plt.plot([min(history.epoch), min(history.epoch)], _plt.ylim(), label=f'{labels[idx]}')
-
-
-def _plot_history_graph_line(data, label, color, linestyle='solid') -> None:
-    """
-    Internal method which will plot the information from the fit history.
-
-    :param data: the data to plot
-    :param label: the label associated with the data
-    :param color: color of the line
-    :param linestyle: line-style of the line (default: solid)
-    """
-    if data:
-        _plt.plot(data, label=label, color=color, linestyle=linestyle, linewidth=1.5)
+    return (merged_metrics, merged_epochs)

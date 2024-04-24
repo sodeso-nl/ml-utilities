@@ -209,10 +209,12 @@ def histogram_for_columns(dataframe: _pd.DataFrame, column_names: list[str] = No
     _plt.show()
 
 
-def lineplot(dataframe: _pd.DataFrame, column_names: list[str] = None, figsize: tuple = None, cols=1,
+def lineplot(dataframe: _pd.DataFrame, x_column: str = None, y_columns: list[str] = None, figsize: tuple = None, cols=1,
              verbose=1, label_color='black'):
     """
-    Plots a histogram for each of the numeric columns in the DataFrame.
+    Plots a histogram for each of the numeric columns in the DataFrame. If the dataframe is
+    indexed by a date / time column then do not specify the x_column since it will then automatically
+    pick up the index for the x-axis
 
     :param dataframe: the pandas dataframe
     :param column_names: columns which exist within the DataFrame if none specified all columns that are numeric
@@ -225,12 +227,12 @@ def lineplot(dataframe: _pd.DataFrame, column_names: list[str] = None, figsize: 
     # assert column_names is not None, "column_names cannot be None"
 
     # If the column_names argument is not a list then create a list
-    if not type(column_names) == list and column_names is not None:
-        column_names = [column_names]
+    if not type(y_columns) == list and y_columns is not None:
+        y_columns = [y_columns]
 
     # If we don't have a list of column names then create a histogram for every column.
-    if column_names is not None:
-        columns = list(dataframe[column_names].columns)
+    if y_columns is not None:
+        columns = list(dataframe[y_columns].columns)
     else:
         columns = dataframe.select_dtypes(include=_np.number).columns.values
 
@@ -261,7 +263,10 @@ def lineplot(dataframe: _pd.DataFrame, column_names: list[str] = None, figsize: 
     for c in columns:
         v = dataframe[c]
         if _pd.api.types.is_numeric_dtype(v):
-            _sns.lineplot(data=v, ax=axs[n])
+            if x_column:
+                _sns.lineplot(x=dataframe[x_column], y=v, ax=axs[n])
+            else:
+                _sns.lineplot(data=v, ax=axs[n])
             axs[n].grid(False)
         else:
             if verbose:

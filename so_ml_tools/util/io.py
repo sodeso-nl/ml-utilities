@@ -77,6 +77,6 @@ def list_dir_summary(folder='./data') -> None:
 
 
 def list_dir(folder='./data'):
-    filenames = [folder + filename for filename in _os.listdir(folder)]
+    filenames = [_os.path.join(folder, filename) for filename in _os.listdir(folder)]
     for filename in filenames:
         print(f"{filename}")

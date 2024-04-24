@@ -122,13 +122,13 @@ def column_as_dataframe(dataframe: _pd.DataFrame, column_name: str, drop_after: 
     return column
 
 
-def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype: _Union[type] = _np.float32,
+def convert_column_to_type(dataframe: _pd.DataFrame, column_names: list[str], dtype: _Union[type] = _np.float32,
                            inplace=True):
     """
     Converts the dtype of the given column to the specified dtype.
 
     :param dataframe: the pd.DataFrame
-    :param columns: A `list` of column names
+    :param column_names: A `list` of column names
     :param dtype: the newly to assign dtype.
     :param inplace: return a new instance of the DataFrame or adjust the given DataFrame
     :return: see inplace
@@ -137,8 +137,34 @@ def convert_column_to_type(dataframe: _pd.DataFrame, columns: list[str], dtype: 
     if not inplace:
         work_df = dataframe.copy(deep=True)
 
-    for column in columns:
+    for column in column_names:
         work_df[column] = work_df[column].astype(dtype)
+
+    if inplace:
+        return None
+
+    return work_df
+
+
+def update_rows_where_columns_have_value(
+        dataframe: _pd.DataFrame,
+        column_names: list[str],
+        where_value: type,
+        replace_value: type,
+        inplace=True):
+    if not type(column_names) is list and column_names is not None:
+        column_names = [column_names]
+
+    work_df = dataframe
+    if not inplace:
+        work_df = dataframe.copy(deep=True)
+
+    for c in column_names:
+        if c in dataframe:
+            index = work_df[c] == where_value
+            work_df[c][index] = replace_value
+        else:
+            print(f"update_rows_where_columns_have_value: Column '{c}' does not exist in dataframe.")
 
     if inplace:
         return None
@@ -487,7 +513,7 @@ def fill_nan_with_global_func(dataframe: _pd.DataFrame, column_names: list[str],
     return work_df
 
 
-def ffill_nan_with_groupby_mode(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
+def fill_nan_with_groupby_mode(dataframe: _pd.DataFrame, column_name: str, group_by_column_name: str,
                                   remainder_agg_func='mode', inplace=True, add_indicator=False):
     """
     Fill in missing values based on the mode value (most often) which is calculated on all data having a similar value

@@ -132,4 +132,4 @@ def _merge_histories(histories: list[_ks.callbacks.History]) -> (dict, list[int]
                 merged_metrics[key] = value
         merged_epochs += history.epoch
 
-    return (merged_metrics, merged_epochs)
+    return merged_metrics, merged_epochs
